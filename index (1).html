@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Workout Player</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Workout Player</h1>
+
+  <label for="workoutSelect">Choose a Workout:</label>
+  <select id="workoutSelect"></select>
+
+  <div id="exercise-container" style="display: none;">
+    <h2 id="exercise-name"></h2>
+    <iframe id="video" src="" allowfullscreen></iframe>
+    <div id="timer">00</div>
+  </div>
+
+  <button id="start-button" disabled>Start Workout</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
