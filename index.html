@@ -29,17 +29,19 @@
 
     <div id="exercise-container" style="display: none;">
       <h2 id="exercise-name"></h2>
-      <img id="exercise-gif" src="" alt="Esercizio" />
+      <img id="exercise-gif" src="" alt="Esercizio" width="250" />
       <div id="timer"></div>
 
-      <div id="next-exercise-preview" style="margin-top: 30px;">
+      <div id="next-exercise-preview" style="margin-top: 30px; display: none;">
         <p>Prossimo: <span id="next-exercise-name"></span></p>
-        <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
+        <img id="next-exercise-gif" src="" alt="Prossimo esercizio" width="200" />
       </div>
     </div>
   </main>
-</body>
-  <script src="script.js"></script>
-</html>
 
+  <!-- Suono del beep -->
+  <audio id="beep-sound" src="beep.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
 </html>
