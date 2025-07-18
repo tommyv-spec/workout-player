@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function playExercise(index) {
   if (index >= selectedWorkout.length) {
     document.getElementById("exercise-name").textContent = "Workout Complete!";
-    document.getElementById("video").src = "";
+    document.getElementById("exercise-gif").src = exercise.imageUrl;
     document.getElementById("timer").textContent = "";
     return;
   }
