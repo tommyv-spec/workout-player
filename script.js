@@ -5,7 +5,7 @@ let currentStep = 0;
 let interval;
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://script.google.com/macros/s/AKfycbyCaQ2Jm3uv4Yg-dWjKrk93myZlxeIoI9Wc0hQRTlE84fj-oWqAtCqN-G8DxR6baUOggA/exec")
+  fetch("https://script.google.com/macros/s/AKfycbxCLxcB6ISdGhbQGQ0BS8t6G1ezNI8B-zeqFlwIaIXGexMI0if6PjsgX_wljX9peYW__Q/exec")
     .then((response) => response.json())
     .then((data) => {
       workouts = data;
