@@ -1,4 +1,3 @@
-
 let workouts = {};
 let selectedWorkout = [];
 let currentStep = 0;
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("start-button").disabled = false;
       });
 
-      // Pre-select first workout
       if (select.options.length > 0) {
         select.selectedIndex = 0;
         selectedWorkout = workouts[select.value];
@@ -36,22 +34,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   document.getElementById("start-button").addEventListener("click", () => {
-    // Nasconde tutta la parte iniziale
     document.getElementById("setup-screen").style.display = "none";
     document.querySelector("header").style.display = "none";
-  
-    // Mostra solo la parte del workout
     document.getElementById("exercise-container").style.display = "block";
-  
+
     currentStep = 0;
     playExercise(currentStep);
   });
-
 });
 
 function playExercise(index) {
   if (index >= selectedWorkout.length) {
-    document.getElementById("exercise-name").textContent = "Workout Complete!";
+    document.getElementById("exercise-name").textContent = "Workout completato!";
     document.getElementById("exercise-gif").src = "";
     document.getElementById("timer").textContent = "";
     document.getElementById("next-exercise-preview").style.display = "none";
@@ -80,7 +74,6 @@ function playExercise(index) {
       beepAudio.play();
     }
 
-    // Mostra anteprima del prossimo esercizio
     if (timeLeft === 3 && nextExercise) {
       document.getElementById("next-exercise-name").textContent = nextExercise.name;
       document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
