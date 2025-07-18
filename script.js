@@ -36,11 +36,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   document.getElementById("start-button").addEventListener("click", () => {
+    // Nasconde tutta la parte iniziale
+    document.getElementById("setup-screen").style.display = "none";
+    document.querySelector("header").style.display = "none";
+  
+    // Mostra solo la parte del workout
     document.getElementById("exercise-container").style.display = "block";
-    document.getElementById("start-button").style.display = "none";
+  
     currentStep = 0;
     playExercise(currentStep);
   });
+
 });
 
 function playExercise(index) {
