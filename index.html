@@ -12,31 +12,37 @@
     <h1>Workout Trainer</h1>
   </header>
 
-  <label for="workoutSelect">Seleziona workout:</label>
-  <select id="workoutSelect"></select>
+  <main>
+    <div class="form-group">
+      <label for="workoutSelect">Seleziona workout:</label>
+      <select id="workoutSelect"></select>
+    </div>
 
-  <label for="beep-before-end">Bip finali:</label>
-  <select id="beep-before-end">
-    <option value="0">Nessuno</option>
-    <option value="1">Ultimo secondo</option>
-    <option value="2">Ultimi 2 secondi</option>
-    <option value="3" selected>Ultimi 3 secondi</option>
-    <option value="5">Ultimi 5 secondi</option>
-  </select>
+    <div class="form-group">
+      <label for="beep-before-end">Bip finali:</label>
+      <select id="beep-before-end">
+        <option value="0">Nessuno</option>
+        <option value="1">Ultimo secondo</option>
+        <option value="2">Ultimi 2 secondi</option>
+        <option value="3" selected>Ultimi 3 secondi</option>
+        <option value="5">Ultimi 5 secondi</option>
+      </select>
+    </div>
 
-  <button id="start-button" disabled>Start Workout</button>
+    <button id="start-button" disabled>Start Workout</button>
 
-  <div id="exercise-container" style="display:none;">
-    <h2 id="exercise-name"></h2>
-    <img id="exercise-gif" src="" />
-    <p id="timer"></p>
-  </div>
+    <div id="exercise-container" style="display:none;">
+      <h2 id="exercise-name"></h2>
+      <img id="exercise-gif" src="" />
+      <p id="timer"></p>
+    </div>
 
-  <div id="next-exercise-container" style="display: none;">
-    <h3>Prossimo:</h3>
-    <p id="next-exercise-name"></p>
-    <img id="next-exercise-gif" src="" />
-  </div>
+    <div id="next-exercise-container" style="display: none;">
+      <h3>Prossimo:</h3>
+      <p id="next-exercise-name"></p>
+      <img id="next-exercise-gif" src="" />
+    </div>
+  </main>
 
   <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
   <script src="script.js"></script>
