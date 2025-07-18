@@ -20,14 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       select.addEventListener("change", () => {
-        selectedWorkout = [
-          {
-            name: "Test Jumping Jacks",
-            duration: 10,
-            imageUrl: "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif"
-          }
-        ];
-
+        selectedWorkout = workouts[select.value];
         document.getElementById("start-button").disabled = false;
       });
 
