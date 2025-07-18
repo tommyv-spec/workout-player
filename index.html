@@ -4,9 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Workout App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 1em;
+      background-color: #f9f9f9;
+      color: #222;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 1.5em;
+    }
+    header img {
+      width: 120px;
+    }
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 0.3em;
+    }
+    select, button {
+      font-size: 1.1em;
+      padding: 0.5em;
+      margin: 0.5em 0;
+      width: 100%;
+      max-width: 300px;
+    }
+    #exercise-container, #next-exercise-container {
+      text-align: center;
+      margin-top: 1.5em;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    #timer {
+      font-size: 2.5em;
+      margin-top: 0.5em;
+    }
+  </style>
 </head>
 <body>
-  <h1>Workout</h1>
+  <header>
+    <img src="https://drive.google.com/file/d/12BkxTeS2OhJjuAPXGsRgP-KHrCXjul05/view?usp=drive_link" alt="Logo">
+    <h1>Workout Trainer</h1>
+  </header>
 
   <label for="workoutSelect">Seleziona workout:</label>
   <select id="workoutSelect"></select>
@@ -22,16 +65,16 @@
 
   <button id="start-button" disabled>Start Workout</button>
 
-  <div id="exercise-container" style="display:none; margin-top: 20px;">
+  <div id="exercise-container" style="display:none;">
     <h2 id="exercise-name"></h2>
-    <img id="exercise-gif" src="" width="300" />
-    <p id="timer" style="font-size: 2em;"></p>
+    <img id="exercise-gif" src="" />
+    <p id="timer"></p>
   </div>
 
-  <div id="next-exercise-container" style="display: none; margin-top: 20px;">
+  <div id="next-exercise-container" style="display: none;">
     <h3>Prossimo:</h3>
     <p id="next-exercise-name"></p>
-    <img id="next-exercise-gif" src="" width="200" />
+    <img id="next-exercise-gif" src="" />
   </div>
 
   <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
