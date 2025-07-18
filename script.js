@@ -6,7 +6,6 @@ let interval;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetch("https://script.google.com/macros/s/AKfycbyHYEgstYs1q7qklukS2H-bg3cEXm6zNq-LEq5mrU6HlahQgW5sPz36iHQYtDZ6IYV0GA/exec")
-    console.log(selectedWorkout[0])
     .then((response) => response.json())
     .then((data) => {
       workouts = data;
@@ -47,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function playExercise(index) {
   if (index >= selectedWorkout.length) {
     document.getElementById("exercise-name").textContent = "Workout Complete!";
-    document.getElementById("exercise-gif").src = "";
+    document.getElementById("exercise-gif").src = exercise.imageUrl;
     document.getElementById("timer").textContent = "";
     return;
   }
