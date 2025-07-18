@@ -58,7 +58,7 @@ function playExercise(index) {
     return;
   }
 
-  const beepFinalSeconds = parseInt(document.getElementById("beep-before-end").value);
+  const beepFinalSeconds = parseInt(document.getElementById("beepSelect").value);
   const beepAudio = document.getElementById("beep-sound");
 
   const exercise = selectedWorkout[index];
