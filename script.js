@@ -46,10 +46,13 @@ document.addEventListener("DOMContentLoaded", () => {
 function playExercise(index) {
   if (index >= selectedWorkout.length) {
     document.getElementById("exercise-name").textContent = "Workout Complete!";
-    document.getElementById("exercise-gif").src = exercise.imageUrl;
+    document.getElementById("exercise-gif").src = "";
     document.getElementById("timer").textContent = "";
     return;
   }
+
+  const beepFinalSeconds = parseInt(document.getElementById("beep-before-end").value);
+  const beepAudio = document.getElementById("beep-sound");
 
   const exercise = selectedWorkout[index];
   document.getElementById("exercise-name").textContent = exercise.name;
@@ -62,6 +65,11 @@ function playExercise(index) {
   interval = setInterval(() => {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
+
+    if (beepFinalSeconds > 0 && timeLeft <= beepFinalSeconds && timeLeft > 0) {
+      beepAudio.play();
+    }
+
     if (timeLeft <= 0) {
       clearInterval(interval);
       currentStep++;
