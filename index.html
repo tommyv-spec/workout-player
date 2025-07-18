@@ -1,16 +1,14 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Workout Player (GIF)</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Workout App</title>
 </head>
 <body>
-  <h1>Workout Player (GIF)</h1>
+  <h1>Workout</h1>
 
-  <label for="workoutSelect">Choose a Workout:</label>
+  <label for="workoutSelect">Seleziona workout:</label>
   <select id="workoutSelect"></select>
 
   <label for="beep-before-end">Bip finali:</label>
@@ -18,15 +16,16 @@
     <option value="0">Nessuno</option>
     <option value="1">Ultimo secondo</option>
     <option value="2">Ultimi 2 secondi</option>
-    <option value="3">Ultimi 3 secondi</option>
+    <option value="3" selected>Ultimi 3 secondi</option>
     <option value="5">Ultimi 5 secondi</option>
   </select>
 
+  <button id="start-button" disabled>Start Workout</button>
 
-  <div id="exercise-container" style="display: none;">
+  <div id="exercise-container" style="display:none; margin-top: 20px;">
     <h2 id="exercise-name"></h2>
-    <img id="exercise-gif" src="" alt="Esercizio" style="max-width: 90%; border-radius: 12px;" />
-    <div id="timer">00</div>
+    <img id="exercise-gif" src="" width="300" />
+    <p id="timer" style="font-size: 2em;"></p>
   </div>
 
   <div id="next-exercise-container" style="display: none; margin-top: 20px;">
@@ -35,12 +34,7 @@
     <img id="next-exercise-gif" src="" width="200" />
   </div>
 
-
-  <button id="start-button" disabled>Start Workout</button>
-
-  <script src="script.js"></script>
-
   <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-
+  <script src="script.js"></script>
 </body>
 </html>
