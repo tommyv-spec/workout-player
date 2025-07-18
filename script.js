@@ -6,6 +6,7 @@ let interval;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetch("https://script.google.com/macros/s/AKfycbyHYEgstYs1q7qklukS2H-bg3cEXm6zNq-LEq5mrU6HlahQgW5sPz36iHQYtDZ6IYV0GA/exec")
+    console.log(selectedWorkout[0])
     .then((response) => response.json())
     .then((data) => {
       workouts = data;
