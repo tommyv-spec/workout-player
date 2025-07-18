@@ -54,7 +54,7 @@ function playExercise(index) {
     document.getElementById("exercise-name").textContent = "Workout Complete!";
     document.getElementById("exercise-gif").src = "";
     document.getElementById("timer").textContent = "";
-    document.getElementById("next-exercise-container").style.display = "none";
+    document.getElementById("next-exercise-preview").style.display = "none";
     return;
   }
 
@@ -66,7 +66,7 @@ function playExercise(index) {
 
   document.getElementById("exercise-name").textContent = exercise.name;
   document.getElementById("exercise-gif").src = exercise.imageUrl;
-  document.getElementById("next-exercise-container").style.display = "none";
+  document.getElementById("next-exercise-preview").style.display = "none";
 
   let timeLeft = parseInt(exercise.duration);
   document.getElementById("timer").textContent = timeLeft;
@@ -84,12 +84,12 @@ function playExercise(index) {
     if (timeLeft === 3 && nextExercise) {
       document.getElementById("next-exercise-name").textContent = nextExercise.name;
       document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-container").style.display = "block";
+      document.getElementById("next-exercise-preview").style.display = "block";
     }
 
     if (timeLeft <= 0) {
       clearInterval(interval);
-      document.getElementById("next-exercise-container").style.display = "none";
+      document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
       setTimeout(() => playExercise(currentStep), 1000);
     }
