@@ -9,42 +9,34 @@
 <body>
   <header>
     <img src="https://drive.google.com/thumbnail?id=12BkxTeS2OhJjuAPXGsRgP-KHrCXjul05" alt="Logo" width="100" />
-    <h1>Workout Trainer with logo</h1>
+    <h1>Workout Trainer</h1>
   </header>
 
   <main>
-    <div class="form-group">
+    <div id="setup-screen">
       <label for="workoutSelect">Seleziona workout:</label>
       <select id="workoutSelect"></select>
-    </div>
 
-    <div class="form-group">
-      <label for="beep-before-end">Bip finali:</label>
-      <select id="beep-before-end">
-        <option value="0">Nessuno</option>
-        <option value="1">Ultimo secondo</option>
-        <option value="2">Ultimi 2 secondi</option>
-        <option value="3" selected>Ultimi 3 secondi</option>
+      <label for="beepSelect">Bip finali:</label>
+      <select id="beepSelect">
+        <option value="3">Ultimi 3 secondi</option>
         <option value="5">Ultimi 5 secondi</option>
+        <option value="0">Nessun bip</option>
       </select>
-    </div>
 
-    <button id="start-button" disabled>Start Workout</button>
+      <button id="start-button" disabled>Start Workout</button>
+    </div>
 
     <div id="exercise-container" style="display: none;">
       <h2 id="exercise-name"></h2>
-      <img id="exercise-gif" src="" alt="Esercizio corrente" />
-      <p id="timer"></p>
-    </div>
+      <img id="exercise-gif" src="" alt="Esercizio" />
+      <div id="timer"></div>
 
-    <div id="next-exercise-container" style="display: none;">
-      <h3>Prossimo:</h3>
-      <p id="next-exercise-name"></p>
-      <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
+      <div id="next-exercise-preview" style="margin-top: 30px;">
+        <p>Prossimo: <span id="next-exercise-name"></span></p>
+        <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
+      </div>
     </div>
   </main>
-
-  <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-  <script src="script.js"></script>
 </body>
 </html>
