@@ -94,6 +94,8 @@ function playExercise(index, exercises, resumeTime = null) {
   document.getElementById("next-exercise-preview").style.display = "none";
 
   let timeLeft = resumeTime !== null ? resumeTime : parseInt(exercise.duration);
+  savedTimeLeft = timeLeft; // salva sempre il valore all'inizio
+
   document.getElementById("timer").textContent = timeLeft;
   clearInterval(interval);
 
