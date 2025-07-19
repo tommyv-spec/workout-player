@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("workout-preview").style.display = "none"; // NASCONDE IL RECAP
 
     currentStep = 0;
-    playExercise(currentStep);
+    playExercise(currentStep, selectedWorkout.exercises); // ✅ PASSA GLI ESERCIZI!
   });
 });
 
