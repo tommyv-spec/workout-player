@@ -1,51 +1,68 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body, html {
-  height: 100%;
-  font-family: sans-serif;
-  background: #f5f5f5;
+#setup-screen {
   display: flex;
   flex-direction: column;
-}
-
-#exercise-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f7f7f7;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header img {
+  max-width: 120px;
+  margin-bottom: 10px;
+}
+
+header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+#setup-screen label {
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+#setup-screen select,
+#start-button {
+  width: 100%;
+  max-width: 300px;
   padding: 10px;
-  height: 100vh;
-  text-align: center;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-#exercise-name {
-  font-size: 1.6rem;
-  font-weight: bold;
+#start-button {
+  background-color: #6ab04c;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-#exercise-gif {
-  max-height: 30vh;
-  width: auto;
+#start-button:hover {
+  background-color: #58a039;
 }
 
-#timer {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #333;
+#workout-preview {
+  max-width: 300px;
+  margin-top: 20px;
+  text-align: left;
 }
 
-#next-exercise-preview {
-  font-size: 0.9rem;
-  text-align: center;
+#workout-preview h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
 }
 
-#next-exercise-preview img {
-  max-height: 15vh;
-  margin-top: 5px;
-  width: auto;
+#exercise-list {
+  padding-left: 20px;
 }
