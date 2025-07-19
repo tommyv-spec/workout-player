@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function playExercise(index) {
-  if (index >= selectedWorkout.length) {
+function playExercise(index, exercises) {
+  if (index >= exercises.length) {
     document.getElementById("exercise-name").textContent = "Workout completato!";
     document.getElementById("exercise-gif").src = "";
     document.getElementById("timer").textContent = "";
@@ -58,8 +58,8 @@ function playExercise(index) {
   const beepFinalSeconds = parseInt(document.getElementById("beepSelect").value);
   const beepAudio = document.getElementById("beep-sound");
 
-  const exercise = selectedWorkout[index];
-  const nextExercise = selectedWorkout[index + 1];
+  const exercise = exercises[index];
+  const nextExercise = exercises[index + 1];
 
   document.getElementById("exercise-name").textContent = exercise.name;
   document.getElementById("exercise-gif").src = exercise.imageUrl;
@@ -87,10 +87,11 @@ function playExercise(index) {
       clearInterval(interval);
       document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
-      setTimeout(() => playExercise(currentStep), 1000);
+      setTimeout(() => playExercise(currentStep, exercises), 1000);
     }
   }, 1000);
 }
+
 
 // ✅ QUESTA FUNZIONE DEVE STARE FUORI DA playExercise
 function updateWorkoutPreview() {
