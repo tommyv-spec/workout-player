@@ -4,6 +4,7 @@ let currentStep = 0;
 let interval;
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Carica i dati dal Google Sheet pubblicato come JSON
   fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
     .then((response) => response.json())
     .then((data) => {
@@ -35,24 +36,27 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Errore nel caricamento del JSON:", error);
     });
 
-document.getElementById("start-button").addEventListener("click", () => {
-  document.getElementById("setup-screen").style.display = "none";
-  document.querySelector("header").style.display = "none";
-  document.getElementById("exercise-container").style.display = "block";
-  document.getElementById("workout-preview").style.display = "none";
+  // Gestione click su Start Workout
+  document.getElementById("start-button").addEventListener("click", () => {
+    document.getElementById("setup-screen").style.display = "none";
+    document.querySelector("header").style.display = "none";
+    document.getElementById("exercise-container").style.display = "block";
+    document.getElementById("workout-preview").style.display = "none";
 
-  // ✅ RIASSEGNA ISTRUZIONI PRIMA DI PARTIRE
-  const workoutName = document.getElementById("workoutSelect").value;
-  const workout = workouts[workoutName];
-  if (workout.instructions) {
-    document.getElementById("instructions-text").textContent = workout.instructions;
-    document.getElementById("instructions-box").style.display = "block";
-  }
+    // Mostra le istruzioni anche durante il workout
+    const workoutName = document.getElementById("workoutSelect").value;
+    const workout = workouts[workoutName];
+    if (workout.instructions) {
+      document.getElementById("instructions-text").textContent = workout.instructions;
+      document.getElementById("instructions-box").style.display = "block";
+    }
 
-  currentStep = 0;
-  playExercise(currentStep, selectedWorkout.exercises);
+    currentStep = 0;
+    playExercise(currentStep, selectedWorkout.exercises);
+  });
 });
 
+// Funzione per eseguire un esercizio
 function playExercise(index, exercises) {
   if (index >= exercises.length) {
     document.getElementById("exercise-name").textContent = "Workout completato!";
@@ -99,15 +103,14 @@ function playExercise(index, exercises) {
   }, 1000);
 }
 
-
-// ✅ QUESTA FUNZIONE DEVE STARE FUORI DA playExercise
+// Mostra l’anteprima del workout e le istruzioni
 function updateWorkoutPreview() {
   const preview = document.getElementById("workout-preview");
   const list = document.getElementById("exercise-list");
   const instructionsBox = document.getElementById("instructions-box");
   const instructionsText = document.getElementById("instructions-text");
 
-  list.innerHTML = ""; // Pulisce la lista precedente
+  list.innerHTML = "";
 
   const workoutName = document.getElementById("workoutSelect").value;
   const workout = workouts[workoutName];
@@ -118,7 +121,7 @@ function updateWorkoutPreview() {
     return;
   }
 
-  workout.exercises.forEach(ex => {
+  workout.exercises.forEach((ex) => {
     const li = document.createElement("li");
     li.textContent = `${ex.name} (${ex.duration} sec)`;
     list.appendChild(li);
@@ -133,4 +136,3 @@ function updateWorkoutPreview() {
     instructionsBox.style.display = "none";
   }
 }
-
