@@ -2,6 +2,9 @@ let workouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
 let interval;
+let isPaused = false;
+let savedTimeLeft = 0;
+
 
 document.addEventListener("DOMContentLoaded", () => {
   // Carica i dati dal Google Sheet pubblicato come JSON
@@ -54,10 +57,24 @@ document.addEventListener("DOMContentLoaded", () => {
     currentStep = 0;
     playExercise(currentStep, selectedWorkout.exercises);
   });
+  document.getElementById("pause-button").addEventListener("click", () => {
+    isPaused = !isPaused;
+  
+    const pauseBtn = document.getElementById("pause-button");
+  
+    if (isPaused) {
+      clearInterval(interval);
+      pauseBtn.textContent = "▶️ Riprendi";
+    } else {
+      pauseBtn.textContent = "⏸ Pausa";
+      playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft); // Riprende da dove era
+    }
+  });
+
 });
 
 // Funzione per eseguire un esercizio
-function playExercise(index, exercises) {
+function playExercise(index, exercises, resumeTime = null) {
   if (index >= exercises.length) {
     document.getElementById("exercise-name").textContent = "Workout completato!";
     document.getElementById("exercise-gif").src = "";
@@ -76,11 +93,16 @@ function playExercise(index, exercises) {
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
 
-  let timeLeft = parseInt(exercise.duration);
+  let timeLeft = resumeTime !== null ? resumeTime : parseInt(exercise.duration);
   document.getElementById("timer").textContent = timeLeft;
   clearInterval(interval);
 
   interval = setInterval(() => {
+    if (isPaused) {
+      savedTimeLeft = timeLeft;
+      clearInterval(interval);
+      return;
+    }
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
