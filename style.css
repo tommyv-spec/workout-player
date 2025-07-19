@@ -103,6 +103,7 @@ body {
 
 #exercise-gif {
   width: 80%;
+  height: 80%;
   object-fit: cover;
   border-radius: 10px;
 }
