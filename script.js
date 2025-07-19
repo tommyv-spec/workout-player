@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pauseBtn.textContent = "▶️ Riprendi";
     } else {
       pauseBtn.textContent = "⏸ Pausa";
-      playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft); // Riprende da dove era
+      resumeTimer(); // Riprende da dove era
     }
   });
 
@@ -158,3 +158,41 @@ function updateWorkoutPreview() {
     instructionsBox.style.display = "none";
   }
 }
+
+
+function resumeTimer() {
+  clearInterval(interval);
+  interval = setInterval(() => {
+    if (isPaused) {
+      clearInterval(interval);
+      return;
+    }
+
+    savedTimeLeft--;
+    document.getElementById("timer").textContent = savedTimeLeft;
+
+    const beepFinalSeconds = parseInt(document.getElementById("beepSelect").value);
+    const beepAudio = document.getElementById("beep-sound");
+
+    const exercises = selectedWorkout.exercises;
+    const nextExercise = exercises[currentStep + 1];
+
+    if (beepFinalSeconds > 0 && savedTimeLeft <= beepFinalSeconds && savedTimeLeft > 0) {
+      beepAudio.play();
+    }
+
+    if (savedTimeLeft === 3 && nextExercise) {
+      document.getElementById("next-exercise-name").textContent = nextExercise.name;
+      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
+      document.getElementById("next-exercise-preview").style.display = "block";
+    }
+
+    if (savedTimeLeft <= 0) {
+      clearInterval(interval);
+      document.getElementById("next-exercise-preview").style.display = "none";
+      currentStep++;
+      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 1000);
+    }
+  }, 1000);
+}
+
