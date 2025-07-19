@@ -4,7 +4,7 @@ let currentStep = 0;
 let interval;
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://script.google.com/macros/s/AKfycbxB6Sct0D38ex5edWQyqDe2wql1VwGT3U_YCONbWxYR_Zf3yHsINfM9PF3tXu-sS5YS/exec")
+  fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
     .then((response) => response.json())
     .then((data) => {
       workouts = data;
@@ -96,19 +96,33 @@ function playExercise(index) {
 function updateWorkoutPreview() {
   const preview = document.getElementById("workout-preview");
   const list = document.getElementById("exercise-list");
+  const instructionsBox = document.getElementById("instructions-box");
+  const instructionsText = document.getElementById("instructions-text");
 
-  list.innerHTML = "";
+  list.innerHTML = ""; // Pulisce la lista precedente
 
-  if (!selectedWorkout || selectedWorkout.length === 0) {
+  const workoutName = document.getElementById("workoutSelect").value;
+  const workout = workouts[workoutName];
+
+  if (!workout || !workout.exercises || workout.exercises.length === 0) {
     preview.style.display = "none";
+    instructionsBox.style.display = "none";
     return;
   }
 
-  selectedWorkout.forEach(ex => {
+  workout.exercises.forEach(ex => {
     const li = document.createElement("li");
     li.textContent = `${ex.name} (${ex.duration} sec)`;
     list.appendChild(li);
   });
 
   preview.style.display = "block";
+
+  if (workout.instructions) {
+    instructionsText.textContent = workout.instructions;
+    instructionsBox.style.display = "block";
+  } else {
+    instructionsBox.style.display = "none";
+  }
 }
+
