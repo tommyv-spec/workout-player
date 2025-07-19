@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("setup-screen").style.display = "none";
     document.querySelector("header").style.display = "none";
     document.getElementById("exercise-container").style.display = "block";
+    document.getElementById("workout-preview").style.display = "none"; // NASCONDE IL RECAP
 
     currentStep = 0;
     playExercise(currentStep);
@@ -91,12 +92,12 @@ function playExercise(index) {
   }, 1000);
 }
 
-
+// ✅ QUESTA FUNZIONE DEVE STARE FUORI DA playExercise
 function updateWorkoutPreview() {
   const preview = document.getElementById("workout-preview");
   const list = document.getElementById("exercise-list");
 
-  list.innerHTML = ""; // Pulisce la lista precedente
+  list.innerHTML = "";
 
   if (!selectedWorkout || selectedWorkout.length === 0) {
     preview.style.display = "none";
