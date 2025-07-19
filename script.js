@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const select = document.getElementById("workoutSelect");
       select.innerHTML = "";
 
-      for (const name in workouts) {
+      for (const name in data) {
         const option = document.createElement("option");
         option.value = name;
         option.textContent = name;
