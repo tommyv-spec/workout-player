@@ -39,12 +39,19 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("setup-screen").style.display = "none";
     document.querySelector("header").style.display = "none";
     document.getElementById("exercise-container").style.display = "block";
-    document.getElementById("workout-preview").style.display = "none"; // NASCONDE IL RECAP
-
+    document.getElementById("workout-preview").style.display = "none";
+  
+    // ✅ RIASSEGNA ISTRUZIONI PRIMA DI PARTIRE
+    const workoutName = document.getElementById("workoutSelect").value;
+    const workout = workouts[workoutName];
+    if (workout.instructions) {
+      document.getElementById("instructions-text").textContent = workout.instructions;
+      document.getElementById("instructions-box").style.display = "block";
+    }
+  
     currentStep = 0;
-    playExercise(currentStep, selectedWorkout.exercises); // ✅ PASSA GLI ESERCIZI!
+    playExercise(currentStep, selectedWorkout.exercises);
   });
-});
 
 function playExercise(index, exercises) {
   if (index >= exercises.length) {
