@@ -1,5 +1,5 @@
 let workouts = {};
-let selectedWorkout = [];
+let selectedWorkout = {};
 let currentStep = 0;
 let interval;
 
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       select.addEventListener("change", () => {
-        selectedWorkout = workouts[select.value];
+        selectedWorkout = workouts[select.value] || {};
         document.getElementById("start-button").disabled = false;
         updateWorkoutPreview();
       });
