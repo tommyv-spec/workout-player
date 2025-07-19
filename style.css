@@ -85,10 +85,15 @@ body {
 }
 
 #instructions-box {
-  font-size: 14px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  background-color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-size: 16px;
+  max-width: 90%;
+  margin: 10px auto;
 }
+
 
 #exercise-name {
   font-size: 22px;
