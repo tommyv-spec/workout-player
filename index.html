@@ -19,9 +19,9 @@
 
       <label for="beepSelect">Bip finali:</label>
       <select id="beepSelect">
+        <option value="0">Nessun bip</option>
         <option value="3">Ultimi 3 secondi</option>
         <option value="5">Ultimi 5 secondi</option>
-        <option value="0">Nessun bip</option>
       </select>
 
       <button id="start-button" disabled>Start Workout</button>
@@ -31,19 +31,27 @@
         <ul id="exercise-list"></ul>
       </div>
 
+      <div id="instructions-box" style="display: none; margin-top: 20px;">
+        <h3>Istruzioni:</h3>
+        <p id="instructions-text"></p>
+      </div>
+
     </div>
 
-    <div id="instructions-box" style="display: none; margin-top: 20px;">
-      <h3>Istruzioni:</h3>
-      <p id="instructions-text"></p>
-    </div>
+
 
 
     <div id="exercise-container" style="display: none;">
+      <div id="instructions-box" style="margin-bottom: 10px;">
+        <strong>Istruzioni:</strong>
+        <span id="instructions-text"></span>
+      </div>
+    
       <h2 id="exercise-name"></h2>
       <img id="exercise-gif" src="" alt="Esercizio" />
+    
       <div id="timer"></div>
-
+    
       <div id="next-exercise-preview" style="display: none;">
         <p>Prossimo: <span id="next-exercise-name"></span></p>
         <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
