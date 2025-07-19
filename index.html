@@ -14,26 +14,33 @@
 
   <main>
     <div id="setup-screen">
+      <header>
+        <img src="https://drive.google.com/thumbnail?id=12BkxTeS2OhJjuAPXGsRgP-KHrCXjul05" alt="Logo" />
+        <h1>Workout Trainer</h1>
+      </header>
+    
       <label for="workoutSelect">Seleziona workout:</label>
       <select id="workoutSelect"></select>
-
+    
       <label for="beepSelect">Bip finali:</label>
       <select id="beepSelect">
-        <option value="0">Nessun bip</option>
         <option value="3">Ultimi 3 secondi</option>
         <option value="5">Ultimi 5 secondi</option>
+        <option value="0">Nessun bip</option>
       </select>
-
+    
       <button id="start-button" disabled>Start Workout</button>
-
-      <div id="workout-preview" style="display: none; margin-top: 20px;">
+    
+      <div id="workout-preview" style="display: none;">
         <h3>Esercizi nel workout:</h3>
         <ul id="exercise-list"></ul>
       </div>
-
-
-
+    
+      <div id="instructions-box" style="display: none; margin-top: 10px;">
+        <strong>Istruzioni:</strong> <span id="instructions-text"></span>
+      </div>
     </div>
+
 
     <div id="instructions-box" style="display: none; margin-top: 20px;">
       <h3>Istruzioni:</h3>
