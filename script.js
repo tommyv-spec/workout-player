@@ -89,25 +89,25 @@ function playExercise(index) {
       setTimeout(() => playExercise(currentStep), 1000);
     }
   }, 1000);
-
-  function updateWorkoutPreview() {
-    const preview = document.getElementById("workout-preview");
-    const list = document.getElementById("exercise-list");
-  
-    list.innerHTML = ""; // Pulisce la lista precedente
-  
-    if (!selectedWorkout || selectedWorkout.length === 0) {
-      preview.style.display = "none";
-      return;
-    }
-  
-    selectedWorkout.forEach(ex => {
-      const li = document.createElement("li");
-      li.textContent = `${ex.name} (${ex.duration} sec)`;
-      list.appendChild(li);
-    });
-  
-    preview.style.display = "block";
 }
 
+
+function updateWorkoutPreview() {
+  const preview = document.getElementById("workout-preview");
+  const list = document.getElementById("exercise-list");
+
+  list.innerHTML = ""; // Pulisce la lista precedente
+
+  if (!selectedWorkout || selectedWorkout.length === 0) {
+    preview.style.display = "none";
+    return;
+  }
+
+  selectedWorkout.forEach(ex => {
+    const li = document.createElement("li");
+    li.textContent = `${ex.name} (${ex.duration} sec)`;
+    list.appendChild(li);
+  });
+
+  preview.style.display = "block";
 }
