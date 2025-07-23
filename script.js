@@ -133,8 +133,11 @@ function updateWorkoutPreview() {
   const list = document.getElementById("exercise-list");
   const instructionsBox = document.getElementById("instructions-box");
   const instructionsText = document.getElementById("instructions-text");
+  const exerciseGrid = document.getElementById("exercise-grid");
+  const visuals = document.getElementById("exercise-visuals");
 
   list.innerHTML = "";
+  exerciseGrid.innerHTML = "";
 
   const workoutName = document.getElementById("workoutSelect").value;
   const workout = workouts[workoutName];
@@ -142,16 +145,44 @@ function updateWorkoutPreview() {
   if (!workout || !workout.exercises || workout.exercises.length === 0) {
     preview.style.display = "none";
     instructionsBox.style.display = "none";
+    visuals.style.display = "none";
     return;
   }
 
+  // 🟩 Lista testuale (classica)
   workout.exercises.forEach((ex) => {
     const li = document.createElement("li");
     li.textContent = `${ex.name} (${ex.duration} sec)`;
     list.appendChild(li);
   });
 
+  // 🟦 Lista visiva (senza ripetizioni)
+  const seen = new Set();
+  workout.exercises.forEach((ex) => {
+    if (seen.has(ex.name)) return;
+    seen.add(ex.name);
+
+    const card = document.createElement("div");
+    card.style.textAlign = "center";
+
+    const name = document.createElement("div");
+    name.textContent = ex.name;
+    name.style.fontWeight = "bold";
+    name.style.marginBottom = "5px";
+
+    const img = document.createElement("img");
+    img.src = ex.imageUrl;
+    img.alt = ex.name;
+    img.style.width = "100%";
+    img.style.borderRadius = "8px";
+
+    card.appendChild(name);
+    card.appendChild(img);
+    exerciseGrid.appendChild(card);
+  });
+
   preview.style.display = "block";
+  visuals.style.display = "block";
 
   if (workout.instructions) {
     instructionsText.textContent = workout.instructions;
@@ -160,6 +191,7 @@ function updateWorkoutPreview() {
     instructionsBox.style.display = "none";
   }
 }
+
 
 
 function resumeTimer() {
