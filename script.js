@@ -5,9 +5,7 @@ let interval;
 let isPaused = false;
 let savedTimeLeft = 0;
 
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Carica i dati dal Google Sheet pubblicato come JSON
   fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
     .then((response) => response.json())
     .then((data) => {
@@ -35,20 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
         updateWorkoutPreview();
       }
     })
-    .catch((error) => {
-      console.error("Errore nel caricamento del JSON:", error);
-    });
+    .catch((error) => console.error("Errore nel caricamento del JSON:", error));
 
-  // Gestione click su Start Workout
   document.getElementById("start-button").addEventListener("click", () => {
     document.getElementById("setup-screen").style.display = "none";
     document.querySelector("header").style.display = "none";
     document.getElementById("exercise-container").style.display = "block";
     document.getElementById("workout-preview").style.display = "none";
 
-    // Mostra le istruzioni anche durante il workout
     const workoutName = document.getElementById("workoutSelect").value;
     const workout = workouts[workoutName];
+
     if (workout.instructions) {
       document.getElementById("instructions-text").textContent = workout.instructions;
       document.getElementById("instructions-box").style.display = "block";
@@ -57,23 +52,21 @@ document.addEventListener("DOMContentLoaded", () => {
     currentStep = 0;
     playExercise(currentStep, selectedWorkout.exercises);
   });
+
   document.getElementById("pause-button").addEventListener("click", () => {
     isPaused = !isPaused;
-  
     const pauseBtn = document.getElementById("pause-button");
-  
+
     if (isPaused) {
       clearInterval(interval);
       pauseBtn.textContent = "▶️ Riprendi";
     } else {
       pauseBtn.textContent = "⏸ Pausa";
-      resumeTimer(); // Riprende da dove era
+      resumeTimer();
     }
   });
-
 });
 
-// Funzione per eseguire un esercizio
 function playExercise(index, exercises, resumeTime = null) {
   if (index >= exercises.length) {
     document.getElementById("exercise-name").textContent = "Workout completato!";
@@ -83,8 +76,9 @@ function playExercise(index, exercises, resumeTime = null) {
     return;
   }
 
-  const beepFinalSeconds = parseInt(document.getElementById("beepSelect").value);
   const beepAudio = document.getElementById("beep-sound");
+  const transitionSound = document.getElementById("transition-sound");
+  const beepEnabled = document.getElementById("beepToggle").checked;
 
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
@@ -94,10 +88,12 @@ function playExercise(index, exercises, resumeTime = null) {
   document.getElementById("next-exercise-preview").style.display = "none";
 
   let timeLeft = resumeTime !== null ? resumeTime : parseInt(exercise.duration);
-  savedTimeLeft = timeLeft; // salva sempre il valore all'inizio
+  savedTimeLeft = timeLeft;
 
   document.getElementById("timer").textContent = timeLeft;
   clearInterval(interval);
+
+  const beepMoments = [60, 30, 10, 5].filter(t => t < timeLeft);
 
   interval = setInterval(() => {
     if (isPaused) {
@@ -105,12 +101,11 @@ function playExercise(index, exercises, resumeTime = null) {
       clearInterval(interval);
       return;
     }
+
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-    const beepMoments = [60, 30, 10, 5];
-
-    if (beepMoments.includes(timeLeft) && timeLeft <= parseInt(exercise.duration)) {
+    if (beepEnabled && beepMoments.includes(timeLeft)) {
       beepAudio.play();
     }
 
@@ -123,13 +118,54 @@ function playExercise(index, exercises, resumeTime = null) {
     if (timeLeft <= 0) {
       clearInterval(interval);
       document.getElementById("next-exercise-preview").style.display = "none";
+      transitionSound.play();
       currentStep++;
       setTimeout(() => playExercise(currentStep, exercises), 1000);
     }
   }, 1000);
 }
 
-// Mostra l’anteprima del workout e le istruzioni
+function resumeTimer() {
+  clearInterval(interval);
+
+  const beepAudio = document.getElementById("beep-sound");
+  const transitionSound = document.getElementById("transition-sound");
+  const beepEnabled = document.getElementById("beepToggle").checked;
+
+  const exercises = selectedWorkout.exercises;
+  const nextExercise = exercises[currentStep + 1];
+  const currentExercise = exercises[currentStep];
+  const beepMoments = [60, 30, 10, 5].filter(t => t < currentExercise.duration);
+
+  interval = setInterval(() => {
+    if (isPaused) {
+      clearInterval(interval);
+      return;
+    }
+
+    savedTimeLeft--;
+    document.getElementById("timer").textContent = savedTimeLeft;
+
+    if (beepEnabled && beepMoments.includes(savedTimeLeft)) {
+      beepAudio.play();
+    }
+
+    if (savedTimeLeft === 3 && nextExercise) {
+      document.getElementById("next-exercise-name").textContent = nextExercise.name;
+      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
+      document.getElementById("next-exercise-preview").style.display = "block";
+    }
+
+    if (savedTimeLeft <= 0) {
+      clearInterval(interval);
+      document.getElementById("next-exercise-preview").style.display = "none";
+      transitionSound.play();
+      currentStep++;
+      setTimeout(() => playExercise(currentStep, exercises), 1000);
+    }
+  }, 1000);
+}
+
 function updateWorkoutPreview() {
   const preview = document.getElementById("workout-preview");
   const list = document.getElementById("exercise-list");
@@ -151,14 +187,12 @@ function updateWorkoutPreview() {
     return;
   }
 
-  // 🟩 Lista testuale (classica)
   workout.exercises.forEach((ex) => {
     const li = document.createElement("li");
     li.textContent = `${ex.name} (${ex.duration} sec)`;
     list.appendChild(li);
   });
 
-  // 🟦 Lista visiva (senza ripetizioni)
   const seen = new Set();
   workout.exercises.forEach((ex) => {
     if (seen.has(ex.name)) return;
@@ -193,47 +227,3 @@ function updateWorkoutPreview() {
     instructionsBox.style.display = "none";
   }
 }
-
-
-
-function resumeTimer() {
-  clearInterval(interval);
-  interval = setInterval(() => {
-    if (isPaused) {
-      clearInterval(interval);
-      return;
-    }
-
-    savedTimeLeft--;
-    document.getElementById("timer").textContent = savedTimeLeft;
-
-    const beepFinalSeconds = parseInt(document.getElementById("beepSelect").value);
-    const beepAudio = document.getElementById("beep-sound");
-
-    const exercises = selectedWorkout.exercises;
-    const nextExercise = exercises[currentStep + 1];
-
-    const beepMoments = [60, 30, 10, 5];
-
-    if (beepMoments.includes(savedTimeLeft) && savedTimeLeft <= parseInt(exercises[currentStep].duration)) {
-      beepAudio.play();
-    }
-
-
-    if (savedTimeLeft === 3 && nextExercise) {
-      document.getElementById("next-exercise-name").textContent = nextExercise.name;
-      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-preview").style.display = "block";
-    }
-
-    if (savedTimeLeft <= 0) {
-      clearInterval(interval);
-      document.getElementById("next-exercise-preview").style.display = "none";
-      currentStep++;
-      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 1000);
-    }
-  }, 1000);
-}
-
-const transitionSound = document.getElementById("transition-sound");
-transitionSound.play();
