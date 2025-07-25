@@ -235,3 +235,5 @@ function resumeTimer() {
   }, 1000);
 }
 
+const transitionSound = document.getElementById("transition-sound");
+transitionSound.play();
