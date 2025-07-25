@@ -108,11 +108,13 @@ function playExercise(index, exercises, resumeTime = null) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-    if (beepFinalSeconds > 0 && timeLeft <= beepFinalSeconds && timeLeft > 0) {
+    const beepMoments = [60, 30, 10, 5];
+
+    if (beepMoments.includes(timeLeft) && timeLeft <= parseInt(exercise.duration)) {
       beepAudio.play();
     }
 
-    if (timeLeft === 3 && nextExercise) {
+    if (timeLeft === 10 && nextExercise) {
       document.getElementById("next-exercise-name").textContent = nextExercise.name;
       document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
       document.getElementById("next-exercise-preview").style.display = "block";
@@ -211,9 +213,12 @@ function resumeTimer() {
     const exercises = selectedWorkout.exercises;
     const nextExercise = exercises[currentStep + 1];
 
-    if (beepFinalSeconds > 0 && savedTimeLeft <= beepFinalSeconds && savedTimeLeft > 0) {
+    const beepMoments = [60, 30, 10, 5];
+
+    if (beepMoments.includes(savedTimeLeft) && savedTimeLeft <= parseInt(exercises[currentStep].duration)) {
       beepAudio.play();
     }
+
 
     if (savedTimeLeft === 3 && nextExercise) {
       document.getElementById("next-exercise-name").textContent = nextExercise.name;
