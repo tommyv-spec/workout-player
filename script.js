@@ -3,7 +3,7 @@ let selectedWorkout = {};
 let currentStep = 0;
 let interval;
 let isPaused = false;
-let savedTimeLeft = 0;
+let savedTimeLeft = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     currentStep = 0;
+    savedTimeLeft = null; // reset al primo start
     playExercise(currentStep, selectedWorkout.exercises);
   });
 
@@ -87,8 +88,8 @@ function playExercise(index, exercises, resumeTime = null) {
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
 
-  let timeLeft = resumeTime !== null ? resumeTime : parseInt(exercise.duration);
-  savedTimeLeft = timeLeft;
+  let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft !== null ? savedTimeLeft : parseInt(exercise.duration);
+  savedTimeLeft = null; // reset per evitare che venga riusato nel prossimo esercizio
 
   document.getElementById("timer").textContent = timeLeft;
   clearInterval(interval);
@@ -120,6 +121,7 @@ function playExercise(index, exercises, resumeTime = null) {
       document.getElementById("next-exercise-preview").style.display = "none";
       transitionSound.play();
       currentStep++;
+      savedTimeLeft = null;
       setTimeout(() => playExercise(currentStep, exercises), 1000);
     }
   }, 1000);
@@ -127,47 +129,12 @@ function playExercise(index, exercises, resumeTime = null) {
 
 function resumeTimer() {
   clearInterval(interval);
-  // Se il tempo salvato non è ancora settato, inizializzalo dal timer attuale
+
   if (!savedTimeLeft || savedTimeLeft <= 0) {
     savedTimeLeft = parseInt(document.getElementById("timer").textContent);
   }
 
-  const beepAudio = document.getElementById("beep-sound");
-  const transitionSound = document.getElementById("transition-sound");
-  const beepEnabled = document.getElementById("beepToggle").checked;
-
-  const exercises = selectedWorkout.exercises;
-  const nextExercise = exercises[currentStep + 1];
-  const currentExercise = exercises[currentStep];
-  const beepMoments = [60, 30, 10, 5].filter(t => t < currentExercise.duration);
-
-  interval = setInterval(() => {
-    if (isPaused) {
-      clearInterval(interval);
-      return;
-    }
-
-    savedTimeLeft--;
-    document.getElementById("timer").textContent = savedTimeLeft;
-
-    if (beepEnabled && beepMoments.includes(savedTimeLeft)) {
-      beepAudio.play();
-    }
-
-    if (savedTimeLeft === 3 && nextExercise) {
-      document.getElementById("next-exercise-name").textContent = nextExercise.name;
-      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-preview").style.display = "block";
-    }
-
-    if (savedTimeLeft <= 0) {
-      clearInterval(interval);
-      document.getElementById("next-exercise-preview").style.display = "none";
-      transitionSound.play();
-      currentStep++;
-      setTimeout(() => playExercise(currentStep, exercises), 1000);
-    }
-  }, 1000);
+  playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
 }
 
 function updateWorkoutPreview() {
