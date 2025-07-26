@@ -127,6 +127,10 @@ function playExercise(index, exercises, resumeTime = null) {
 
 function resumeTimer() {
   clearInterval(interval);
+  // Se il tempo salvato non è ancora settato, inizializzalo dal timer attuale
+  if (!savedTimeLeft || savedTimeLeft <= 0) {
+    savedTimeLeft = parseInt(document.getElementById("timer").textContent);
+  }
 
   const beepAudio = document.getElementById("beep-sound");
   const transitionSound = document.getElementById("transition-sound");
