@@ -246,3 +246,14 @@ function updateWorkoutPreview() {
     instructionsBox.style.display = "none";
   }
 }
+
+function logout() {
+  document.getElementById("main-app").style.display = "none";
+  document.getElementById("login-screen").style.display = "block";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("login-error").style.display = "none";
+}
+
+document.getElementById("logout-button").addEventListener("click", logout);
+
