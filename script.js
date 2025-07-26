@@ -1,42 +1,11 @@
 let workouts = {};
-let userWorkouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
 let interval;
 let isPaused = false;
 let savedTimeLeft = null;
 
-document.getElementById("login-button").addEventListener("click", () => {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  fetch("https://script.google.com/macros/s/AKfycbxI6iNXDy23xo3SM8iILEh87dD9CQohTPSncpGycqJKvcrsKclvM08f56aM9PXUz0zoPA/exec", {
-    method: "POST",
-    body: JSON.stringify({ username, password }),
-    headers: { "Content-Type": "application/json" }
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("main-app").style.display = "block";
-
-        // Se vuoi pre-selezionare l'utente nel menu a tendina:
-        const userSelect = document.getElementById("userSelect");
-        setTimeout(() => {
-          userSelect.value = username;
-          userSelect.dispatchEvent(new Event("change"));
-        }, 500);
-      } else {
-        document.getElementById("login-error").style.display = "block";
-      }
-    });
-});
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
-
   const savedUser = localStorage.getItem("loggedUser");
 
   if (savedUser) {
@@ -47,47 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("login-screen").style.display = "block";
   }
 
-  fetch("https://script.google.com/macros/s/AKfycbwJOVDYlsLMMkuFHCVCsstR4Y6VXYPz5U5r2iEDXAFhqQ_-vgZ1FYYvsKROn9YbYT5fwQ/exec")
-    .then((response) => response.json())
-    .then((data) => {
-      workouts = data.workouts;
-      userWorkouts = data.userWorkouts;
-
-      const userSelect = document.getElementById("userSelect");
-      const workoutSelect = document.getElementById("workoutSelect");
-
-      userSelect.innerHTML = '<option disabled selected>Scegli un utente</option>';
-      for (const user in userWorkouts) {
-        const option = document.createElement("option");
-        option.value = user;
-        option.textContent = user;
-        userSelect.appendChild(option);
-      }
-
-      userSelect.addEventListener("change", () => {
-        const selectedUser = userSelect.value;
-        const assigned = userWorkouts[selectedUser] || [];
-
-        workoutSelect.innerHTML = '<option disabled selected>Seleziona un workout</option>';
-        assigned.forEach((w) => {
-          const option = document.createElement("option");
-          option.value = w;
-          option.textContent = w;
-          workoutSelect.appendChild(option);
-        });
-
-        workoutSelect.disabled = false;
-        document.getElementById("start-button").disabled = true;
-        document.getElementById("workout-preview").style.display = "none";
-      });
-
-      workoutSelect.addEventListener("change", () => {
-        const name = workoutSelect.value;
-        selectedWorkout = workouts[name] || {};
-        document.getElementById("start-button").disabled = false;
-        updateWorkoutPreview();
-      });
-    });
+  document.getElementById("login-button").addEventListener("click", login);
+  document.getElementById("logout-button").addEventListener("click", logout);
 
   document.getElementById("start-button").addEventListener("click", () => {
     document.getElementById("setup-screen").style.display = "none";
@@ -120,6 +50,74 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const errorBox = document.getElementById("login-error");
+
+  if (!username || !password) {
+    errorBox.textContent = "Inserisci username e password.";
+    errorBox.style.display = "block";
+    return;
+  }
+
+  fetch(`https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec?username=${username}&password=${password}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        localStorage.setItem("loggedUser", username);
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("setup-screen").style.display = "block";
+        loadUserData(username);
+      } else {
+        errorBox.textContent = data.message;
+        errorBox.style.display = "block";
+      }
+    })
+    .catch(err => {
+      console.error("Login error", err);
+      errorBox.textContent = "Errore durante il login.";
+      errorBox.style.display = "block";
+    });
+}
+
+function loadUserData(username) {
+  fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
+    .then((response) => response.json())
+    .then((data) => {
+      workouts = data.workouts;
+      const userWorkouts = data.userWorkouts[username] || [];
+      const select = document.getElementById("workoutSelect");
+
+      select.innerHTML = "";
+
+      userWorkouts.forEach((workoutName) => {
+        const option = document.createElement("option");
+        option.value = workoutName;
+        option.textContent = workoutName;
+        select.appendChild(option);
+      });
+
+      if (select.options.length > 0) {
+        select.selectedIndex = 0;
+        selectedWorkout = workouts[select.value];
+        document.getElementById("start-button").disabled = false;
+        updateWorkoutPreview();
+      }
+
+      select.addEventListener("change", () => {
+        selectedWorkout = workouts[select.value] || {};
+        updateWorkoutPreview();
+      });
+    })
+    .catch((error) => console.error("Errore nel caricamento del JSON:", error));
+}
+
+function logout() {
+  localStorage.removeItem("loggedUser");
+  location.reload();
+}
 
 function playExercise(index, exercises, resumeTime = null) {
   if (index >= exercises.length) {
@@ -208,7 +206,7 @@ function updateWorkoutPreview() {
 
   workout.exercises.forEach((ex) => {
     const li = document.createElement("li");
-    li.textContent = ${ex.name} (${ex.duration} sec);
+    li.textContent = `${ex.name} (${ex.duration} sec)`;
     list.appendChild(li);
   });
 
@@ -245,71 +243,4 @@ function updateWorkoutPreview() {
   } else {
     instructionsBox.style.display = "none";
   }
-}
-
-function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const errorBox = document.getElementById("login-error");
-
-  if (!username || !password) {
-    errorBox.textContent = "Inserisci username e password.";
-    errorBox.style.display = "block";
-    return;
-  }
-
-  fetch(`https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec?username=${username}&password=${password}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === "success") {
-        localStorage.setItem("loggedUser", username); // salvataggio utente
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("setup-screen").style.display = "block";
-        loadUserData(username); // nuova funzione per caricare i workout giusti
-      } else {
-        errorBox.textContent = data.message;
-        errorBox.style.display = "block";
-      }
-    })
-    .catch(err => {
-      console.error("Login error", err);
-      errorBox.textContent = "Errore durante il login.";
-      errorBox.style.display = "block";
-    });
-}
-
-function loadUserData(username) {
-  fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
-    .then((response) => response.json())
-    .then((data) => {
-      workouts = data.workouts;
-      const userWorkouts = data.userWorkouts[username] || [];
-      const select = document.getElementById("workoutSelect");
-      select.innerHTML = "";
-
-      userWorkouts.forEach((workoutName) => {
-        const option = document.createElement("option");
-        option.value = workoutName;
-        option.textContent = workoutName;
-        select.appendChild(option);
-      });
-
-      if (select.options.length > 0) {
-        select.selectedIndex = 0;
-        selectedWorkout = workouts[select.value];
-        document.getElementById("start-button").disabled = false;
-        updateWorkoutPreview();
-      }
-
-      select.addEventListener("change", () => {
-        selectedWorkout = workouts[select.value] || {};
-        updateWorkoutPreview();
-      });
-    })
-    .catch((error) => console.error("Errore nel caricamento del JSON:", error));
-}
-
-function logout() {
-  localStorage.removeItem("loggedUser");
-  location.reload();
 }
