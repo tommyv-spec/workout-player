@@ -86,6 +86,8 @@ function loadUserData(username) {
   fetch("https://script.google.com/macros/s/AKfycbwBf7FvlhELlsuhtE7uR9m34NKInWqNYe95EqFo6VhR-s9EQ1Bc6WZVi-EbvNeCCYTbrw/exec")
     .then((response) => response.json())
     .then((data) => {
+      console.log(data); // <-- aggiungi questa riga
+      
       workouts = data.workouts;
       const userWorkouts = data.userWorkouts[username] || [];
       const select = document.getElementById("workoutSelect");
