@@ -1,3 +1,4 @@
+// ✅ JavaScript (script.js)
 let workouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (savedUser) {
     document.getElementById("login-screen").style.display = "none";
-    document.getElementById("setup-screen").style.display = "block";
+    document.getElementById("main-app").style.display = "block";
     loadUserData(savedUser);
   } else {
     document.getElementById("login-screen").style.display = "block";
@@ -68,7 +69,7 @@ function login() {
       if (data.status === "success") {
         localStorage.setItem("loggedUser", username);
         document.getElementById("login-screen").style.display = "none";
-        document.getElementById("setup-screen").style.display = "block";
+        document.getElementById("main-app").style.display = "block";
         loadUserData(username);
       } else {
         errorBox.textContent = data.message;
@@ -86,8 +87,6 @@ function loadUserData(username) {
   fetch("https://script.google.com/macros/s/AKfycbwBf7FvlhELlsuhtE7uR9m34NKInWqNYe95EqFo6VhR-s9EQ1Bc6WZVi-EbvNeCCYTbrw/exec")
     .then((response) => response.json())
     .then((data) => {
-      console.log(data); // <-- aggiungi questa riga
-      
       workouts = data.workouts;
       const userWorkouts = data.userWorkouts[username] || [];
       const select = document.getElementById("workoutSelect");
@@ -246,14 +245,3 @@ function updateWorkoutPreview() {
     instructionsBox.style.display = "none";
   }
 }
-
-function logout() {
-  document.getElementById("main-app").style.display = "none";
-  document.getElementById("login-screen").style.display = "block";
-  document.getElementById("username").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("login-error").style.display = "none";
-}
-
-document.getElementById("logout-button").addEventListener("click", logout);
-
