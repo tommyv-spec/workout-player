@@ -1,90 +1,73 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Workout App</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
+    .screen { display: none; }
+    #login-screen, #setup-screen, #exercise-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+    button { padding: 10px 20px; margin-top: 10px; }
+    #exercise-gif, #next-exercise-gif { max-width: 100%; border-radius: 8px; }
+    ul { list-style: none; padding-left: 0; }
+    #exercise-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+    .hidden { display: none; }
+    #logout-button { float: right; background: #ccc; border: none; cursor: pointer; }
+  </style>
 </head>
 <body>
+
   <header>
-    <img src="https://drive.google.com/thumbnail?id=12BkxTeS2OhJjuAPXGsRgP-KHrCXjul05" alt="Logo" />
-    <h1>Workout Trainer</h1>
+    <button id="logout-button">Logout</button>
   </header>
 
-  <main>
-    <div id="login-screen">
-      <h3>Login</h3>
-      <input type="text" id="username" placeholder="Username"><br>
-      <input type="password" id="password" placeholder="Password"><br>
-      <button onclick="login()">Accedi</button>
-      <p id="login-error" style="color: red; display: none;"></p>
-    </div>
-    
-    <div id="main-app" style="display: none;">
-      <div id="setup-screen">
-      <label for="userSelect">Seleziona utente:</label>
-      <select id="userSelect">
-        <option disabled selected>Scegli un utente</option>
-      </select>
-    
-      <label for="workoutSelect">Seleziona workout:</label>
-      <select id="workoutSelect"></select>
-    
-      <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
-        <label for="beepToggle">Attiva bip:</label>
-        <input type="checkbox" id="beepToggle" checked />
+  <div id="login-screen" class="screen">
+    <h2>Login</h2>
+    <input id="username" type="text" placeholder="Username"><br>
+    <input id="password" type="password" placeholder="Password"><br>
+    <button id="login-button">Login</button>
+    <p id="login-error" style="color: red; display: none;"></p>
+  </div>
+
+  <div id="setup-screen" class="screen">
+    <h2>Seleziona Workout</h2>
+    <select id="workoutSelect"></select><br>
+    <button id="start-button" disabled>Inizia</button>
+
+    <div id="workout-preview" style="margin-top: 20px;">
+      <h3>Esercizi</h3>
+      <ul id="exercise-list"></ul>
+      <div id="exercise-visuals">
+        <div id="exercise-grid"></div>
       </div>
-
-    
-      <button id="start-button" disabled>Start Workout</button>
-    
-      <div id="workout-preview" style="display: none;">
-        <h3>Esercizi nel workout:</h3>
-        <ul id="exercise-list"></ul>
-      </div>
-
-      <div id="exercise-visuals" style="display: none; margin-top: 20px;">
-        <h3>Anteprima visiva:</h3>
-        <div id="exercise-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;"></div>
-      </div>
-
-    </div>
-
-    <div id="instructions-box" style="display: none; text-align: center; margin: 20px;">
-      <strong>Istruzioni:</strong>
-      <p id="instructions-text"></p>
-    </div>
-
-
-
-
-    <div id="exercise-container" style="display: none;">
-    
-      <h2 id="exercise-name"></h2>
-      <img id="exercise-gif" src="" alt="Esercizio" />
-    
-      <div id="timer"></div>
-      <button id="pause-button" style="margin-top: 10px;">⏸ Pausa</button>
-    
-      <div id="next-exercise-preview" style="display: none;">
-        <p>Prossimo: <span id="next-exercise-name"></span></p>
-        <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
+      <div id="instructions-box" style="margin-top: 20px;">
+        <h4>Istruzioni:</h4>
+        <p id="instructions-text"></p>
       </div>
     </div>
-      <!-- tutto il resto della tua app -->
+  </div>
+
+  <div id="exercise-container" class="screen">
+    <h2 id="exercise-name"></h2>
+    <img id="exercise-gif" src="" alt="Exercise"><br>
+    <h3 id="timer">0</h3>
+    <button id="pause-button">⏸ Pausa</button>
+    <div id="next-exercise-preview" style="margin-top: 20px; display: none;">
+      <h4>Prossimo: <span id="next-exercise-name"></span></h4>
+      <img id="next-exercise-gif" src="" alt="Next Exercise">
     </div>
+    <div style="margin-top: 20px;">
+      <label>
+        <input type="checkbox" id="beepToggle" checked>
+        Suoni di avviso
+      </label>
+    </div>
+  </div>
 
-
-    
-  </main>
-
-  <!-- Suono del beep -->
-  <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-  <audio id="transition-sound" src="https://actions.google.com/sounds/v1/emergency/emergency_siren_short_burst.ogg" preload="auto"></audio>
+  <audio id="beep-sound" src="beep.mp3" preload="auto"></audio>
+  <audio id="transition-sound" src="transition.mp3" preload="auto"></audio>
 
   <script src="script.js"></script>
-  <button onclick="logout()">Logout</button>
-
 </body>
 </html>
