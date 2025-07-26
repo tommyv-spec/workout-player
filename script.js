@@ -6,6 +6,35 @@ let interval;
 let isPaused = false;
 let savedTimeLeft = null;
 
+document.getElementById("login-button").addEventListener("click", () => {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  fetch("https://script.google.com/macros/s/AKfycbxOXzTXlBxlDCevGVOhveNTzRX5jgnw9X80cxpdAw6Kb3MGyv2b7SSCGtjm7YTNnbMW9w/exec", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("main-app").style.display = "block";
+
+        // Se vuoi pre-selezionare l'utente nel menu a tendina:
+        const userSelect = document.getElementById("userSelect");
+        setTimeout(() => {
+          userSelect.value = username;
+          userSelect.dispatchEvent(new Event("change"));
+        }, 500);
+      } else {
+        document.getElementById("login-error").style.display = "block";
+      }
+    });
+});
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   fetch("https://script.google.com/macros/s/AKfycbxOXzTXlBxlDCevGVOhveNTzRX5jgnw9X80cxpdAw6Kb3MGyv2b7SSCGtjm7YTNnbMW9w/exec")
     .then((response) => response.json())
