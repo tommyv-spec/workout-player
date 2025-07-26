@@ -10,7 +10,7 @@ document.getElementById("login-button").addEventListener("click", () => {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  fetch("https://script.google.com/macros/s/AKfycbwJOVDYlsLMMkuFHCVCsstR4Y6VXYPz5U5r2iEDXAFhqQ_-vgZ1FYYvsKROn9YbYT5fwQ/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbxI6iNXDy23xo3SM8iILEh87dD9CQohTPSncpGycqJKvcrsKclvM08f56aM9PXUz0zoPA/exec", {
     method: "POST",
     body: JSON.stringify({ username, password }),
     headers: { "Content-Type": "application/json" }
