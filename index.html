@@ -13,7 +13,16 @@
   </header>
 
   <main>
-    <div id="setup-screen">
+    <div id="login-screen">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Username"><br><br>
+      <input type="password" id="password" placeholder="Password"><br><br>
+      <button id="login-button">Accedi</button>
+      <p id="login-error" style="color: red; display: none;">Credenziali errate</p>
+    </div>
+    
+    <div id="main-app" style="display: none;">
+      <div id="setup-screen">
       <label for="userSelect">Seleziona utente:</label>
       <select id="userSelect">
         <option disabled selected>Scegli un utente</option>
@@ -40,7 +49,6 @@
         <div id="exercise-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;"></div>
       </div>
 
-    
     </div>
 
     <div id="instructions-box" style="display: none; text-align: center; margin: 20px;">
@@ -64,6 +72,11 @@
         <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
       </div>
     </div>
+      <!-- tutto il resto della tua app -->
+    </div>
+
+
+    
   </main>
 
   <!-- Suono del beep -->
