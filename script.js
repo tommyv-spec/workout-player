@@ -10,7 +10,7 @@ document.getElementById("login-button").addEventListener("click", () => {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  fetch("https://script.google.com/macros/s/AKfycbxjtBk3mKB3GRyZjcQTIQUCGikyYjIz_yvrGeBfI1eYcnc0LaCbji_7SMByRvGErNj95g/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwJOVDYlsLMMkuFHCVCsstR4Y6VXYPz5U5r2iEDXAFhqQ_-vgZ1FYYvsKROn9YbYT5fwQ/exec", {
     method: "POST",
     body: JSON.stringify({ username, password }),
     headers: { "Content-Type": "application/json" }
@@ -36,7 +36,7 @@ document.getElementById("login-button").addEventListener("click", () => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://script.google.com/macros/s/AKfycbxjtBk3mKB3GRyZjcQTIQUCGikyYjIz_yvrGeBfI1eYcnc0LaCbji_7SMByRvGErNj95g/exec")
+  fetch("https://script.google.com/macros/s/AKfycbwJOVDYlsLMMkuFHCVCsstR4Y6VXYPz5U5r2iEDXAFhqQ_-vgZ1FYYvsKROn9YbYT5fwQ/exec")
     .then((response) => response.json())
     .then((data) => {
       workouts = data.workouts;
