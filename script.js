@@ -1,12 +1,10 @@
-// ✅ File completo: script.js aggiornato
-
 let workouts = {};
 let userWorkouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
 let interval;
 let isPaused = false;
-let savedTimeLeft = 0;
+let savedTimeLeft = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetch("https://script.google.com/macros/s/AKfycbxOXzTXlBxlDCevGVOhveNTzRX5jgnw9X80cxpdAw6Kb3MGyv2b7SSCGtjm7YTNnbMW9w/exec")
@@ -28,10 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       userSelect.addEventListener("change", () => {
         const selectedUser = userSelect.value;
-        const userAssignedWorkouts = userWorkouts[selectedUser] || [];
+        const assigned = userWorkouts[selectedUser] || [];
 
         workoutSelect.innerHTML = '<option disabled selected>Seleziona un workout</option>';
-        userAssignedWorkouts.forEach((w) => {
+        assigned.forEach((w) => {
           const option = document.createElement("option");
           option.value = w;
           option.textContent = w;
@@ -44,7 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       workoutSelect.addEventListener("change", () => {
-        selectedWorkout = workouts[workoutSelect.value] || {};
+        const name = workoutSelect.value;
+        selectedWorkout = workouts[name] || {};
         document.getElementById("start-button").disabled = false;
         updateWorkoutPreview();
       });
@@ -56,13 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("exercise-container").style.display = "block";
     document.getElementById("workout-preview").style.display = "none";
 
-    if (selectedWorkout.instructions) {
-      document.getElementById("instructions-text").textContent = selectedWorkout.instructions;
+    const workout = selectedWorkout;
+
+    if (workout.instructions) {
+      document.getElementById("instructions-text").textContent = workout.instructions;
       document.getElementById("instructions-box").style.display = "block";
     }
 
     currentStep = 0;
-    playExercise(currentStep, selectedWorkout.exercises);
+    savedTimeLeft = null;
+    playExercise(currentStep, workout.exercises);
   });
 
   document.getElementById("pause-button").addEventListener("click", () => {
@@ -79,6 +81,71 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+function playExercise(index, exercises, resumeTime = null) {
+  if (index >= exercises.length) {
+    document.getElementById("exercise-name").textContent = "Workout completato!";
+    document.getElementById("exercise-gif").src = "";
+    document.getElementById("timer").textContent = "";
+    document.getElementById("next-exercise-preview").style.display = "none";
+    return;
+  }
+
+  const beepAudio = document.getElementById("beep-sound");
+  const transitionSound = document.getElementById("transition-sound");
+  const beepEnabled = document.getElementById("beepToggle").checked;
+
+  const exercise = exercises[index];
+  const nextExercise = exercises[index + 1];
+
+  document.getElementById("exercise-name").textContent = exercise.name;
+  document.getElementById("exercise-gif").src = exercise.imageUrl;
+  document.getElementById("next-exercise-preview").style.display = "none";
+
+  let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft !== null ? savedTimeLeft : parseInt(exercise.duration);
+  savedTimeLeft = null;
+
+  document.getElementById("timer").textContent = timeLeft;
+  clearInterval(interval);
+
+  const beepMoments = [60, 30, 10, 5].filter(t => t < timeLeft);
+
+  interval = setInterval(() => {
+    if (isPaused) {
+      savedTimeLeft = timeLeft;
+      clearInterval(interval);
+      return;
+    }
+
+    timeLeft--;
+    document.getElementById("timer").textContent = timeLeft;
+
+    if (beepEnabled && beepMoments.includes(timeLeft)) beepAudio.play();
+
+    if (timeLeft === 10 && nextExercise) {
+      document.getElementById("next-exercise-name").textContent = nextExercise.name;
+      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
+      document.getElementById("next-exercise-preview").style.display = "block";
+    }
+
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      document.getElementById("next-exercise-preview").style.display = "none";
+      transitionSound.play();
+      currentStep++;
+      savedTimeLeft = null;
+      setTimeout(() => playExercise(currentStep, exercises), 1000);
+    }
+  }, 1000);
+}
+
+function resumeTimer() {
+  clearInterval(interval);
+  if (!savedTimeLeft || savedTimeLeft <= 0) {
+    savedTimeLeft = parseInt(document.getElementById("timer").textContent);
+  }
+  playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
+}
+
 function updateWorkoutPreview() {
   const preview = document.getElementById("workout-preview");
   const list = document.getElementById("exercise-list");
@@ -90,22 +157,23 @@ function updateWorkoutPreview() {
   list.innerHTML = "";
   exerciseGrid.innerHTML = "";
 
-  // ✅ Controlla se l'oggetto ha la struttura corretta
-  if (!selectedWorkout || !selectedWorkout.exercises || selectedWorkout.exercises.length === 0) {
+  const workout = selectedWorkout;
+
+  if (!workout || !workout.exercises || workout.exercises.length === 0) {
     preview.style.display = "none";
-    visuals.style.display = "none";
     instructionsBox.style.display = "none";
+    visuals.style.display = "none";
     return;
   }
 
-  selectedWorkout.exercises.forEach((ex) => {
+  workout.exercises.forEach((ex) => {
     const li = document.createElement("li");
     li.textContent = `${ex.name} (${ex.duration} sec)`;
     list.appendChild(li);
   });
 
   const seen = new Set();
-  selectedWorkout.exercises.forEach((ex) => {
+  workout.exercises.forEach((ex) => {
     if (seen.has(ex.name)) return;
     seen.add(ex.name);
 
@@ -131,8 +199,8 @@ function updateWorkoutPreview() {
   preview.style.display = "block";
   visuals.style.display = "block";
 
-  if (selectedWorkout.instructions) {
-    instructionsText.textContent = selectedWorkout.instructions;
+  if (workout.instructions) {
+    instructionsText.textContent = workout.instructions;
     instructionsBox.style.display = "block";
   } else {
     instructionsBox.style.display = "none";
