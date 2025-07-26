@@ -1,40 +1,57 @@
 let workouts = {};
+let userWorkouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
 let interval;
 let isPaused = false;
-let savedTimeLeft = null;
+let savedTimeLeft = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://script.google.com/macros/s/AKfycbxKvwNyzfrcecJSTlF0oIBHI3pJL-vkr0Er8f_mBxa8f6ef_OkDeKaC58LLyINElpgBSw/exec")
+  fetch("https://script.google.com/macros/s/AKfycbxOXzTXlBxlDCevGVOhveNTzRX5jgnw9X80cxpdAw6Kb3MGyv2b7SSCGtjm7YTNnbMW9w/exec")
     .then((response) => response.json())
     .then((data) => {
-      workouts = data;
-      const select = document.getElementById("workoutSelect");
-      select.innerHTML = "";
+      workouts = data.workouts;
+      userWorkouts = data.userWorkouts;
 
-      for (const name in data) {
+      const userSelect = document.getElementById("userSelect");
+      const workoutSelect = document.getElementById("workoutSelect");
+
+      // Popola select utenti
+      userSelect.innerHTML = '<option disabled selected>Scegli un utente</option>';
+      for (const user in userWorkouts) {
         const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        select.appendChild(option);
+        option.value = user;
+        option.textContent = user;
+        userSelect.appendChild(option);
       }
 
-      select.addEventListener("change", () => {
-        selectedWorkout = workouts[select.value] || {};
+      // Quando scelgo utente → popola workout
+      userSelect.addEventListener("change", () => {
+        const selectedUser = userSelect.value;
+        const userAssignedWorkouts = userWorkouts[selectedUser] || [];
+
+        workoutSelect.innerHTML = '<option disabled selected>Seleziona un workout</option>';
+        userAssignedWorkouts.forEach((w) => {
+          const option = document.createElement("option");
+          option.value = w;
+          option.textContent = w;
+          workoutSelect.appendChild(option);
+        });
+
+        workoutSelect.disabled = false;
+        document.getElementById("start-button").disabled = true;
+        document.getElementById("workout-preview").style.display = "none";
+      });
+
+      // Quando scelgo workout → abilita Start
+      workoutSelect.addEventListener("change", () => {
+        selectedWorkout = workouts[workoutSelect.value] || {};
         document.getElementById("start-button").disabled = false;
         updateWorkoutPreview();
       });
-
-      if (select.options.length > 0) {
-        select.selectedIndex = 0;
-        selectedWorkout = workouts[select.value];
-        document.getElementById("start-button").disabled = false;
-        updateWorkoutPreview();
-      }
-    })
-    .catch((error) => console.error("Errore nel caricamento del JSON:", error));
-
+    });
+  
+  // Inizio workout
   document.getElementById("start-button").addEventListener("click", () => {
     document.getElementById("setup-screen").style.display = "none";
     document.querySelector("header").style.display = "none";
@@ -50,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     currentStep = 0;
-    savedTimeLeft = null; // reset al primo start
     playExercise(currentStep, selectedWorkout.exercises);
   });
 
@@ -67,134 +83,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
-function playExercise(index, exercises, resumeTime = null) {
-  if (index >= exercises.length) {
-    document.getElementById("exercise-name").textContent = "Workout completato!";
-    document.getElementById("exercise-gif").src = "";
-    document.getElementById("timer").textContent = "";
-    document.getElementById("next-exercise-preview").style.display = "none";
-    return;
-  }
-
-  const beepAudio = document.getElementById("beep-sound");
-  const transitionSound = document.getElementById("transition-sound");
-  const beepEnabled = document.getElementById("beepToggle").checked;
-
-  const exercise = exercises[index];
-  const nextExercise = exercises[index + 1];
-
-  document.getElementById("exercise-name").textContent = exercise.name;
-  document.getElementById("exercise-gif").src = exercise.imageUrl;
-  document.getElementById("next-exercise-preview").style.display = "none";
-
-  let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft !== null ? savedTimeLeft : parseInt(exercise.duration);
-  savedTimeLeft = null; // reset per evitare che venga riusato nel prossimo esercizio
-
-  document.getElementById("timer").textContent = timeLeft;
-  clearInterval(interval);
-
-  const beepMoments = [60, 30, 10, 5].filter(t => t < timeLeft);
-
-  interval = setInterval(() => {
-    if (isPaused) {
-      savedTimeLeft = timeLeft;
-      clearInterval(interval);
-      return;
-    }
-
-    timeLeft--;
-    document.getElementById("timer").textContent = timeLeft;
-
-    if (beepEnabled && beepMoments.includes(timeLeft)) {
-      beepAudio.play();
-    }
-
-    if (timeLeft === 10 && nextExercise) {
-      document.getElementById("next-exercise-name").textContent = nextExercise.name;
-      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-preview").style.display = "block";
-    }
-
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-      document.getElementById("next-exercise-preview").style.display = "none";
-      transitionSound.play();
-      currentStep++;
-      savedTimeLeft = null;
-      setTimeout(() => playExercise(currentStep, exercises), 1000);
-    }
-  }, 1000);
-}
-
-function resumeTimer() {
-  clearInterval(interval);
-
-  if (!savedTimeLeft || savedTimeLeft <= 0) {
-    savedTimeLeft = parseInt(document.getElementById("timer").textContent);
-  }
-
-  playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
-}
-
-function updateWorkoutPreview() {
-  const preview = document.getElementById("workout-preview");
-  const list = document.getElementById("exercise-list");
-  const instructionsBox = document.getElementById("instructions-box");
-  const instructionsText = document.getElementById("instructions-text");
-  const exerciseGrid = document.getElementById("exercise-grid");
-  const visuals = document.getElementById("exercise-visuals");
-
-  list.innerHTML = "";
-  exerciseGrid.innerHTML = "";
-
-  const workoutName = document.getElementById("workoutSelect").value;
-  const workout = workouts[workoutName];
-
-  if (!workout || !workout.exercises || workout.exercises.length === 0) {
-    preview.style.display = "none";
-    instructionsBox.style.display = "none";
-    visuals.style.display = "none";
-    return;
-  }
-
-  workout.exercises.forEach((ex) => {
-    const li = document.createElement("li");
-    li.textContent = `${ex.name} (${ex.duration} sec)`;
-    list.appendChild(li);
-  });
-
-  const seen = new Set();
-  workout.exercises.forEach((ex) => {
-    if (seen.has(ex.name)) return;
-    seen.add(ex.name);
-
-    const card = document.createElement("div");
-    card.style.textAlign = "center";
-
-    const name = document.createElement("div");
-    name.textContent = ex.name;
-    name.style.fontWeight = "bold";
-    name.style.marginBottom = "5px";
-
-    const img = document.createElement("img");
-    img.src = ex.imageUrl;
-    img.alt = ex.name;
-    img.style.width = "100%";
-    img.style.borderRadius = "8px";
-
-    card.appendChild(name);
-    card.appendChild(img);
-    exerciseGrid.appendChild(card);
-  });
-
-  preview.style.display = "block";
-  visuals.style.display = "block";
-
-  if (workout.instructions) {
-    instructionsText.textContent = workout.instructions;
-    instructionsBox.style.display = "block";
-  } else {
-    instructionsBox.style.display = "none";
-  }
-}
