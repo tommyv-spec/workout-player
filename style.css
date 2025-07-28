@@ -42,73 +42,83 @@ main {
   height: 100vh;
   background: linear-gradient(to bottom right, #1e1e1e, #3a2f1f);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  overflow: hidden;
 }
 
 .login-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 40px 30px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  border-radius: 16px;
+  padding: 36px 24px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
   text-align: center;
   width: 100%;
-  max-width: 350px;
+  max-width: 340px;
+  transition: all 0.3s ease;
 }
 
 .login-card img {
-  width: 80px;
-  margin-bottom: 10px;
+  width: 70px;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
 }
 
 .login-card h1 {
-  font-size: 24px;
-  color: #fff;
-  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
 }
 
 .login-card h3 {
-  font-size: 18px;
-  color: #ccc;
+  font-size: 16px;
+  color: #dddddd;
   margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .login-card input[type="text"],
 .login-card input[type="password"] {
   width: 100%;
-  padding: 12px 15px;
+  padding: 12px 14px;
   margin-bottom: 15px;
   border: none;
-  border-radius: 10px;
-  background-color: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background-color: rgba(255,255,255,0.1);
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   outline: none;
-  transition: 0.2s;
+  transition: background 0.2s ease;
 }
 
 .login-card input::placeholder {
-  color: #ddd;
+  color: #ccc;
 }
 
 .login-card input:focus {
-  background-color: rgba(255,255,255,0.25);
+  background-color: rgba(255,255,255,0.2);
+  box-shadow: 0 0 0 2px #58a03944;
 }
 
 .login-card button {
   width: 100%;
   padding: 12px;
-  background-color: #58a039;
-  color: #fff;
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
   font-size: 16px;
+  font-weight: bold;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background 0.3s, transform 0.2s;
 }
 
 .login-card button:hover {
-  background-color: #6ab04c;
+  background: linear-gradient(135deg, #7ddc5c, #58a039);
+  transform: translateY(-1px);
 }
 
 
