@@ -39,7 +39,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 88vh;
   background: linear-gradient(to bottom right, #1e1e1e, #3a2f1f);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
