@@ -82,6 +82,7 @@ body {
   padding: 10px 20px;
   box-sizing: border-box;
   text-align: center;
+  position: relative;
 }
 
 #instructions-box {
@@ -102,21 +103,38 @@ body {
 }
 
 #exercise-gif {
-  width: 80%;
-  max-height: 40vh; /* max 40% dell'altezza schermo */
-  object-fit: cover;
+  width: 90%;
+  height: 80vh;
+  object-fit: contain;
   border-radius: 10px;
+  margin-top: 60px;
 }
 
-#timer {
-  font-size: 48px;
+#next-exercise-preview .next-wrapper {
+  display: flex;
+  gap: 10px;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+#next-exercise-preview .next-info {
+  width: 45%;
+  text-align: center;
+}
+
+#next-exercise-preview img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+#next-exercise-preview p {
+  font-size: 16px;
+  margin-bottom: 10px;
   font-weight: bold;
-  margin: 10px 0;
-  color: #333;
-}
-
-#next-exercise-preview {
-  font-size: 14px;
 }
 
 #next-exercise-gif {
@@ -234,9 +252,11 @@ audio {
   margin-bottom: 10px;
 }
 
-#timer {
+#timer.full-timer {
+  position: absolute;
+  top: 20px;
   font-size: 48px;
-  margin-top: 20px;
   font-weight: bold;
+  color: #222;
 }
 
