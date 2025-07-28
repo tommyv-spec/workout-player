@@ -21,7 +21,7 @@
       <button id="login-button">Accedi</button>
       <p id="login-error" style="color: red; display: none;"></p>
     </div>
-    
+
     <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
       <div id="setup-screen">
@@ -56,18 +56,24 @@
       </div>
 
       <div id="exercise-container" style="display: none;">
-        <h2 id="exercise-name"></h2>
+        <div id="timer" class="full-timer"></div>
         <img id="exercise-gif" src="" alt="Esercizio" />
-        <div id="timer"></div>
-        <button id="pause-button" style="margin-top: 10px;">⏸ Pausa</button>
 
         <div id="next-exercise-preview" style="display: none;">
-          <p>Prossimo: <span id="next-exercise-name"></span></p>
-          <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
+          <div class="next-wrapper">
+            <div class="next-info">
+              <p>Prossimo: <span id="next-exercise-name"></span></p>
+              <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
+            </div>
+            <div class="next-info">
+              <p>Ora: <span id="exercise-name"></span></p>
+              <img id="current-exercise-gif" src="" alt="Esercizio corrente" />
+            </div>
+          </div>
         </div>
-      </div>
 
-      
+        <button id="pause-button">⏸ Pausa</button>
+      </div>
     </div>
   </main>
 
