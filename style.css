@@ -159,103 +159,65 @@ audio {
   font-size: 16px;
   max-width: 90%;
   margin: 10px auto;
-  color: #000;
+  color: #111;
 }
 
 #exercise-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  padding: 0;
-  margin: 0;
+  padding: 10px;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
   text-align: center;
+  gap: 10px;
 }
 
 #timer.full-timer {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   font-size: 48px;
   font-weight: bold;
   color: #FFD700;
-  z-index: 2;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
 }
 
 #exercise-name {
   font-size: 22px;
   font-weight: bold;
-  margin-top: 80px;
   color: #fff;
+  margin-top: 0;
 }
 
 #exercise-gif {
-  width: 100vw;
-  height: 40vh;
-  object-fit: contain;
-  margin: 0;
-  border-radius: 0;
-}
-
-#next-exercise-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  padding: 0;
-  margin: 0;
-  gap: 0;
-  overflow: hidden;
-}
-
-#next-exercise-preview .next-info {
-  flex: 1;
   width: 100%;
-  height: 50vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-#next-exercise-preview .next-info p {
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 10px;
-}
-
-#next-exercise-preview .next-info img {
-  width: 100vw;
   height: 40vh;
-  object-fit: contain;
-  border-radius: 0;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+}
+
+#next-exercise-name {
+  font-size: 18px;
+  color: #ccc;
+  font-weight: bold;
+}
+
+#next-exercise-preview img {
+  width: 100%;
+  height: 40vh;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
 }
 
 #pause-button {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-}
-
-#exercise-grid img {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-#exercise-grid div {
-  background-color: #f9f9f9;
-  padding: 10px;
-  border-radius: 10px;
+  margin-top: auto;
+  background-color: #111;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
 }
