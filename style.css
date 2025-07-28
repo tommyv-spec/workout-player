@@ -36,46 +36,81 @@ main {
 
 /* ====== LOGIN SCREEN ====== */
 #login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(to bottom right, #1e1e1e, #3a2f1f);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   text-align: center;
-  margin-top: 30px;
+  width: 100%;
+  max-width: 350px;
 }
 
-#login-screen h3 {
+.login-card img {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.login-card h1 {
   font-size: 24px;
+  color: #fff;
   margin-bottom: 20px;
-  color: #fff;
 }
 
-input[type="text"],
-input[type="password"] {
+.login-card h3 {
+  font-size: 18px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.login-card input[type="text"],
+.login-card input[type="password"] {
   width: 100%;
-  padding: 12px;
+  padding: 12px 15px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
   font-size: 16px;
+  outline: none;
+  transition: 0.2s;
 }
 
-button {
+.login-card input::placeholder {
+  color: #ddd;
+}
+
+.login-card input:focus {
+  background-color: rgba(255,255,255,0.25);
+}
+
+.login-card button {
   width: 100%;
   padding: 12px;
-  background-color: #222;
+  background-color: #58a039;
   color: #fff;
-  border: none;
-  border-radius: 8px;
   font-size: 16px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
-button:hover {
-  background-color: #444;
+.login-card button:hover {
+  background-color: #6ab04c;
 }
 
-#login-error {
-  color: red;
-  font-size: 14px;
-}
 
 /* ====== SETUP SCREEN ====== */
 #setup-screen {
