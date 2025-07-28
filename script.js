@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("start-button").addEventListener("click", () => {
     document.getElementById("setup-screen").style.display = "none";
     document.querySelector("header").style.display = "none";
-    document.getElementById("exercise-container").style.display = "block";
+    document.getElementById("exercise-container").style.display = "flex";
     document.getElementById("workout-preview").style.display = "none";
 
     const workout = selectedWorkout;
@@ -163,7 +163,7 @@ function playExercise(index, exercises, resumeTime = null) {
     if (timeLeft === 10 && nextExercise) {
       document.getElementById("next-exercise-name").textContent = nextExercise.name;
       document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-preview").style.display = "block";
+      document.getElementById("next-exercise-preview").style.display = "flex";
     }
 
     if (timeLeft <= 0) {
