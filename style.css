@@ -165,7 +165,7 @@ button:hover {
 #timer.full-timer {
   font-size: 48px;
   font-weight: bold;
-  color: #000000;
+  color: #FFD700;
   margin-bottom: 8px;
 }
 
@@ -173,7 +173,7 @@ button:hover {
 #exercise-name {
   font-size: 22px;
   font-weight: bold;
-  color: #000000;
+  color: #fff;
   margin-bottom: 10px;
   text-align: center;
 }
@@ -200,7 +200,7 @@ button:hover {
 
 #next-exercise-name {
   font-size: 18px;
-  color: #000000;
+  color: #aaa;
   font-weight: bold;
   margin-bottom: 6px;
 }
