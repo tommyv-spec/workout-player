@@ -17,12 +17,12 @@
     <div id="login-screen">
       <div class="login-card">
         <h3>Login</h3>
-        <input type="text" placeholder="Username" id="username">
-        <input type="password" placeholder="Password" id="password">
-        <button onclick="login-button">Accedi</button>
+        <input type="text" placeholder="Username" id="username" />
+        <input type="password" placeholder="Password" id="password" />
+        <button id="login-button">Accedi</button>
+        <div id="login-error" style="display:none; color: red; margin-top: 10px;"></div>
       </div>
     </div>
-
 
     <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
@@ -65,7 +65,7 @@
 
         <!-- 4. SE PRESENTE: PROSSIMO ESERCIZIO -->
         <div id="next-exercise-preview" style="display: none;">
-          <div id="next-exercise-name">Prossimo esercizio: <span></span></div>
+          <div id="next-exercise-name"><span></span></div>
           <img id="next-exercise-gif" src="" alt="Prossimo esercizio" />
         </div>
 
