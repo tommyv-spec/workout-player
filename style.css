@@ -86,7 +86,7 @@ header img {
 header h1 {
   margin-top: 10px;
   font-size: 28px;
-  color: #000000;
+  color: #fff;
 }
 
 main {
@@ -159,75 +159,86 @@ audio {
   font-size: 16px;
   max-width: 90%;
   margin: 10px auto;
+  color: #000;
 }
 
 #exercise-container {
-  height: 80vh;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
 }
-
 
 #timer.full-timer {
   position: absolute;
-  top: 30px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 52px;
+  font-size: 48px;
   font-weight: bold;
   color: #FFD700;
-  z-index: 999;
+  z-index: 2;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
 }
 
-
+#exercise-name {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 80px;
+  color: #fff;
+}
 
 #exercise-gif {
   width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  object-position: center;
+  height: 40vh;
+  object-fit: contain;
   margin: 0;
   border-radius: 0;
 }
 
 #next-exercise-preview {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  height: 100vh;
   width: 100vw;
-  padding: 20px;
-  box-sizing: border-box;
-  gap: 20px;
-}
-
-
-#next-exercise-preview .next-info {
-  flex: 1;
-  max-height: 100vh;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  gap: 0;
   overflow: hidden;
 }
 
+#next-exercise-preview .next-info {
+  flex: 1;
+  width: 100%;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-
-#next-exercise-preview p {
+#next-exercise-preview .next-info p {
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 10px;
   color: #fff;
+  margin-bottom: 10px;
 }
 
-#next-exercise-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 10px;
+#next-exercise-preview .next-info img {
+  width: 100vw;
+  height: 40vh;
+  object-fit: contain;
+  border-radius: 0;
 }
-
-
 
 #pause-button {
   position: absolute;
@@ -236,15 +247,6 @@ audio {
   transform: translateX(-50%);
   z-index: 2;
 }
-
-#exercise-name {
-  font-size: 24px;
-  margin-top: 80px;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-}
-
 
 #exercise-grid img {
   max-width: 100%;
