@@ -236,10 +236,7 @@ main {
 
 /* 4. PROSSIMO ESERCIZIO (nome + GIF) */
 #next-exercise-preview {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  display: none !important;
 }
 
 #next-exercise-name {
