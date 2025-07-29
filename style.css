@@ -207,12 +207,14 @@ main {
 }
 
 /* 1. TIMER GIALLO */
-#timer.full-timer {
-  font-size: 48px;
+.full-timer {
+  font-size: 6rem;
   font-weight: bold;
+  text-align: center;
   color: #FFD700;
-  margin-bottom: 8px;
+  margin: 30px 0;
 }
+
 
 /* 2. NOME ESERCIZIO ATTUALE */
 #exercise-name {
