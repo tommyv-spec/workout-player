@@ -233,8 +233,17 @@ function speak(text) {
   msg.rate = 1.15;
   msg.pitch = 1;
   msg.volume = 1;
+
   const voices = speechSynthesis.getVoices();
   const male = voices.find(v => v.lang === "it-IT" && v.name.toLowerCase().includes("male"));
   if (male) msg.voice = male;
-  speechSynthesis.speak(msg);
+
+  // Svuota la coda se sta già parlando
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    setTimeout(() => speechSynthesis.speak(msg), 50); // leggera attesa
+  } else {
+    speechSynthesis.speak(msg);
+  }
 }
+
