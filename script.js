@@ -1,4 +1,3 @@
-// ✅ JavaScript (script.js)
 let workouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
@@ -136,17 +135,22 @@ function playExercise(index, exercises, resumeTime = null) {
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
-  document.getElementById("exercise-name").textContent = exercise.name;
-  document.getElementById("exercise-gif").src = exercise.imageUrl;
-  document.getElementById("next-exercise-preview").style.display = "none";
+  const timerEl = document.getElementById("timer");
+  const exerciseNameEl = document.getElementById("exercise-name");
+  const exerciseGifEl = document.getElementById("exercise-gif");
+  const nextNameEl = document.getElementById("next-exercise-name").querySelector("span");
+  const nextGifEl = document.getElementById("next-exercise-gif");
+  const nextPreviewEl = document.getElementById("next-exercise-preview");
+
+  exerciseNameEl.textContent = exercise.name;
+  exerciseGifEl.src = exercise.imageUrl;
+  nextPreviewEl.style.display = "none";
+  nextGifEl.style.display = "none";
 
   let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft !== null ? savedTimeLeft : parseInt(exercise.duration);
   savedTimeLeft = null;
-
-  document.getElementById("timer").textContent = timeLeft;
+  timerEl.textContent = timeLeft;
   clearInterval(interval);
-
-  const beepMoments = [60, 30, 10, 5].filter(t => t < timeLeft);
 
   interval = setInterval(() => {
     if (isPaused) {
@@ -156,25 +160,59 @@ function playExercise(index, exercises, resumeTime = null) {
     }
 
     timeLeft--;
-    document.getElementById("timer").textContent = timeLeft;
+    timerEl.textContent = timeLeft;
 
-    if (beepEnabled && beepMoments.includes(timeLeft)) beepAudio.play();
+    // 2. Attiva/disattiva tutti i suoni con la checkbox
+    if (beepEnabled && (timeLeft === 60 || timeLeft === 30)) {
+      // 3. Al posto del suono, mostra solo testo
+      const msg = document.createElement("div");
+      msg.textContent = `(${timeLeft} seconds left)`;
+      msg.style.fontSize = "16px";
+      msg.style.color = "#FFD700";
+      msg.style.marginBottom = "10px";
+      msg.id = `msg-${timeLeft}`;
+      document.getElementById("exercise-container").prepend(msg);
+      setTimeout(() => {
+        const oldMsg = document.getElementById(`msg-${timeLeft}`);
+        if (oldMsg) oldMsg.remove();
+      }, 3000);
+    }
 
+    // 4. A 10 secondi mostra solo il prossimo esercizio a schermo intero
     if (timeLeft === 10 && nextExercise) {
-      document.getElementById("next-exercise-name").textContent = nextExercise.name;
-      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-preview").style.display = "flex";
+      nextNameEl.textContent = nextExercise.name;
+      nextGifEl.src = nextExercise.imageUrl;
+      nextPreviewEl.style.display = "flex";
+
+      // Nasconde il corrente
+      exerciseGifEl.style.display = "none";
+      exerciseNameEl.style.display = "none";
+
+      if (beepEnabled) speak(`Prossimo esercizio: ${nextExercise.name}`);
+    }
+
+    // 5. Conto alla rovescia vocale negli ultimi 5 secondi
+    if (timeLeft <= 5 && timeLeft > 0 && beepEnabled) {
+      speak(timeLeft.toString());
     }
 
     if (timeLeft <= 0) {
       clearInterval(interval);
-      document.getElementById("next-exercise-preview").style.display = "none";
       transitionSound.play();
+      nextPreviewEl.style.display = "none";
+
+      // Rende visibile di nuovo il corrente
+      exerciseGifEl.style.display = "block";
+      exerciseNameEl.style.display = "block";
+
       currentStep++;
       savedTimeLeft = null;
       setTimeout(() => playExercise(currentStep, exercises), 1000);
     }
   }, 1000);
+
+  // 6. Dì il nome dell'esercizio all'inizio
+  if (beepEnabled) speak(exercise.name);
 }
 
 function resumeTimer() {
@@ -244,4 +282,10 @@ function updateWorkoutPreview() {
   } else {
     instructionsBox.style.display = "none";
   }
+}
+
+function speak(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "it-IT";
+  speechSynthesis.speak(utterance);
 }
