@@ -223,10 +223,11 @@ main {
   text-align: center;
 }
 
-/* 3. GIF ATTUALE */
+/* 3. GIF ATTUALE - occupa spazio rimanente */
 #exercise-gif {
+  flex-grow: 1;
   width: 100%;
-  height: 40vh;
+  max-height: 50vh;
   object-fit: cover;
   object-position: center;
   border-radius: 10px;
@@ -239,20 +240,27 @@ main {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-top: 10px;
   width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.95);
+  height: 100%;
+  justify-content: center;
+  transition: opacity 0.3s ease;
 }
 
 #next-exercise-name {
-  font-size: 18px;
-  color: #aaa;
+  font-size: 22px;
+  color: #fff;
   font-weight: bold;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 
 #next-exercise-preview img {
   width: 100%;
-  height: 40vh;
+  max-height: 50vh;
   object-fit: cover;
   object-position: center;
   border-radius: 10px;
@@ -273,6 +281,20 @@ main {
   cursor: pointer;
   z-index: 999;
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+/* Container per mantenere flessibilità verticale */
+#exercise-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  padding: 20px;
+  gap: 16px;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
 }
 
 /* ====== AUDIO ====== */
