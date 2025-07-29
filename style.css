@@ -233,12 +233,14 @@ main {
 #exercise-gif {
   flex-grow: 1;
   width: 100%;
-  max-height: 50vh;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain; /* usalo se vuoi tutto visibile */
   object-position: center;
   border-radius: 10px;
   margin-bottom: 10px;
+  max-height: 70vh;
 }
+
 
 /* 4. PROSSIMO ESERCIZIO (nome + GIF) */
 #next-exercise-preview {
