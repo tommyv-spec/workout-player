@@ -207,14 +207,6 @@ main {
 }
 
 /* 1. TIMER GIALLO */
-.full-timer {
-  font-size: 6rem;
-  font-weight: bold;
-  text-align: center;
-  color: #FFD700;
-  margin: 30px 0;
-}
-
 #timer.full-timer {
   display: block;
   font-size: 6rem;
@@ -222,7 +214,9 @@ main {
   color: #FFD700;
   text-align: center;
   margin: 30px 0;
+  z-index: 2;
 }
+
 
 
 
