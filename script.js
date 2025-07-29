@@ -173,7 +173,7 @@ function playExercise(index, exercises, resumeTime = null) {
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
-  document.getElementById("exercise-name").textContent = exercise.name;
+  document.getElementById("exercise-name").innerHTML = "<strong>" + exercise.name + "</strong>";
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
 
@@ -199,9 +199,10 @@ function playExercise(index, exercises, resumeTime = null) {
     if (timeLeft === 30 && beepEnabled) speak("mancano trenta secondi");
 
     if (timeLeft === 10 && nextExercise) {
-      document.getElementById("next-exercise-name").textContent = nextExercise.name;
-      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      speak("prossimo esercizio: " + nextExercise.name);
+        // Cambia nome e gif a schermo con quelli del prossimo esercizio
+        document.getElementById("exercise-name").innerHTML = "prossimo esercizio:<br><strong>" + nextExercise.name + "</strong>";
+        document.getElementById("exercise-gif").src = nextExercise.imageUrl;
+        speak("prossimo esercizio: " + nextExercise.name);
     }
 
     if (timeLeft === 5 && timeLeft === 3 && beepEnabled) speak(String(timeLeft));
