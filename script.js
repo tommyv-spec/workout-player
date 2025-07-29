@@ -204,7 +204,7 @@ function playExercise(index, exercises, resumeTime = null) {
       speak("prossimo esercizio: " + nextExercise.name);
     }
 
-    if (timeLeft <= 5 && timeLeft > 0 && beepEnabled) speak(String(timeLeft));
+    if (timeLeft === 5 && timeLeft === 3 && beepEnabled) speak(String(timeLeft));
 
     if (timeLeft <= 0) {
       clearInterval(interval);
