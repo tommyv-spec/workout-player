@@ -1,24 +1,9 @@
-// ✅ JavaScript (script.js)
 let workouts = {};
 let selectedWorkout = {};
 let currentStep = 0;
 let interval;
 let isPaused = false;
 let savedTimeLeft = null;
-
-const synth = window.speechSynthesis;
-const voiceSettings = {
-  pitch: 1,
-  rate: 1.3,
-  lang: 'it-IT'
-};
-
-function speak(text) {
-  const utterance = new SpeechSynthesisUtterance(text);
-  Object.assign(utterance, voiceSettings);
-  utterance.voice = synth.getVoices().find(v => v.lang === 'it-IT' && v.name.toLowerCase().includes("male")) || null;
-  synth.speak(utterance);
-}
 
 document.addEventListener("DOMContentLoaded", () => {
   const savedUser = localStorage.getItem("loggedUser");
@@ -39,23 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("header").style.display = "none";
     document.getElementById("exercise-container").style.display = "flex";
     document.getElementById("workout-preview").style.display = "none";
-
-    const workout = selectedWorkout;
-
-    if (workout.instructions) {
-      document.getElementById("instructions-text").textContent = workout.instructions;
-      document.getElementById("instructions-box").style.display = "block";
-    }
-
     currentStep = 0;
     savedTimeLeft = null;
-    playExercise(currentStep, workout.exercises);
+    playExercise(currentStep, selectedWorkout.exercises);
   });
 
   document.getElementById("pause-button").addEventListener("click", () => {
     isPaused = !isPaused;
     const pauseBtn = document.getElementById("pause-button");
-
     if (isPaused) {
       clearInterval(interval);
       pauseBtn.textContent = "▶️ Riprendi";
@@ -81,10 +57,10 @@ function login() {
     .then(res => res.json())
     .then(data => {
       if (data.status === "success") {
-        localStorage.setItem("loggedUser", username.toLowerCase());
+        localStorage.setItem("loggedUser", username);
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("main-app").style.display = "block";
-        loadUserData(username.toLowerCase());
+        loadUserData(username);
       } else {
         errorBox.textContent = data.message;
         errorBox.style.display = "block";
@@ -97,23 +73,25 @@ function login() {
     });
 }
 
+function logout() {
+  localStorage.removeItem("loggedUser");
+  location.reload();
+}
+
 function loadUserData(username) {
   fetch("https://script.google.com/macros/s/AKfycbwBf7FvlhELlsuhtE7uR9m34NKInWqNYe95EqFo6VhR-s9EQ1Bc6WZVi-EbvNeCCYTbrw/exec")
-    .then((response) => response.json())
-    .then((data) => {
-      workouts = data.workouts || {};
-      const userWorkouts = (data.userWorkouts && data.userWorkouts[username]) || [];
+    .then(res => res.json())
+    .then(data => {
+      workouts = data.workouts;
+      const userWorkouts = data.userWorkouts[username] || [];
       const select = document.getElementById("workoutSelect");
-
       select.innerHTML = "";
 
-      userWorkouts.forEach((workoutName) => {
-        if (workouts[workoutName]) {
-          const option = document.createElement("option");
-          option.value = workoutName;
-          option.textContent = workoutName;
-          select.appendChild(option);
-        }
+      userWorkouts.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
       });
 
       if (select.options.length > 0) {
@@ -127,13 +105,59 @@ function loadUserData(username) {
         selectedWorkout = workouts[select.value] || {};
         updateWorkoutPreview();
       });
-    })
-    .catch((error) => console.error("Errore nel caricamento del JSON:", error));
+    });
 }
 
-function logout() {
-  localStorage.removeItem("loggedUser");
-  location.reload();
+function updateWorkoutPreview() {
+  const preview = document.getElementById("workout-preview");
+  const list = document.getElementById("exercise-list");
+  const visuals = document.getElementById("exercise-visuals");
+  const instructionsBox = document.getElementById("instructions-box");
+  const instructionsText = document.getElementById("instructions-text");
+
+  list.innerHTML = "";
+  document.getElementById("exercise-grid").innerHTML = "";
+
+  const workout = selectedWorkout;
+  if (!workout || !workout.exercises?.length) {
+    preview.style.display = "none";
+    visuals.style.display = "none";
+    instructionsBox.style.display = "none";
+    return;
+  }
+
+  workout.exercises.forEach(ex => {
+    const li = document.createElement("li");
+    li.textContent = `${ex.name} (${ex.duration}s)`;
+    list.appendChild(li);
+  });
+
+  const seen = new Set();
+  workout.exercises.forEach(ex => {
+    if (seen.has(ex.name)) return;
+    seen.add(ex.name);
+
+    const card = document.createElement("div");
+    card.className = "exercise-card";
+
+    const name = document.createElement("div");
+    name.textContent = ex.name;
+    name.className = "exercise-name";
+
+    const img = document.createElement("img");
+    img.src = ex.imageUrl;
+    img.alt = ex.name;
+
+    card.appendChild(name);
+    card.appendChild(img);
+    document.getElementById("exercise-grid").appendChild(card);
+  });
+
+  instructionsBox.style.display = workout.instructions ? "block" : "none";
+  if (workout.instructions) instructionsText.textContent = workout.instructions;
+
+  preview.style.display = "block";
+  visuals.style.display = "block";
 }
 
 function playExercise(index, exercises, resumeTime = null) {
@@ -153,13 +177,13 @@ function playExercise(index, exercises, resumeTime = null) {
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
 
-  let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft !== null ? savedTimeLeft : parseInt(exercise.duration);
+  let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft ?? parseInt(exercise.duration);
   savedTimeLeft = null;
-
   document.getElementById("timer").textContent = timeLeft;
-  clearInterval(interval);
 
   speak(exercise.name);
+
+  clearInterval(interval);
 
   interval = setInterval(() => {
     if (isPaused) {
@@ -171,27 +195,24 @@ function playExercise(index, exercises, resumeTime = null) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-    if (beepEnabled) {
-      if (timeLeft === 60 || timeLeft === 30) {
-        speak(`Mancano ${timeLeft} secondi`);
-      }
-      if (timeLeft === 10 && nextExercise) {
-        speak(`Prossimo esercizio: ${nextExercise.name}`);
-        document.getElementById("next-exercise-name").textContent = nextExercise.name;
-        document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-        document.getElementById("next-exercise-preview").style.display = "flex";
-      }
-      if (timeLeft <= 5 && timeLeft > 0) {
-        speak(timeLeft.toString());
-      }
+    if (timeLeft === 60 && beepEnabled) speak("mancano sessanta secondi");
+    if (timeLeft === 30 && beepEnabled) speak("mancano trenta secondi");
+
+    if (timeLeft === 10 && nextExercise) {
+      document.getElementById("next-exercise-name").textContent = nextExercise.name;
+      document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
+      document.getElementById("next-exercise-preview").style.display = "flex";
+      speak("prossimo esercizio: " + nextExercise.name);
     }
+
+    if (timeLeft <= 5 && timeLeft > 0 && beepEnabled) speak(String(timeLeft));
 
     if (timeLeft <= 0) {
       clearInterval(interval);
       document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
       savedTimeLeft = null;
-      setTimeout(() => playExercise(currentStep, exercises), 100);
+      setTimeout(() => playExercise(currentStep, exercises), 300);
     }
   }, 1000);
 }
@@ -204,64 +225,14 @@ function resumeTimer() {
   playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
 }
 
-
-function updateWorkoutPreview() {
-  const preview = document.getElementById("workout-preview");
-  const list = document.getElementById("exercise-list");
-  const instructionsBox = document.getElementById("instructions-box");
-  const instructionsText = document.getElementById("instructions-text");
-  const exerciseGrid = document.getElementById("exercise-grid");
-  const visuals = document.getElementById("exercise-visuals");
-
-  list.innerHTML = "";
-  exerciseGrid.innerHTML = "";
-
-  const workout = selectedWorkout;
-
-  if (!workout || !workout.exercises || workout.exercises.length === 0) {
-    preview.style.display = "none";
-    instructionsBox.style.display = "none";
-    visuals.style.display = "none";
-    return;
-  }
-
-  workout.exercises.forEach((ex) => {
-    const li = document.createElement("li");
-    li.textContent = `${ex.name} (${ex.duration} sec)`;
-    list.appendChild(li);
-  });
-
-  const seen = new Set();
-  workout.exercises.forEach((ex) => {
-    if (seen.has(ex.name)) return;
-    seen.add(ex.name);
-
-    const card = document.createElement("div");
-    card.style.textAlign = "center";
-
-    const name = document.createElement("div");
-    name.textContent = ex.name;
-    name.style.fontWeight = "bold";
-    name.style.marginBottom = "5px";
-
-    const img = document.createElement("img");
-    img.src = ex.imageUrl;
-    img.alt = ex.name;
-    img.style.width = "100%";
-    img.style.borderRadius = "8px";
-
-    card.appendChild(name);
-    card.appendChild(img);
-    exerciseGrid.appendChild(card);
-  });
-
-  preview.style.display = "block";
-  visuals.style.display = "block";
-
-  if (workout.instructions) {
-    instructionsText.textContent = workout.instructions;
-    instructionsBox.style.display = "block";
-  } else {
-    instructionsBox.style.display = "none";
-  }
+function speak(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "it-IT";
+  msg.rate = 1.15;
+  msg.pitch = 1;
+  msg.volume = 1;
+  const voices = speechSynthesis.getVoices();
+  const male = voices.find(v => v.lang === "it-IT" && v.name.toLowerCase().includes("male"));
+  if (male) msg.voice = male;
+  speechSynthesis.speak(msg);
 }
