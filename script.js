@@ -68,7 +68,7 @@ function login() {
     return;
   }
 
-  fetch(`https://script.google.com/macros/s/.../exec?username=${username}&password=${password}`)
+  fetch(`hhttps://script.google.com/macros/s/AKfycbwBf7FvlhELlsuhtE7uR9m34NKInWqNYe95EqFo6VhR-s9EQ1Bc6WZVi-EbvNeCCYTbrw/exec?username=${username}&password=${password}`)
     .then(res => res.json())
     .then(data => {
       if (data.status === "success") {
@@ -88,7 +88,7 @@ function login() {
 }
 
 function loadUserData(username) {
-  fetch("https://script.google.com/macros/s/.../exec")
+  fetch("https://script.google.com/macros/s/AKfycbwBf7FvlhELlsuhtE7uR9m34NKInWqNYe95EqFo6VhR-s9EQ1Bc6WZVi-EbvNeCCYTbrw/exec")
     .then((response) => response.json())
     .then((data) => {
       workouts = data.workouts;
