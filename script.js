@@ -201,7 +201,6 @@ function playExercise(index, exercises, resumeTime = null) {
     if (timeLeft === 10 && nextExercise) {
       document.getElementById("next-exercise-name").textContent = nextExercise.name;
       document.getElementById("next-exercise-gif").src = nextExercise.imageUrl;
-      document.getElementById("next-exercise-preview").style.display = "flex";
       speak("prossimo esercizio: " + nextExercise.name);
     }
 
