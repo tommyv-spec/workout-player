@@ -227,23 +227,21 @@ function resumeTimer() {
   playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
 }
 
-function speak(text) {
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.lang = "it-IT";
-  msg.rate = 1.15;
-  msg.pitch = 1;
-  msg.volume = 1;
+async function speak(text) {
+  try {
+    const response = await fetch("https://eleven-server.onrender.com/speak", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text })
+    });
 
-  const voices = speechSynthesis.getVoices();
-  const male = voices.find(v => v.lang === "it-IT" && v.name.toLowerCase().includes("male"));
-  if (male) msg.voice = male;
-
-  // Svuota la coda se sta già parlando
-  if (speechSynthesis.speaking) {
-    speechSynthesis.cancel();
-    setTimeout(() => speechSynthesis.speak(msg), 50); // leggera attesa
-  } else {
-    speechSynthesis.speak(msg);
+    const blob = await response.blob();
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+  } catch (err) {
+    console.error("Errore nel text-to-speech:", err);
   }
 }
+
 
