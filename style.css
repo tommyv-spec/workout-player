@@ -127,41 +127,85 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background-color: #f7f7f7;
-  color: #000;
-  border-radius: 12px;
-  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  padding: 30px 20px;
+  margin: 30px auto;
+  max-width: 420px;
+  color: #fff;
   text-align: center;
 }
 
 #setup-screen label {
-  margin: 10px 0 5px;
-  font-weight: bold;
-}
-
-#setup-screen select,
-#start-button {
+  font-weight: 600;
+  margin-top: 15px;
+  margin-bottom: 5px;
   width: 100%;
   max-width: 300px;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 15px;
+  color: #ddd;
 }
 
-#start-button {
-  background-color: #6ab04c;
-  color: white;
+#setup-screen select {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
   border: none;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+#setup-screen select:focus {
+  outline: none;
+  background-color: rgba(255,255,255,0.2);
+  box-shadow: 0 0 0 2px #6ab04c80;
+}
+
+/* Pulsante Start Workout */
+#start-button {
+  margin-top: 20px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+#start-button:hover {
+  background: linear-gradient(135deg, #7ddc5c, #58a039);
+  transform: translateY(-2px);
+}
+
+/* Pulsante Logout in alto a destra del blocco */
+#logout-button {
+  align-self: flex-end;
+  margin-bottom: 20px;
+  background-color: rgba(255,255,255,0.1);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: bold;
   cursor: pointer;
   transition: background 0.3s;
 }
 
-#start-button:hover {
-  background-color: #58a039;
+#logout-button:hover {
+  background-color: rgba(255,255,255,0.2);
 }
+
 
 /* ====== WORKOUT PREVIEW ====== */
 #workout-preview {
