@@ -35,8 +35,12 @@
         <select id="workoutSelect"></select>
 
         <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
-          <label for="beepToggle">Attiva voce:</label>
-          <input type="checkbox" id="beepToggle" checked />
+          <label for="soundMode">Modalità audio:</label>
+          <select id="soundMode">
+            <option value="none">Nessun suono</option>
+            <option value="bip">Solo bip</option>
+            <option value="voice" selected>Voce</option>
+          </select>
         </div>
 
         <button id="start-button" disabled>Start Workout</button>
