@@ -1,3 +1,4 @@
+
 /* ====== RESET BASE ====== */
 * {
   box-sizing: border-box;
@@ -121,7 +122,6 @@ main {
   transform: translateY(-1px);
 }
 
-
 /* ====== SETUP SCREEN ====== */
 #setup-screen {
   display: flex;
@@ -177,6 +177,12 @@ main {
   padding: 0 10px;
 }
 
+#instructions-box,
+#exercise-visuals {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
 @media (min-width: 768px) {
   #instructions-box,
   #exercise-visuals {
@@ -185,32 +191,42 @@ main {
   }
 }
 
-#exercise-visuals img {
+#exercise-visuals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.exercise-card {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.exercise-card img {
   max-width: 100%;
-  height: auto;
   border-radius: 8px;
 }
 
-#workout-preview h3 {
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-
-#exercise-list {
-  padding-left: 20px;
+.exercise-name {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
 }
 
 /* ====== INSTRUCTIONS ====== */
 #instructions-box {
   background-color: #fff;
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 16px 18px;
+  border-radius: 12px;
   font-size: 16px;
-  max-width: 90%;
-  margin: 20px auto 90px;
   color: #111;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  text-align: center;
+  text-align: left;
+  line-height: 1.5;
 }
 
 /* ====== WORKOUT MODE ====== */
@@ -227,7 +243,6 @@ main {
   text-align: center;
 }
 
-/* 1. TIMER GIALLO */
 #timer.full-timer {
   display: block;
   font-size: 6rem;
@@ -237,10 +252,6 @@ main {
   z-index: 2;
 }
 
-
-
-
-/* 2. NOME ESERCIZIO ATTUALE */
 #exercise-name {
   font-size: 42px;
   font-weight: bold;
@@ -249,20 +260,17 @@ main {
   text-align: center;
 }
 
-/* 3. GIF ATTUALE - occupa spazio rimanente */
 #exercise-gif {
   flex-grow: 1;
   width: 100%;
   height: auto;
-  object-fit: contain; /* usalo se vuoi tutto visibile */
+  object-fit: contain;
   object-position: center;
   border-radius: 10px;
   margin-bottom: 10px;
   max-height: 70vh;
 }
 
-
-/* 4. PROSSIMO ESERCIZIO (nome + GIF) */
 #next-exercise-preview {
   display: none !important;
 }
@@ -279,7 +287,6 @@ main {
   border-radius: 8px;
 }
 
-/* 5. BOTTONE PAUSA FISSO IN BASSO */
 #pause-button {
   position: fixed;
   bottom: 20px;
@@ -296,12 +303,10 @@ main {
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 
-/* ====== AUDIO ====== */
 audio {
   display: none;
 }
 
-/* ====== RESPONSIVE ====== */
 @media (max-width: 600px) {
   #exercise-name,
   #next-exercise-name {
@@ -314,5 +319,9 @@ audio {
 
   #instructions-box {
     font-size: 14px;
+  }
+
+  #exercise-visuals {
+    grid-template-columns: 1fr;
   }
 }
