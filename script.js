@@ -227,7 +227,6 @@ function playExercise(index, exercises, resumeTime = null) {
       setTimeout(() => playExercise(currentStep, exercises), 300);
     }
 
-    }
   }, 1000);
 }
 
