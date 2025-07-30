@@ -221,11 +221,19 @@ main {
   padding: 0 10px;
 }
 
-#instructions-box,
-#exercise-visuals {
-  flex: 1 1 100%;
+#instructions-box {
+  background-color: #fff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  width: 100%;
+  margin: 40px auto 40px;
+  color: #111;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-align: left;
   max-width: 100%;
 }
+
 
 @media (min-width: 768px) {
   #instructions-box,
