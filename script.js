@@ -204,7 +204,6 @@ function playExercise(index, exercises, resumeTime = null) {
     if (timeLeft === 30 && useVoice) speak("mancano trenta secondi");
     
     if (timeLeft === 10) {
-      // Mostra anteprima prossimo esercizio
       if (nextExercise) {
         document.getElementById("exercise-name").innerHTML = "prossimo esercizio:<br><strong>" + nextExercise.name + "</strong>";
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
@@ -212,20 +211,22 @@ function playExercise(index, exercises, resumeTime = null) {
         if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
       }
     
-      // Beep di preavviso
-      if (useBip) playBeep();  // ← solo uno, valido per entrambi i casi
+      if (useBip) playBeep(); // bip preavviso
     }
     
     if (timeLeft === 5 && useVoice) speak("cinque");
     if (timeLeft === 3 && useVoice) speak("tre");
-
-
+    
     if (timeLeft <= 0) {
+      if (useBip) playTransition(); // suono lungo al cambio esercizio
+    
       clearInterval(interval);
       document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
       savedTimeLeft = null;
       setTimeout(() => playExercise(currentStep, exercises), 300);
+    }
+
     }
   }, 1000);
 }
