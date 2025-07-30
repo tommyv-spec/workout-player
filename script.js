@@ -230,44 +230,31 @@ function resumeTimer() {
 }
 
 async function speak(text) {
-  const cached = localStorage.getItem("voice_" + text);
-
-  if (cached) {
-    const audio = new Audio(cached);
-    audio.play().catch(console.error);
-    return;
-  }
-
   try {
-    const response = await fetch("https://google-tts-server.onrender.com/speak", {
+    const response = await fetch("https://eleven-server.onrender.com/speak", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
     });
 
-    if (!response.ok) throw new Error("Server response not OK");
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error("Errore server: " + errorText);
+    }
 
     const blob = await response.blob();
-    const audioURL = URL.createObjectURL(blob);
+    console.log("🎧 blob type:", blob.type, "size:", blob.size);
 
-    // Cache nel localStorage
-    localStorage.setItem("voice_" + text, audioURL);
+    if (blob.size === 0) throw new Error("Blob audio vuoto");
 
-    const audio = new Audio(audioURL);
-    audio.play().catch(console.error);
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+    await audio.play();
   } catch (error) {
-    console.error("Errore nel text-to-speech:", error);
-
-    // 🔊 Fallback: usa SpeechSynthesis del browser
-    const fallback = new SpeechSynthesisUtterance(text);
-    fallback.lang = "it-IT";
-    fallback.pitch = 1;
-    fallback.rate = 1;
-    speechSynthesis.speak(fallback);
+    console.error("❌ Errore nel text-to-speech:", error);
   }
 }
+
 
 // 🔄 Ping server per "svegliarlo" subito dopo il login
 async function warmUpServer() {
