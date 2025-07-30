@@ -171,7 +171,10 @@ function playExercise(index, exercises, resumeTime = null) {
     return;
   }
 
-  const beepEnabled = document.getElementById("beepToggle").checked;
+  const soundMode = document.getElementById("soundMode").value;
+  const useVoice = soundMode === "voice";
+  const useBip = soundMode === "bip";
+
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
@@ -183,7 +186,7 @@ function playExercise(index, exercises, resumeTime = null) {
   savedTimeLeft = null;
   document.getElementById("timer").textContent = timeLeft;
 
-  speak(exercise.name);
+  if (useVoice) speak(exercise.name);
 
   clearInterval(interval);
 
@@ -197,19 +200,21 @@ function playExercise(index, exercises, resumeTime = null) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-    if (timeLeft === 60 && beepEnabled) speak("mancano sessanta secondi");
-    if (timeLeft === 30 && beepEnabled) speak("mancano trenta secondi");
-
-    if (timeLeft === 10 && nextExercise) {
-        // Cambia nome e gif a schermo con quelli del prossimo esercizio
-        document.getElementById("exercise-name").innerHTML = "prossimo esercizio:<br><strong>" + nextExercise.name + "</strong>";
-        document.getElementById("exercise-gif").src = nextExercise.imageUrl;
-        speak("prossimo esercizio: " + nextExercise.name);
-    }
-
+    if (timeLeft === 60 && useVoice) speak("mancano sessanta secondi");
+    if (timeLeft === 30 && useVoice) speak("mancano trenta secondi");
     
-    if (timeLeft === 5 && beepEnabled) speak("cinque");
-    if (timeLeft === 3 && beepEnabled) speak("tre");
+    if (timeLeft === 10 && nextExercise) {
+      document.getElementById("exercise-name").innerHTML = "prossimo esercizio:<br><strong>" + nextExercise.name + "</strong>";
+      document.getElementById("exercise-gif").src = nextExercise.imageUrl;
+    
+      if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
+      if (useBip) playBeep(); // per il cambio esercizio
+    }
+    
+    if (timeLeft === 5 && useVoice) speak("cinque");
+    if (timeLeft === 3 && useVoice) speak("tre");
+    
+    if (timeLeft === 10 && useBip) playBeep(); // preavviso fine
 
     if (timeLeft <= 0) {
       clearInterval(interval);
@@ -268,6 +273,12 @@ async function warmUpServer() {
   } catch (e) {
     console.warn("⚠️ Impossibile attivare subito il server:", e.message);
   }
+}
+
+function playBeep() {
+  const beep = document.getElementById("beep-sound");
+  beep.currentTime = 0;
+  beep.play().catch(err => console.warn("Errore beep:", err));
 }
 
 
