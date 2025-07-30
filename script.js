@@ -281,8 +281,13 @@ async function warmUpServer() {
 
 function playBeep() {
   const beep = document.getElementById("beep-sound");
-  beep.currentTime = 0;
-  beep.play().catch(err => console.warn("Errore beep:", err));
+  if (beep) beep.play();
 }
+
+function playTransition() {
+  const transition = document.getElementById("transition-sound");
+  if (transition) transition.play();
+}
+
 
 
