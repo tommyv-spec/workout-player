@@ -231,7 +231,9 @@ async function speak(text) {
   try {
     const response = await fetch("https://eleven-server.onrender.com/speak", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ text })
     });
 
@@ -243,5 +245,6 @@ async function speak(text) {
     console.error("Errore nel text-to-speech:", err);
   }
 }
+
 
 
