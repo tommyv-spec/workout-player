@@ -228,6 +228,14 @@ function resumeTimer() {
 }
 
 async function speak(text) {
+  const cached = localStorage.getItem("voice_" + text);
+
+  if (cached) {
+    const audio = new Audio(cached);
+    audio.play().catch(console.error);
+    return;
+  }
+
   try {
     const response = await fetch("https://eleven-server.onrender.com/speak", {
       method: "POST",
@@ -237,12 +245,25 @@ async function speak(text) {
       body: JSON.stringify({ text })
     });
 
+    if (!response.ok) throw new Error("Server response not OK");
+
     const blob = await response.blob();
-    const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
-    audio.play();
-  } catch (err) {
-    console.error("Errore nel text-to-speech:", err);
+    const audioURL = URL.createObjectURL(blob);
+
+    // Cache nel localStorage
+    localStorage.setItem("voice_" + text, audioURL);
+
+    const audio = new Audio(audioURL);
+    audio.play().catch(console.error);
+  } catch (error) {
+    console.error("Errore nel text-to-speech:", error);
+
+    // 🔊 Fallback: usa SpeechSynthesis del browser
+    const fallback = new SpeechSynthesisUtterance(text);
+    fallback.lang = "it-IT";
+    fallback.pitch = 1;
+    fallback.rate = 1;
+    speechSynthesis.speak(fallback);
   }
 }
 
