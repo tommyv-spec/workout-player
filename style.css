@@ -165,9 +165,30 @@ main {
 
 /* ====== WORKOUT PREVIEW ====== */
 #workout-preview {
-  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-start;
   margin-top: 20px;
-  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 10px;
+}
+
+@media (min-width: 768px) {
+  #instructions-box,
+  #exercise-visuals {
+    flex: 1 1 48%;
+    max-width: 48%;
+  }
+}
+
+#exercise-visuals img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
 #workout-preview h3 {
