@@ -6,6 +6,7 @@ let isPaused = false;
 let savedTimeLeft = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+  warmUpServer(); // Attiva il server ElevenLabs
   const savedUser = localStorage.getItem("loggedUser");
 
   if (savedUser) {
@@ -288,16 +289,9 @@ async function speak(text) {
 
 // 🔄 Ping server per "svegliarlo" subito dopo il login
 async function warmUpServer() {
-  try {
-    await fetch("https://eleven-server.onrender.com/speak", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: "Avvio del server completato" })
-    });
-    console.log("✅ Server ElevenLabs attivato");
-  } catch (e) {
-    console.warn("⚠️ Impossibile attivare subito il server:", e.message);
-  }
+  fetch("https://google-tts-server.onrender.com")
+    .then(() => console.log("✅ TTS server attivo"))
+    .catch(() => console.warn("⚠️ Server TTS non raggiungibile"));
 }
 
 function playBeep() {
