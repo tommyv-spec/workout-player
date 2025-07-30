@@ -238,31 +238,52 @@ function resumeTimer() {
   playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
 }
 
+let lastSpeakTime = 0;
+let currentSpeakId = 0;
+
 async function speak(text) {
+  const speakId = ++currentSpeakId;
+  lastSpeakTime = Date.now();
+
   try {
-    const response = await fetch("https://eleven-server.onrender.com/speak", {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000); // Timeout dopo 2s
+
+    const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text }),
+      signal: controller.signal
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error("Errore server: " + errorText);
-    }
+    clearTimeout(timeout);
+
+    if (!response.ok) throw new Error("Errore dal server Google TTS");
 
     const blob = await response.blob();
-    console.log("🎧 blob type:", blob.type, "size:", blob.size);
+    if (blob.size === 0) throw new Error("Risposta audio vuota");
 
-    if (blob.size === 0) throw new Error("Blob audio vuoto");
+    // Se nel frattempo è partita un'altra speak(), ignora questa
+    if (speakId !== currentSpeakId) return;
 
     const audioUrl = URL.createObjectURL(blob);
     const audio = new Audio(audioUrl);
     await audio.play();
   } catch (error) {
-    console.error("❌ Errore nel text-to-speech:", error);
+    console.warn("❌ Google TTS fallito, uso fallback TTS:", error);
+
+    // fallback se ancora valido e recente
+    if (Date.now() - lastSpeakTime < 2000 && speakId === currentSpeakId) {
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "it-IT";
+      utter.rate = 1.0;
+      synth.cancel(); // ferma eventuali ripetizioni
+      synth.speak(utter);
+    }
   }
 }
+
 
 
 // 🔄 Ping server per "svegliarlo" subito dopo il login
