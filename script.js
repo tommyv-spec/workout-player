@@ -237,7 +237,7 @@ async function speak(text) {
   }
 
   try {
-    const response = await fetch("https://eleven-server.onrender.com/speak", {
+    const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
