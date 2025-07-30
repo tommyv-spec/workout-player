@@ -43,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function login() {
+  warmUpServer(); // Attiva il server ElevenLabs
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
   const errorBox = document.getElementById("login-error");
@@ -267,5 +269,18 @@ async function speak(text) {
   }
 }
 
+// 🔄 Ping server per "svegliarlo" subito dopo il login
+async function warmUpServer() {
+  try {
+    await fetch("https://eleven-server.onrender.com/speak", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: "Avvio del server completato" })
+    });
+    console.log("✅ Server ElevenLabs attivato");
+  } catch (e) {
+    console.warn("⚠️ Impossibile attivare subito il server:", e.message);
+  }
+}
 
 
