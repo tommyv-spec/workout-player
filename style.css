@@ -1,5 +1,4 @@
-
-/* RESET BASE */
+/* ====== RESET BASE ====== */
 * {
   margin: 0;
   padding: 0;
@@ -10,63 +9,57 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #1e1e1e, #3a2f1f);
   color: #fff;
-  overflow-x: hidden;
 }
 
-/* HEADER */
+/* ====== HEADER ====== */
 header {
   text-align: center;
   padding: 20px 0 10px;
 }
 
 header img {
-  width: 200px;
+  width: 180px;
   border-radius: 8px;
 }
 
 header h1 {
-  font-size: 26px;
-  font-weight: bold;
-  color: #fff;
   margin-top: 10px;
+  font-size: 26px;
+  color: #fff;
   letter-spacing: 1px;
 }
 
-/* LOGIN CONTAINER */
+/* ====== LOGIN SCREEN ====== */
 #login-screen {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90vh;
+  min-height: 80vh;
   padding: 20px;
 }
 
-/* CARD LOGIN */
 .login-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 36px 28px;
+  padding: 32px 24px;
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.5);
   text-align: center;
-  transition: all 0.3s ease;
 }
 
-/* TESTI LOGIN */
 .login-card h2 {
   font-size: 22px;
   color: #fff;
   margin-bottom: 20px;
 }
 
-/* CAMPI INPUT */
 .login-card input[type="text"],
 .login-card input[type="password"] {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px;
   margin-bottom: 15px;
   border: none;
   border-radius: 8px;
@@ -74,19 +67,12 @@ header h1 {
   color: #fff;
   font-size: 15px;
   outline: none;
-  transition: background 0.2s ease;
 }
 
 .login-card input::placeholder {
   color: #ccc;
 }
 
-.login-card input:focus {
-  background-color: rgba(255,255,255,0.2);
-  box-shadow: 0 0 0 2px #58a03944;
-}
-
-/* PULSANTE LOGIN */
 .login-card button {
   width: 100%;
   padding: 12px;
@@ -97,67 +83,44 @@ header h1 {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .login-card button:hover {
   background: linear-gradient(135deg, #7ddc5c, #58a039);
-  transform: translateY(-1px);
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .login-card {
-    padding: 28px 20px;
-  }
-
-  .login-card h2 {
-    font-size: 20px;
-  }
-
-  .login-card button {
-    font-size: 15px;
-  }
+  transform: translateY(-2px);
 }
 
 /* ====== SETUP SCREEN ====== */
 #setup-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   padding: 30px 20px;
-  margin: 30px auto;
-  max-width: 420px;
-  color: #fff;
+  margin: 40px auto;
+  max-width: 400px;
   text-align: center;
 }
 
 #setup-screen label {
-  font-weight: 600;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  width: 100%;
-  max-width: 300px;
+  display: block;
   text-align: left;
+  margin-top: 15px;
   font-size: 15px;
   color: #ddd;
+  font-weight: 600;
 }
 
 #setup-screen select {
   width: 100%;
-  max-width: 300px;
-  padding: 12px;
+  padding: 10px;
   font-size: 16px;
   border-radius: 8px;
   background-color: rgba(255,255,255,0.1);
   color: #fff;
   border: none;
-  margin-bottom: 10px;
-  transition: all 0.2s ease;
+  margin-top: 5px;
 }
 
 #setup-screen select:focus {
@@ -166,39 +129,43 @@ header h1 {
   box-shadow: 0 0 0 2px #6ab04c80;
 }
 
-/* Pulsante Start Workout */
+/* ====== BUTTONS ====== */
 #start-button {
   margin-top: 20px;
-  padding: 14px 24px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, #6ab04c, #58a039);
   color: white;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: background 0.3s ease, transform 0.2s ease;
+  width: 100%;
 }
 
-#start-button:hover {
+#start-button:hover{
   background: linear-gradient(135deg, #7ddc5c, #58a039);
   transform: translateY(-2px);
 }
 
-.start-button {
-  background-color: #77b255;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.start-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 24px 16px;
+  }
+
+  header img {
+    width: 150px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  #setup-screen {
+    padding: 24px 16px;
+  }
 }
 
 
