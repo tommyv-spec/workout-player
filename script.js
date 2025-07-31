@@ -236,8 +236,7 @@ async function playExercise(index, exercises, resumeTime = null) {
       if (useBip) playBeep();
     }
 
-    if (timeLeft === 5 && useVoice) speak("cinque");
-    if (timeLeft === 3 && useVoice) speak("tre");
+    if (timeLeft === 5 && useVoice) speak("cinque, quattro, tre, due, uno");
 
     if (timeLeft <= 0) {
       if (useBip) playTransition();
@@ -296,8 +295,7 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
       if (useBip) playBeep();
     }
 
-    if (timeLeft === 5 && useVoice) speak("cinque");
-    if (timeLeft === 3 && useVoice) speak("tre");
+    if (timeLeft === 5 && useVoice) speak("cinque, quattro, tre, due, uno");
 
     if (timeLeft <= 0) {
       if (useBip) playTransition();
@@ -311,10 +309,29 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
 }
 
 // 🔊 Text-to-speech (Google + fallback)
+let fallbackVoice = null;
+
+function getUnifiedVoice() {
+  const voices = speechSynthesis.getVoices();
+  if (fallbackVoice) return fallbackVoice;
+
+  // Prefer voices that support both it-IT and en-US
+  const priorityNames = [
+    "Google italiano", "Google UK English", "Google US English", "Microsoft Elsa", "Microsoft Aria", "Microsoft Francesco"
+  ];
+
+  fallbackVoice = voices.find(v => priorityNames.includes(v.name))
+               || voices.find(v => v.lang.startsWith("en") || v.lang.startsWith("it"))
+               || voices[0];
+
+  return fallbackVoice;
+}
+
 async function speak(text, lang = "it-IT") {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
+
     const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -323,7 +340,9 @@ async function speak(text, lang = "it-IT") {
     });
 
     clearTimeout(timeout);
+
     if (!response.ok) throw new Error("Errore dal server TTS");
+
     const blob = await response.blob();
     if (blob.size === 0) throw new Error("Risposta audio vuota");
 
@@ -335,11 +354,14 @@ async function speak(text, lang = "it-IT") {
       ttsAudio.onerror = reject;
       ttsAudio.play();
     });
+
   } catch (error) {
-    console.warn("❌ Google TTS fallito, uso fallback:", error);
+    console.warn("❌ Google TTS fallito, uso fallback locale:", error);
+
     await new Promise(resolve => {
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = lang;
+      utter.voice = getUnifiedVoice();
       utter.rate = 1.0;
       utter.onend = resolve;
       speechSynthesis.cancel();
@@ -348,14 +370,15 @@ async function speak(text, lang = "it-IT") {
   }
 }
 
+
 async function speakSequence(segments) {
   for (const segment of segments) {
     await speak(segment.text, segment.lang);
   }
 }
 
-function announceNextExercise(nextExercise) {
-  speakSequence([
+async function announceNextExercise(nextExercise) {
+  await speakSequence([
     { text: "prossimo esercizio:", lang: "it-IT" },
     { text: nextExercise.name, lang: "en-US" }
   ]);
