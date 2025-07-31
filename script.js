@@ -329,22 +329,18 @@ function getUnifiedVoice() {
 
 async function speak(text, lang = "it-IT") {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
+    const voice = lang === "it-IT" ? "it-IT-Wavenet-C" : "en-US-Wavenet-D";
 
     const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, lang }),
-      signal: controller.signal
+      body: JSON.stringify({ text, lang, voice }),
     });
 
-    clearTimeout(timeout);
-
-    if (!response.ok) throw new Error("Errore dal server TTS");
+    if (!response.ok) throw new Error("Errore TTS");
 
     const blob = await response.blob();
-    if (blob.size === 0) throw new Error("Risposta audio vuota");
+    if (blob.size === 0) throw new Error("Audio vuoto");
 
     const audioUrl = URL.createObjectURL(blob);
     ttsAudio.src = audioUrl;
@@ -354,14 +350,11 @@ async function speak(text, lang = "it-IT") {
       ttsAudio.onerror = reject;
       ttsAudio.play();
     });
-
   } catch (error) {
-    console.warn("❌ Google TTS fallito, uso fallback locale:", error);
-
+    console.warn("❌ Google TTS fallito, uso fallback:", error);
     await new Promise(resolve => {
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = lang;
-      utter.voice = getUnifiedVoice();
       utter.rate = 1.0;
       utter.onend = resolve;
       speechSynthesis.cancel();
@@ -369,6 +362,7 @@ async function speak(text, lang = "it-IT") {
     });
   }
 }
+
 
 
 async function speakSequence(segments) {
