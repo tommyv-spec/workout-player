@@ -380,6 +380,7 @@ function italianizeName(name) {
 async function speak(text) {
   const speakId = ++currentSpeakId;
   lastSpeakTime = Date.now();
+  const lang = detectLang(text); // 👈 lingua dinamica
 
   try {
     const controller = new AbortController();
@@ -388,15 +389,17 @@ async function speak(text) {
     const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, lang }), // 👈 passa anche lang
       signal: controller.signal
     });
 
     clearTimeout(timeout);
 
     if (!response.ok) throw new Error("Errore dal server TTS");
+
     const blob = await response.blob();
     if (blob.size === 0) throw new Error("Risposta audio vuota");
+
     if (speakId !== currentSpeakId) return;
 
     const audioUrl = URL.createObjectURL(blob);
@@ -408,12 +411,25 @@ async function speak(text) {
     if (Date.now() - lastSpeakTime < 2000 && speakId === currentSpeakId) {
       const synth = window.speechSynthesis;
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "it-IT";
+      utter.lang = detectLang(text); // 👈 anche qui
       utter.rate = 1.0;
       synth.cancel();
       synth.speak(utter);
     }
   }
+}
+
+function detectLang(text) {
+  // Se contiene accenti, vocali italiane o parole comuni italiane
+  const italianIndicators = /[àèéìòù]|mancano|secondi|esercizio/i;
+  if (italianIndicators.test(text)) return "it-IT";
+
+  // Se contiene solo lettere inglesi e nessun simbolo italiano
+  const englishIndicators = /^[a-zA-Z0-9\s]+$/;
+  if (englishIndicators.test(text)) return "en-US";
+
+  // Fallback default
+  return "it-IT";
 }
 
 
