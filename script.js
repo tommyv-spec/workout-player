@@ -20,15 +20,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-button").addEventListener("click", login);
   document.getElementById("logout-button").addEventListener("click", logout);
 
-  document.getElementById("start-button").addEventListener("click", () => {
-    document.getElementById("setup-screen").style.display = "none";
-    document.querySelector("header").style.display = "none";
-    document.getElementById("exercise-container").style.display = "flex";
-    document.getElementById("workout-preview").style.display = "none";
-    currentStep = 0;
-    savedTimeLeft = null;
-    playExercise(currentStep, selectedWorkout.exercises);
-  });
+  document.getElementById("start-button").addEventListener("click", startWorkout);
+  document.getElementById("start-button-bottom").addEventListener("click", startWorkout); // <--- nuovo pulsante
+});
+
+
+function startWorkout() {
+  document.getElementById("setup-screen").style.display = "none";
+  document.querySelector("header").style.display = "none";
+  document.getElementById("exercise-container").style.display = "flex";
+  document.getElementById("workout-preview").style.display = "none";
+  currentStep = 0;
+  savedTimeLeft = null;
+  playExercise(currentStep, selectedWorkout.exercises);
+}
+
 
   document.getElementById("pause-button").addEventListener("click", () => {
     isPaused = !isPaused;
