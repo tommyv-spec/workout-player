@@ -271,8 +271,6 @@ function resumeTimer() {
   playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
 }
 
-let lastSpeakTime = 0;
-let currentSpeakId = 0;
 
 async function speak(text) {
   const speakId = ++currentSpeakId;
