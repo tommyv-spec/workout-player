@@ -178,7 +178,7 @@ function updateWorkoutPreview() {
   visuals.style.display = "block";
 }
 
-function playExercise(index, exercises, resumeTime = null) {
+async function playExercise(index, exercises, resumeTime = null) {
   if (index >= exercises.length) {
     document.getElementById("exercise-name").textContent = "Workout completato!";
     document.getElementById("exercise-gif").src = "";
@@ -232,7 +232,7 @@ function playExercise(index, exercises, resumeTime = null) {
 
         if (useVoice) {
           const originalName = nextExercise.name;
-          speakSequence([
+          await speakSequence([
             { text: "prossimo esercizio:", lang: "it-IT" },
             { text: originalName, lang: "en-US" }
           ]);
@@ -267,7 +267,7 @@ function resumeTimer() {
   playTimerOnly(savedTimeLeft, currentExercise, nextExercise);
 }
 
-function playTimerOnly(timeLeft, exercise, nextExercise) {
+async function playTimerOnly(timeLeft, exercise, nextExercise) {
   const soundMode = document.getElementById("soundMode").value;
   const useVoice = soundMode === "voice";
   const useBip = soundMode === "bip";
@@ -297,7 +297,7 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
 
         if (useVoice) {
           const originalName = nextExercise.name;
-          speakSequence([
+          await speakSequence([
             { text: "prossimo esercizio:", lang: "it-IT" },
             { text: originalName, lang: "en-US" }
           ]);
@@ -321,11 +321,7 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
   }, 1000);
 }
 
-async function speak(text, langOverride = null) {
-  const speakId = ++currentSpeakId;
-  lastSpeakTime = Date.now();
-  const lang = langOverride || detectLang(text);
-
+async function speak(text, lang = "it-IT") {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
@@ -338,27 +334,30 @@ async function speak(text, langOverride = null) {
     });
 
     clearTimeout(timeout);
+
     if (!response.ok) throw new Error("Errore dal server TTS");
 
     const blob = await response.blob();
     if (blob.size === 0) throw new Error("Risposta audio vuota");
 
-    if (speakId !== currentSpeakId) return;
-
     const audioUrl = URL.createObjectURL(blob);
     ttsAudio.src = audioUrl;
-    await ttsAudio.play();
+
+    await new Promise((resolve, reject) => {
+      ttsAudio.onended = resolve;
+      ttsAudio.onerror = reject;
+      ttsAudio.play();
+    });
   } catch (error) {
     console.warn("❌ Google TTS fallito, uso fallback:", error);
-
-    if (Date.now() - lastSpeakTime < 2000 && speakId === currentSpeakId) {
-      const synth = window.speechSynthesis;
+    await new Promise(resolve => {
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = langOverride || lang;
+      utter.lang = lang;
       utter.rate = 1.0;
-      synth.cancel();
-      synth.speak(utter);
-    }
+      utter.onend = resolve;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    });
   }
 }
 
