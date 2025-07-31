@@ -230,14 +230,9 @@ async function playExercise(index, exercises, resumeTime = null) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) {
-          const originalName = nextExercise.name;
-          await speakSequence([
-            { text: "prossimo esercizio:", lang: "it-IT" },
-            { text: originalName, lang: "en-US" }
-          ]);
-        }
+        if (useVoice) announceNextExercise(nextExercise);
       }
+
       if (useBip) playBeep();
     }
 
@@ -295,13 +290,7 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) {
-          const originalName = nextExercise.name;
-          await speakSequence([
-            { text: "prossimo esercizio:", lang: "it-IT" },
-            { text: originalName, lang: "en-US" }
-          ]);
-        }
+        if (useVoice) announceNextExercise(nextExercise);
       }
 
       if (useBip) playBeep();
@@ -321,11 +310,11 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
   }, 1000);
 }
 
+// 🔊 Text-to-speech (Google + fallback)
 async function speak(text, lang = "it-IT") {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
-
     const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -334,9 +323,7 @@ async function speak(text, lang = "it-IT") {
     });
 
     clearTimeout(timeout);
-
     if (!response.ok) throw new Error("Errore dal server TTS");
-
     const blob = await response.blob();
     if (blob.size === 0) throw new Error("Risposta audio vuota");
 
@@ -367,15 +354,11 @@ async function speakSequence(segments) {
   }
 }
 
-
-function detectLang(text) {
-  const italianIndicators = /[àèéìòù]|mancano|secondi|esercizio/i;
-  if (italianIndicators.test(text)) return "it-IT";
-
-  const englishIndicators = /^[a-zA-Z0-9\s]+$/;
-  if (englishIndicators.test(text)) return "en-US";
-
-  return "it-IT";
+function announceNextExercise(nextExercise) {
+  speakSequence([
+    { text: "prossimo esercizio:", lang: "it-IT" },
+    { text: nextExercise.name, lang: "en-US" }
+  ]);
 }
 
 function warmUpServer() {
