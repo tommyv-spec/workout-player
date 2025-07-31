@@ -2,53 +2,96 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>More Muscle Workout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workout App</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- HEADER (Sempre visibile) -->
   <header>
-    <img src="https://drive.google.com/thumbnail?id=1tU0CSrd0u14kCq-AvKjG32ecDegrzAV7" alt="Logo">
+    <img src="https://drive.google.com/thumbnail?id=1tU0CSrd0u14kCq-AvKjG32ecDegrzAV7" alt="Logo" />
     <h1>MORE MUSCLE WORKOUT</h1>
   </header>
 
   <main>
-
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN -->
     <div id="login-screen">
       <div class="login-card">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
+        <h3>Login</h3>
+        <input type="text" placeholder="Username" id="username">
+        <input type="password" placeholder="Password" id="password">
         <button id="login-button">Accedi</button>
+        <p id="login-error" style="color:red; display:none;"></p>
       </div>
     </div>
 
     <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
       <div id="setup-screen">
-        <button id="logout-button">Logout</button>
+        <div style="margin-top: 20px;">
+          <button id="logout-button">Logout</button>
+        </div>
 
         <label for="workoutSelect">Seleziona workout:</label>
-        <select id="workoutSelect">
-          <option value="">-- Seleziona --</option>
-        </select>
+        <select id="workoutSelect"></select>
+
 
         <label for="soundMode">Modalità audio:</label>
         <select id="soundMode">
-          <option value="voice">Solo Voce</option>
-          <option value="beep">Solo Beep</option>
-          <option value="none">Nessun Suono</option>
+          <option value="none">Nessun suono</option>
+          <option value="bip">Solo bip</option>
+          <option value="voice" selected>Voce</option>
         </select>
 
-        <button id="start-button">Start Workout</button>
-      </div>
-    </div>
 
+        <button id="start-button" class="start-button">Start Workout</button>
+        
+        <div id="workout-preview" style="display: none;">
+          <h3>Esercizi nel workout:</h3>
+          <ul id="exercise-list"></ul>
+        </div>
+
+        <div id="exercise-visuals" style="display: none; margin-top: 20px;">
+          <!--
+          <h3>Anteprima visiva:</h3>
+          -->
+          <div id="exercise-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;"></div>
+        </div>
+
+        <div id="instructions-box">
+          <strong>Istruzioni:</strong>
+          <p id="instructions-text"></p>
+        </div>
+        <button id="start-button-bottom" class="start-button" disabled>Start Workout</button>
+      </div>
+
+
+
+      <!-- SESSIONE ALLENAMENTO -->
+      <div id="exercise-container" style="display: none; flex-direction: column;">
+        <!-- 1. TIMER -->
+        <div id="timer" class="full-timer"></div>
+      
+        <!-- 2. NOME ATTUALE -->
+        <div id="exercise-name"></div>
+      
+        <!-- 3. GIF ATTUALE -->
+        <img id="exercise-gif" src="" alt="Esercizio corrente" />
+      
+        <!-- 5. PAUSA -->
+        <button id="pause-button">⏸ Pausa</button>
+
+        <!-- FIX per JS -->
+        <div id="next-exercise-preview" style="display: none;"></div>
+      </div>
+
+    </div>
   </main>
 
+  <!-- AUDIO -->
+  <audio id="beep-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+  <audio id="transition-sound" src="https://actions.google.com/sounds/v1/emergency/emergency_siren_short_burst.ogg" preload="auto"></audio>
+
+  <!-- JS -->
   <script src="script.js"></script>
 </body>
 </html>
