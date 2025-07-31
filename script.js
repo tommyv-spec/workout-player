@@ -56,7 +56,7 @@ function login() {
     return;
   }
 
-  fetch(`https://script.google.com/macros/s/AKfycbzNKApZgKH33hLddf4Zw2id0wGW9PBPr_2rblRZujQ55Ubgz1SZsWFOZKygSnsWrNqbhQ/exec?username=${username}&password=${password}`)
+  fetch(`https://script.google.com/macros/s/AKfycbxJOD8yGw4l_h9_r4wQPF6JC2P7hlksihoqjVmw8LdFLOsI4FvV37aBss9suQMtjj1eFg/exec?username=${username}&password=${password}`)
     .then(res => res.json())
     .then(data => {
       if (data.status === "success") {
@@ -82,7 +82,7 @@ function logout() {
 }
 
 function loadUserData(username) {
-  fetch("https://script.google.com/macros/s/AKfycbzNKApZgKH33hLddf4Zw2id0wGW9PBPr_2rblRZujQ55Ubgz1SZsWFOZKygSnsWrNqbhQ/exec")
+  fetch("https://script.google.com/macros/s/AKfycbxJOD8yGw4l_h9_r4wQPF6JC2P7hlksihoqjVmw8LdFLOsI4FvV37aBss9suQMtjj1eFg/exec")
     .then(res => res.json())
     .then(data => {
       workouts = data.workouts;
@@ -179,8 +179,11 @@ function playExercise(index, exercises, resumeTime = null) {
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
-  const repsText = exercise.reps ? ` <span style="font-weight: normal; font-size: 14px;">(${exercise.reps} reps)</span>` : "";
-  document.getElementById("exercise-name").innerHTML = "<strong>" + exercise.name + "</strong>" + repsText;
+  const currentReps = (exercise.reps && !exercise.name.toLowerCase().includes("istruz"))
+  ? `<div style="font-size: 14px; font-weight: normal; margin-top: 4px;">${exercise.reps} reps</div>`
+  : "";
+  document.getElementById("exercise-name").innerHTML = `<strong>${exercise.name}</strong>${currentReps}`;
+
 
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
@@ -208,7 +211,11 @@ function playExercise(index, exercises, resumeTime = null) {
     
     if (timeLeft === 10) {
       if (nextExercise) {
-        document.getElementById("exercise-name").innerHTML = "prossimo esercizio:<br><strong>" + nextExercise.name + "</strong>";
+        const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
+          ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
+          : "";
+        document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
+
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
     
         if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
