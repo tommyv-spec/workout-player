@@ -179,7 +179,9 @@ function playExercise(index, exercises, resumeTime = null) {
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
-  document.getElementById("exercise-name").innerHTML = "<strong>" + exercise.name + "</strong>";
+  const repsText = exercise.reps ? ` <span style="font-weight: normal; font-size: 14px;">(${exercise.reps} reps)</span>` : "";
+  document.getElementById("exercise-name").innerHTML = "<strong>" + exercise.name + "</strong>" + repsText;
+
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
 
