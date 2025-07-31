@@ -377,6 +377,11 @@ audio {
     font-size: 14px;
   }
 
+.logo {
+  height: 80px;
+  width: auto;
+}
+
   #exercise-visuals {
     grid-template-columns: 1fr;
   }
