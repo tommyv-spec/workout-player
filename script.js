@@ -230,10 +230,13 @@ function playExercise(index, exercises, resumeTime = null) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) speak("prossimo esercizio:", "it-IT").then(() => {
-                        speak(nextExercise.name, "en-US");
-                      });
-
+        if (useVoice) {
+          const originalName = nextExercise.name;
+          speakSequence([
+            { text: "prossimo esercizio:", lang: "it-IT" },
+            { text: originalName, lang: "en-US" }
+          ]);
+        }
       }
       if (useBip) playBeep();
     }
@@ -292,9 +295,13 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) speak("prossimo esercizio:", "it-IT").then(() => {
-                        speak(nextExercise.name, "en-US");
-                      });
+        if (useVoice) {
+          const originalName = nextExercise.name;
+          speakSequence([
+            { text: "prossimo esercizio:", lang: "it-IT" },
+            { text: originalName, lang: "en-US" }
+          ]);
+        }
       }
 
       if (useBip) playBeep();
@@ -354,6 +361,13 @@ async function speak(text, langOverride = null) {
     }
   }
 }
+
+async function speakSequence(segments) {
+  for (const segment of segments) {
+    await speak(segment.text, segment.lang);
+  }
+}
+
 
 function detectLang(text) {
   const italianIndicators = /[àèéìòù]|mancano|secondi|esercizio/i;
