@@ -205,7 +205,7 @@ function playExercise(index, exercises, resumeTime = null) {
   savedTimeLeft = null;
   document.getElementById("timer").textContent = timeLeft;
 
-  if (useVoice) speak(exercise.name);
+  if (useVoice) speak(exercise.name, "en-US");
 
   clearInterval(interval);
   interval = setInterval(() => {
@@ -230,7 +230,10 @@ function playExercise(index, exercises, resumeTime = null) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
+        if (useVoice) speak("prossimo esercizio:", "it-IT").then(() => {
+                        speak(nextExercise.name, "en-US");
+                      });
+
       }
       if (useBip) playBeep();
     }
@@ -289,7 +292,9 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
+        if (useVoice) speak("prossimo esercizio:", "it-IT").then(() => {
+                        speak(nextExercise.name, "en-US");
+                      });
       }
 
       if (useBip) playBeep();
@@ -309,10 +314,10 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
   }, 1000);
 }
 
-async function speak(text) {
+async function speak(text, langOverride = null) {
   const speakId = ++currentSpeakId;
   lastSpeakTime = Date.now();
-  const lang = detectLang(text);
+  const lang = langOverride || detectLang(text);
 
   try {
     const controller = new AbortController();
@@ -342,7 +347,7 @@ async function speak(text) {
     if (Date.now() - lastSpeakTime < 2000 && speakId === currentSpeakId) {
       const synth = window.speechSynthesis;
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = lang;
+      utter.lang = langOverride || lang;
       utter.rate = 1.0;
       synth.cancel();
       synth.speak(utter);
