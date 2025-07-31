@@ -215,7 +215,7 @@ function playExercise(index, exercises, resumeTime = null) {
   savedTimeLeft = null;
   document.getElementById("timer").textContent = timeLeft;
 
-  if (useVoice) speak(exercise.name);
+  if (useVoice) speak(italianizeName(exercise.name));
 
   clearInterval(interval);
 
@@ -241,7 +241,7 @@ function playExercise(index, exercises, resumeTime = null) {
 
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
     
-        if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
+        if (useVoice) speak("prossimo esercizio: " + italianizeName(nextExercise.name));
       }
     
       if (useBip) playBeep(); // bip preavviso
@@ -305,7 +305,7 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
 
-        if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
+        if (useVoice) speak("prossimo esercizio: " + italianizeName(nextExercise.name));
       }
 
       if (useBip) playBeep();
@@ -325,6 +325,55 @@ function playTimerOnly(timeLeft, exercise, nextExercise) {
     }
   }, 1000);
 }
+
+
+function italianizeName(name) {
+  return name
+    .replace(/Rest/gi, "riposo")
+    .replace(/Arnold Press/gi, "arnold press")
+    .replace(/Banded Pull Apart/gi, "bendit pul apart")
+    .replace(/Bench Press/gi, "benc press")
+    .replace(/Bicep Curl Alternated/gi, "baisep curl alternèitid")
+    .replace(/Bicep Curl Crush Grip/gi, "baisep curl crasc grip")
+    .replace(/Bicep Curl On Incline Bench/gi, "baisep curl su benc inclinata")
+    .replace(/Bicep Curl/gi, "baisep curl")
+    .replace(/Chest Fly/gi, "cest flai")
+    .replace(/Cyclist Crunch/gi, "saiclist cranc")
+    .replace(/Deadbug Pulse/gi, "dedbag pals")
+    .replace(/Dips On Bench/gi, "dips su benc")
+    .replace(/Frontal Raises/gi, "frontal resez")
+    .replace(/Lateral Raises Seated/gi, "lateràl resez da seduto")
+    .replace(/Lateral Raises/gi, "lateràl resez")
+    .replace(/Military Press/gi, "militari press")
+    .replace(/Mountain Climber/gi, "mauntain claimer")
+    .replace(/Plank Pull Through/gi, "plenc pul thru")
+    .replace(/Plank Push Through/gi, "plenc pusci thru")
+    .replace(/Pullover/gi, "pullover")
+    .replace(/Push Press/gi, "pusci press")
+    .replace(/Quad Push Up/gi, "quad pusciap")
+    .replace(/Rear Delt Raise Supine/gi, "riar delt reis supain")
+    .replace(/Reverse Fly/gi, "rivers flai")
+    .replace(/Rows Dx/gi, "rows destra")
+    .replace(/Rows Sx/gi, "rows sinistra")
+    .replace(/Spider Curl/gi, "spaider curl")
+    .replace(/Strict Press/gi, "strict press")
+    .replace(/Tuck Up/gi, "tac ap")
+    .replace(/Tricep Ext Banded/gi, "traisep estensione bendit")
+    .replace(/V Up Alternated/gi, "vi ap alternèitid")
+    .replace(/Bench Press Inclined/gi, "benc press inclinata")
+    .replace(/Tricep Press on Bench/gi, "traisep press su benc")
+    .replace(/Split Squat Dx/gi, "split skuot destra")
+    .replace(/Split Squat Sx/gi, "split skuot sinistra")
+    .replace(/Clamshell Dx/gi, "clamshell destra")
+    .replace(/Clamshell Sx/gi, "clamshell sinistra")
+    .replace(/Rowing Snatch Dx/gi, "roing snac destra")
+    .replace(/Rowing Snatch Sx/gi, "roing snac sinistra")
+    .replace(/One Arm Bench Press Dx/gi, "one arm benc press destra")
+    .replace(/One Arm Bench Press Sx/gi, "one arm benc press sinistra")
+    .replace(/Cyclist Squat/gi, "saiclist skuot")
+    .replace(/Hip Extension on Bench/gi, "hip estension su benc");
+}
+
 
 
 
