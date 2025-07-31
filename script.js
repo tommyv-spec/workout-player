@@ -5,8 +5,19 @@ let interval;
 let isPaused = false;
 let savedTimeLeft = null;
 
+function startWorkout() {
+  document.getElementById("setup-screen").style.display = "none";
+  document.querySelector("header").style.display = "none";
+  document.getElementById("exercise-container").style.display = "flex";
+  document.getElementById("workout-preview").style.display = "none";
+  currentStep = 0;
+  savedTimeLeft = null;
+  playExercise(currentStep, selectedWorkout.exercises);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  warmUpServer(); // Attiva il server ElevenLabs
+  warmUpServer();
+
   const savedUser = localStorage.getItem("loggedUser");
 
   if (savedUser) {
@@ -20,10 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-button").addEventListener("click", login);
   document.getElementById("logout-button").addEventListener("click", logout);
 
+  // 🟢 Pulsanti Start
   document.getElementById("start-button").addEventListener("click", startWorkout);
   document.getElementById("start-button-bottom").addEventListener("click", startWorkout);
 
-  // ✅ Inserisci QUI dentro il listener del pause-button:
+  // 🟡 Pulsante Pausa
   document.getElementById("pause-button").addEventListener("click", () => {
     isPaused = !isPaused;
     const pauseBtn = document.getElementById("pause-button");
@@ -36,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
 
 
 function login() {
