@@ -19,7 +19,7 @@ header {
 }
 
 header img {
-  width: 100px;
+  width: 250px;
   border-radius: 8px;
 }
 
@@ -376,11 +376,6 @@ audio {
   #instructions-box {
     font-size: 14px;
   }
-
-.logo {
-  height: 80px;
-  width: auto;
-}
 
   #exercise-visuals {
     grid-template-columns: 1fr;
