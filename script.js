@@ -205,7 +205,7 @@ async function playExercise(index, exercises, resumeTime = null) {
   savedTimeLeft = null;
   document.getElementById("timer").textContent = timeLeft;
 
-  if (useVoice) speak(exercise.name, "en-US");
+  if (useVoice) speak(exercise.name, detectLang(exercise.name));
 
   clearInterval(interval);
   interval = setInterval(() => {
@@ -384,7 +384,7 @@ async function speakSequence(segments) {
 async function announceNextExercise(nextExercise) {
   await speakSequence([
     { text: "prossimo esercizio:", lang: "it-IT" },
-    { text: nextExercise.name, lang: detectLang(originalName) }
+    { text: nextExercise.name, lang: detectLang(nextExercise.name) }
   ]);
 }
 
