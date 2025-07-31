@@ -327,6 +327,16 @@ function getUnifiedVoice() {
   return fallbackVoice;
 }
 
+
+function detectLang(text) {
+  const italianIndicators = /[àèéìòù]|mancano|secondi|esercizio|istruz|riposo|pausa/i;
+  if (italianIndicators.test(text)) return "it-IT";
+
+  return "en-US"; // default fallback
+}
+
+
+
 async function speak(text, lang = "it-IT") {
   try {
     const voice = lang === "it-IT" ? "it-IT-Wavenet-C" : "en-US-Wavenet-D";
@@ -374,7 +384,7 @@ async function speakSequence(segments) {
 async function announceNextExercise(nextExercise) {
   await speakSequence([
     { text: "prossimo esercizio:", lang: "it-IT" },
-    { text: nextExercise.name, lang: "en-US" }
+    { text: nextExercise.name, lang: detectLang(originalName) }
   ]);
 }
 
