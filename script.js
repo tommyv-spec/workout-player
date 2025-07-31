@@ -4,6 +4,10 @@ let currentStep = 0;
 let interval;
 let isPaused = false;
 let savedTimeLeft = null;
+let lastSpeakTime = 0;
+let currentSpeakId = 0;
+const ttsAudio = new Audio();
+
 
 function startWorkout() {
   document.getElementById("setup-screen").style.display = "none";
@@ -17,6 +21,16 @@ function startWorkout() {
 
 document.addEventListener("DOMContentLoaded", () => {
   warmUpServer();
+  document.addEventListener("click", () => {
+    if (!window.__audioUnlocked) {
+      ttsAudio.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..."; // 1s silenzio base64
+      ttsAudio.play().then(() => {
+        window.__audioUnlocked = true;
+        console.log("🔓 Audio sbloccato su iOS");
+      }).catch(() => console.warn("⚠️ Audio unlock fallito"));
+    }
+  }, { once: true });
+
 
   const savedUser = localStorage.getItem("loggedUser");
 
@@ -266,7 +280,7 @@ async function speak(text) {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000); // Timeout dopo 2s
+    const timeout = setTimeout(() => controller.abort(), 2000);
 
     const response = await fetch("https://google-tts-server.onrender.com/speak", {
       method: "POST",
@@ -277,31 +291,28 @@ async function speak(text) {
 
     clearTimeout(timeout);
 
-    if (!response.ok) throw new Error("Errore dal server Google TTS");
-
+    if (!response.ok) throw new Error("Errore dal server TTS");
     const blob = await response.blob();
     if (blob.size === 0) throw new Error("Risposta audio vuota");
-
-    // Se nel frattempo è partita un'altra speak(), ignora questa
     if (speakId !== currentSpeakId) return;
 
     const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
-    await audio.play();
+    ttsAudio.src = audioUrl;
+    await ttsAudio.play();
   } catch (error) {
-    console.warn("❌ Google TTS fallito, uso fallback TTS:", error);
+    console.warn("❌ Google TTS fallito, uso fallback:", error);
 
-    // fallback se ancora valido e recente
     if (Date.now() - lastSpeakTime < 2000 && speakId === currentSpeakId) {
       const synth = window.speechSynthesis;
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = "it-IT";
       utter.rate = 1.0;
-      synth.cancel(); // ferma eventuali ripetizioni
+      synth.cancel();
       synth.speak(utter);
     }
   }
 }
+
 
 
 
