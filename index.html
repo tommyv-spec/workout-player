@@ -7,23 +7,22 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <img src="https://drive.google.com/thumbnail?id=1tU0CSrd0u14kCq-AvKjG32ecDegrzAV7" alt="Logo" />
-    <h1>MORE MUSCLE WORKOUT</h1>
-  </header>
+  <div id="login-screen">
+    <header>
+      <img src="https://drive.google.com/thumbnail?id=1tU0CSrd0u14kCq-AvKjG32ecDegrzAV7" alt="Logo" />
+      <h1>MORE MUSCLE WORKOUT</h1>
+    </header>
+  
+    <div class="login-box">
+      <h3>Login</h3>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="login-button">Accedi</button>
+      <div id="login-error"></div>
+    </div>
+  </div>
 
   <main>
-    <!-- LOGIN -->
-    <div id="login-screen">
-      <div class="login-card">
-        <h3>Login</h3>
-        <input type="text" placeholder="Username" id="username">
-        <input type="password" placeholder="Password" id="password">
-        <button id="login-button">Accedi</button>
-        <p id="login-error" style="color:red; display:none;"></p>
-      </div>
-    </div>
-
     <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
       <div id="setup-screen">
