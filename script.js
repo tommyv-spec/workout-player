@@ -109,6 +109,7 @@ function loadUserData(username) {
         select.selectedIndex = 0;
         selectedWorkout = workouts[select.value];
         document.getElementById("start-button").disabled = false;
+        document.getElementById("start-button-bottom").disabled = false;
         updateWorkoutPreview();
       }
 
