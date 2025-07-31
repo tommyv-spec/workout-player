@@ -265,11 +265,67 @@ function playExercise(index, exercises, resumeTime = null) {
 
 function resumeTimer() {
   clearInterval(interval);
+
   if (!savedTimeLeft || savedTimeLeft <= 0) {
     savedTimeLeft = parseInt(document.getElementById("timer").textContent);
   }
-  playExercise(currentStep, selectedWorkout.exercises, savedTimeLeft);
+
+  const currentExercise = selectedWorkout.exercises[currentStep];
+  const nextExercise = selectedWorkout.exercises[currentStep + 1];
+
+  playTimerOnly(savedTimeLeft, currentExercise, nextExercise);
 }
+
+function playTimerOnly(timeLeft, exercise, nextExercise) {
+  const soundMode = document.getElementById("soundMode").value;
+  const useVoice = soundMode === "voice";
+  const useBip = soundMode === "bip";
+
+  clearInterval(interval);
+
+  interval = setInterval(() => {
+    if (isPaused) {
+      savedTimeLeft = timeLeft;
+      clearInterval(interval);
+      return;
+    }
+
+    timeLeft--;
+    document.getElementById("timer").textContent = timeLeft;
+
+    if (timeLeft === 60 && useVoice) speak("mancano sessanta secondi");
+    if (timeLeft === 30 && useVoice) speak("mancano trenta secondi");
+
+    if (timeLeft === 10) {
+      if (nextExercise) {
+        const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
+          ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
+          : "";
+
+        document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
+        document.getElementById("exercise-gif").src = nextExercise.imageUrl;
+
+        if (useVoice) speak("prossimo esercizio: " + nextExercise.name);
+      }
+
+      if (useBip) playBeep();
+    }
+
+    if (timeLeft === 5 && useVoice) speak("cinque");
+    if (timeLeft === 3 && useVoice) speak("tre");
+
+    if (timeLeft <= 0) {
+      if (useBip) playTransition();
+
+      clearInterval(interval);
+      document.getElementById("next-exercise-preview").style.display = "none";
+      currentStep++;
+      savedTimeLeft = null;
+      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
+    }
+  }, 1000);
+}
+
 
 
 async function speak(text) {
