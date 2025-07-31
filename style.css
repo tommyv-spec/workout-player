@@ -208,6 +208,10 @@ main {
 
 
 /* ====== WORKOUT PREVIEW ====== */
+#exercise-list {
+  display: none !important;
+}
+
 #workout-preview {
   display: flex;
   flex-direction: row;
