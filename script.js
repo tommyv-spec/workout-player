@@ -483,10 +483,7 @@ function playBeppeAudio(url) {
 }
 
 function convertGoogleDriveToDirect(link) {
-  const idMatch = link.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
-  if (!idMatch) return "";
-  const id = idMatch[1];
-  return `https://drive.google.com/uc?export=download&id=${id}`;
+  return link; // già diretto, non serve conversione
 }
 
 
