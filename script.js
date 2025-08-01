@@ -237,12 +237,6 @@ async function playExercise(index, exercises, resumeTime = null) {
     }
 
 
-    if (timeLeft === 10 && soundMode === "beppe") {
-      playBeppeAudio(beppeSounds.prossimo); // statico
-      if (nextExercise.audio) {
-        setTimeout(() => playBeppeAudio(nextExercise.audio), 1500);
-      }
-    }
 
 
     if (timeLeft === 10) {
@@ -275,8 +269,8 @@ async function playExercise(index, exercises, resumeTime = null) {
 
     if (timeLeft <= 0) {
       if (soundMode === "beppe") {
-        // Suona l’audio al cambio (dell’esercizio precedente)
-        if (exercise.audioCambio) playBeppeAudio(exercise.audioCambio);
+        if (exercise.audioCambio) {
+          await playBeppeAudio(exercise.audioCambio);
       }
 
       if (useBip) playTransition();
@@ -328,13 +322,6 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
     }
 
 
-    if (timeLeft === 10 && soundMode === "beppe") {
-      playBeppeAudio(beppeSounds.prossimo); // statico
-      if (nextExercise.audio) {
-        setTimeout(() => playBeppeAudio(nextExercise.audio), 1500);
-      }
-    }
-
 
     if (timeLeft === 10) {
       if (nextExercise) {
@@ -365,9 +352,8 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
 
 
     if (timeLeft <= 0) {
-      if (soundMode === "beppe") {
-        // Suona l’audio al cambio (dell’esercizio precedente)
-        if (exercise.audioCambio) playBeppeAudio(exercise.audioCambio);
+      if (exercise.audioCambio) {
+        await playBeppeAudio(exercise.audioCambio);
       }
 
       if (useBip) playTransition();
