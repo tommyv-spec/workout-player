@@ -195,92 +195,26 @@ async function playExercise(index, exercises, resumeTime = null) {
     return;
   }
 
-  const soundMode = document.getElementById("soundMode").value;
-  const useVoice = soundMode === "voice";
-  const useBip = soundMode === "bip";
-
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
   const currentReps = (exercise.reps && !exercise.name.toLowerCase().includes("istruz"))
     ? `<div style="font-size: 14px; font-weight: normal; margin-top: 4px;">${exercise.reps} reps</div>`
     : "";
+
   document.getElementById("exercise-name").innerHTML = `<strong>${exercise.name}</strong>${currentReps}`;
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
 
-  let timeLeft = resumeTime !== null ? resumeTime : savedTimeLeft ?? parseInt(exercise.duration);
+  const duration = resumeTime !== null ? resumeTime : savedTimeLeft ?? parseInt(exercise.duration);
   savedTimeLeft = null;
-  document.getElementById("timer").textContent = timeLeft;
+
+  const soundMode = document.getElementById("soundMode").value;
+  const useVoice = soundMode === "voice";
 
   if (useVoice) speak(exercise.name, detectLang(exercise.name));
 
-  clearInterval(interval);
-  interval = setInterval(() => {
-    if (isPaused) {
-      savedTimeLeft = timeLeft;
-      clearInterval(interval);
-      return;
-    }
-
-    timeLeft--;
-    document.getElementById("timer").textContent = timeLeft;
-
-    if (timeLeft === 60) {
-      if (useVoice) speak("mancano sessanta secondi");
-      if (soundMode === "beppe") playBeppeAudio(beppeSounds.s60);
-    }
-
-    if (timeLeft === 30) {
-      if (useVoice) speak("mancano trenta secondi");
-      if (soundMode === "beppe") playBeppeAudio(beppeSounds.s30);
-    }
-
-
-
-
-    if (timeLeft === 10) {
-      if (nextExercise) {
-        const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
-          ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
-          : "";
-    
-        document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
-        document.getElementById("exercise-gif").src = nextExercise.imageUrl;
-    
-        if (soundMode === "beppe") {
-          const urls = [beppeSounds.prossimo];
-          if (nextExercise.audio) urls.push(nextExercise.audio);
-          playBeppeAudioSequence(urls);
-        } else if (useVoice) {
-          announceNextExercise(nextExercise);
-        }
-      }
-    
-      if (useBip) playBeep();
-    }
-
-
-    if (timeLeft === 5) {
-      if (useVoice) speak("cinque, quattro, tre, due, uno");
-      if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
-    }
-
-
-    if (timeLeft <= 0) {
-      if (soundMode === "beppe") {
-        if (exercise.audioCambio) {
-          await playBeppeAudio(exercise.audioCambio);
-      }
-
-      if (useBip) playTransition();
-      clearInterval(interval);
-      document.getElementById("next-exercise-preview").style.display = "none";
-      currentStep++;
-      savedTimeLeft = null;
-      setTimeout(() => playExercise(currentStep, exercises), 300);
-    }
-  }, 1000);
+  await startExerciseTimer(duration, exercise, nextExercise);
 }
 
 function resumeTimer() {
@@ -292,16 +226,16 @@ function resumeTimer() {
   const currentExercise = selectedWorkout.exercises[currentStep];
   const nextExercise = selectedWorkout.exercises[currentStep + 1];
 
-  playTimerOnly(savedTimeLeft, currentExercise, nextExercise);
+  startExerciseTimer(savedTimeLeft, currentExercise, nextExercise);
 }
 
-async function playTimerOnly(timeLeft, exercise, nextExercise) {
+async function startExerciseTimer(timeLeft, exercise, nextExercise) {
   const soundMode = document.getElementById("soundMode").value;
   const useVoice = soundMode === "voice";
   const useBip = soundMode === "bip";
 
   clearInterval(interval);
-  interval = setInterval(() => {
+  interval = setInterval(async () => {
     if (isPaused) {
       savedTimeLeft = timeLeft;
       clearInterval(interval);
@@ -321,8 +255,6 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.s30);
     }
 
-
-
     if (timeLeft === 10) {
       if (nextExercise) {
         const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
@@ -337,7 +269,7 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
           if (nextExercise.audio) urls.push(nextExercise.audio);
           playBeppeAudioSequence(urls);
         } else if (useVoice) {
-          announceNextExercise(nextExercise);
+          speak(`prossimo esercizio: ${nextExercise.name}`);
         }
       }
     
@@ -350,14 +282,15 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
     }
 
-
     if (timeLeft <= 0) {
-      if (exercise.audioCambio) {
+      clearInterval(interval);
+
+      if (soundMode === "beppe" && exercise.audioCambio) {
         await playBeppeAudio(exercise.audioCambio);
       }
 
       if (useBip) playTransition();
-      clearInterval(interval);
+
       document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
       savedTimeLeft = null;
@@ -365,6 +298,7 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
     }
   }, 1000);
 }
+
 
 // 🔊 Text-to-speech (Google + fallback)
 let fallbackVoice = null;
