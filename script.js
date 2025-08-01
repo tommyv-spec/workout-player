@@ -302,8 +302,8 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
         if (sequence.length > 0) {
           playBeppeAudioSequence(sequence);
         }
-      } else if (useVoice && nextExercise) {
-        speak(detectLang(nextExercise.name));
+      } else if (useVoice) {
+        speak(exercise.name, detectLang(exercise.name));
       }
     
       if (useBip) playTransition();
