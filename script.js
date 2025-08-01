@@ -9,10 +9,10 @@ let currentSpeakId = 0;
 const ttsAudio = new Audio();
 
 const beppeSounds = {
-  s60: "https://drive.google.com/uc?export=download&id=1L8OmsZjgrVvHR0vyfSDhaueR1rweGtH7",
-  s30: "https://drive.google.com/uc?export=download&id=1-qll5am-SvO3NbTlFLMmkNg2jcaSiOqq",
-  countdown5: "https://drive.google.com/uc?export=download&id=17o5eU5rr_mW9-M3ZtPiXTfnSyBPnOdsw",
-  prossimo: "https://drive.google.com/uc?export=download&id=1wVr1w6FrasMH5dGPe28ZRTMisYFALtlG"
+  s60: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2060%20secondi.mp3",
+  s30: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2030%20secondi.mp3",
+  countdown5: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/count%20down.MP3",
+  prossimo: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/Prossimo%20esercizio.MP3"
 };
 
 
