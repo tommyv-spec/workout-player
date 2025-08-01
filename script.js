@@ -298,7 +298,7 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
       document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
       savedTimeLeft = null;
-      setTimeout(() => playExercise(currentStep, exercises), 300);
+      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
     }
 
 
