@@ -283,30 +283,25 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     }
 
 
-    if (timeLeft <= 0) {   
-      // Pronuncia o riproduce audio al cambio esercizio
+    if (timeLeft <= 0) {
       clearInterval(interval);
-
-      // Avanza subito per avere il nuovo esercizio
       currentStep++;
       const next = selectedWorkout.exercises[currentStep];
-      const sequence = [];
-      
-      if (soundMode === "beppe") {
-        // NON annunciare di nuovo il prossimo esercizio    
-        if (exercise.audioCambio) sequence.push(exercise.audioCambio);
-      
-        if (sequence.length > 0) {
-          await playBeppeAudioSequence(sequence);
-        }
+    
+      // Avvia subito il nuovo esercizio (non bloccare qui)
+      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 100);
+    
+      // Fai partire audioCambio in background
+      if (soundMode === "beppe" && exercise.audioCambio) {
+        playBeppeAudio(exercise.audioCambio);
       }
     
       if (useBip) playTransition();
     
       document.getElementById("next-exercise-preview").style.display = "none";
       savedTimeLeft = null;
-      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
     }
+
 
 
   }, 1000);
