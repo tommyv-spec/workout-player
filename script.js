@@ -285,22 +285,25 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
 
     if (timeLeft <= 0) {
       clearInterval(interval);
-      currentStep++;
-      const next = selectedWorkout.exercises[currentStep];
     
-      // Avvia subito il nuovo esercizio (non bloccare qui)
+      const prevExercise = exercise; // quello appena finito
+      const nextStep = currentStep + 1;
+      const nextExercise = selectedWorkout.exercises[nextStep];
+    
+      // Avvia subito il nuovo esercizio
+      currentStep = nextStep;
+      savedTimeLeft = null;
       setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 100);
     
-      // Fai partire audioCambio in background
-      if (soundMode === "beppe" && exercise.audioCambio) {
-        playBeppeAudio(exercise.audioCambio);
+      // Riproduci solo l'audioCambio dell'esercizio precedente
+      if (soundMode === "beppe" && prevExercise.audioCambio) {
+        playBeppeAudio(prevExercise.audioCambio);
       }
     
       if (useBip) playTransition();
-    
       document.getElementById("next-exercise-preview").style.display = "none";
-      savedTimeLeft = null;
     }
+
 
 
 
