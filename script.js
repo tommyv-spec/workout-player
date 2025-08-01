@@ -78,7 +78,7 @@ function login() {
     return;
   }
 
-  fetch(`https://script.google.com/macros/s/AKfycby9_MIydDYqOHzyiMsywAW6wnLex_VUycm2UejVFK7E090TzyNZZuxatJAr1nnPzozoCA/exec?username=${username}&password=${password}`)
+  fetch(`https://script.google.com/macros/s/AKfycbwfJHC8f3tLhr4eT57KD9FKz0YmMy-tmt07hdOQQNwpi1FsGalrL4B-9lzRPoe0rW9A7A/exec?username=${username}&password=${password}`)
     .then(res => res.json())
     .then(data => {
       if (data.status === "success") {
@@ -104,7 +104,7 @@ function logout() {
 }
 
 function loadUserData(username) {
-  fetch("https://script.google.com/macros/s/AKfycby9_MIydDYqOHzyiMsywAW6wnLex_VUycm2UejVFK7E090TzyNZZuxatJAr1nnPzozoCA/exec")
+  fetch("https://script.google.com/macros/s/AKfycbwfJHC8f3tLhr4eT57KD9FKz0YmMy-tmt07hdOQQNwpi1FsGalrL4B-9lzRPoe0rW9A7A/exec")
     .then(res => res.json())
     .then(data => {
       workouts = data.workouts;
