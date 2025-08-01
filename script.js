@@ -8,6 +8,14 @@ let lastSpeakTime = 0;
 let currentSpeakId = 0;
 const ttsAudio = new Audio();
 
+const beppeSounds = {
+  s60: "https://drive.google.com/uc?export=download&id=1L8OmsZjgrVvHR0vyfSDhaueR1rweGtH7",
+  s30: "https://drive.google.com/uc?export=download&id=1-qll5am-SvO3NbTlFLMmkNg2jcaSiOqq",
+  countdown5: "https://drive.google.com/uc?export=download&id=17o5eU5rr_mW9-M3ZtPiXTfnSyBPnOdsw",
+  prossimo: "https://drive.google.com/uc?export=download&id=1wVr1w6FrasMH5dGPe28ZRTMisYFALtlG"
+};
+
+
 function startWorkout() {
   document.getElementById("setup-screen").style.display = "none";
   document.querySelector("header").style.display = "none";
@@ -218,27 +226,59 @@ async function playExercise(index, exercises, resumeTime = null) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-    if (timeLeft === 60 && useVoice) speak("mancano sessanta secondi");
-    if (timeLeft === 30 && useVoice) speak("mancano trenta secondi");
+    if (timeLeft === 60) {
+      if (useVoice) speak("mancano sessanta secondi");
+      if (soundMode === "beppe") playBeppeAudio(beppeSounds.s60);
+    }
+
+    if (timeLeft === 30) {
+      if (useVoice) speak("mancano trenta secondi");
+      if (soundMode === "beppe") playBeppeAudio(beppeSounds.s30);
+    }
+
+
+    if (timeLeft === 10 && soundMode === "beppe") {
+      playBeppeAudio(beppeSounds.prossimo); // statico
+      if (nextExercise.audio) {
+        setTimeout(() => playBeppeAudio(nextExercise.audio), 1500);
+      }
+    }
+
 
     if (timeLeft === 10) {
       if (nextExercise) {
         const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
           ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
           : "";
-
+    
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
-
-        if (useVoice) announceNextExercise(nextExercise);
+    
+        if (soundMode === "beppe") {
+          const urls = [beppeSounds.prossimo];
+          if (nextExercise.audio) urls.push(nextExercise.audio);
+          playBeppeAudioSequence(urls);
+        } else if (useVoice) {
+          announceNextExercise(nextExercise);
+        }
       }
-
+    
       if (useBip) playBeep();
     }
 
-    if (timeLeft === 5 && useVoice) speak("cinque, quattro, tre, due, uno");
+
+    if (timeLeft === 5) {
+      if (useVoice) speak("cinque, quattro, tre, due, uno");
+      if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
+    }
+
 
     if (timeLeft <= 0) {
+      if (soundMode === "beppe") {
+        // Suona l’audio al cambio (dell’esercizio precedente)
+        if (exercise.audioCambio) playBeppeAudio(exercise.audioCambio);
+      }
+
       if (useBip) playTransition();
       clearInterval(interval);
       document.getElementById("next-exercise-preview").style.display = "none";
@@ -277,27 +317,59 @@ async function playTimerOnly(timeLeft, exercise, nextExercise) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-    if (timeLeft === 60 && useVoice) speak("mancano sessanta secondi");
-    if (timeLeft === 30 && useVoice) speak("mancano trenta secondi");
+    if (timeLeft === 60) {
+      if (useVoice) speak("mancano sessanta secondi");
+      if (soundMode === "beppe") playBeppeAudio(beppeSounds.s60);
+    }
+
+    if (timeLeft === 30) {
+      if (useVoice) speak("mancano trenta secondi");
+      if (soundMode === "beppe") playBeppeAudio(beppeSounds.s30);
+    }
+
+
+    if (timeLeft === 10 && soundMode === "beppe") {
+      playBeppeAudio(beppeSounds.prossimo); // statico
+      if (nextExercise.audio) {
+        setTimeout(() => playBeppeAudio(nextExercise.audio), 1500);
+      }
+    }
+
 
     if (timeLeft === 10) {
       if (nextExercise) {
         const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
           ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
           : "";
-
+    
         document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
-
-        if (useVoice) announceNextExercise(nextExercise);
+    
+        if (soundMode === "beppe") {
+          const urls = [beppeSounds.prossimo];
+          if (nextExercise.audio) urls.push(nextExercise.audio);
+          playBeppeAudioSequence(urls);
+        } else if (useVoice) {
+          announceNextExercise(nextExercise);
+        }
       }
-
+    
       if (useBip) playBeep();
     }
 
-    if (timeLeft === 5 && useVoice) speak("cinque, quattro, tre, due, uno");
+
+    if (timeLeft === 5) {
+      if (useVoice) speak("cinque, quattro, tre, due, uno");
+      if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
+    }
+
 
     if (timeLeft <= 0) {
+      if (soundMode === "beppe") {
+        // Suona l’audio al cambio (dell’esercizio precedente)
+        if (exercise.audioCambio) playBeppeAudio(exercise.audioCambio);
+      }
+
       if (useBip) playTransition();
       clearInterval(interval);
       document.getElementById("next-exercise-preview").style.display = "none";
@@ -402,4 +474,31 @@ function playBeep() {
 function playTransition() {
   const transition = document.getElementById("transition-sound");
   if (transition) transition.play();
+}
+
+function playBeppeAudio(url) {
+  if (!url) return;
+  const audio = new Audio(convertGoogleDriveToDirect(url));
+  audio.play();
+}
+
+function convertGoogleDriveToDirect(link) {
+  // Estrae l'ID da un link Google Drive
+  const match = link.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+  if (!match) return "";
+  const id = match[1];
+  return `https://drive.google.com/uc?export=download&id=${id}`;
+}
+
+async function playBeppeAudioSequence(urls) {
+  for (const url of urls) {
+    if (!url) continue;
+    const directUrl = convertGoogleDriveToDirect(url);
+    await new Promise((resolve, reject) => {
+      const audio = new Audio(directUrl);
+      audio.onended = resolve;
+      audio.onerror = resolve;
+      audio.play();
+    });
+  }
 }
