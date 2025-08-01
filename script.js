@@ -282,20 +282,26 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
     }
 
+
     if (timeLeft <= 0) {
       clearInterval(interval);
-
+    
+      // Pronuncia o riproduce audio al cambio esercizio
       if (soundMode === "beppe" && exercise.audioCambio) {
         await playBeppeAudio(exercise.audioCambio);
+      } else if (useVoice) {
+        speak(`ora: ${exercise.name}`);
       }
-
+    
       if (useBip) playTransition();
-
+    
       document.getElementById("next-exercise-preview").style.display = "none";
       currentStep++;
       savedTimeLeft = null;
-      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
+      setTimeout(() => playExercise(currentStep, exercises), 300);
     }
+
+
   }, 1000);
 }
 
