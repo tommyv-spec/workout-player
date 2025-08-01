@@ -287,11 +287,22 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
       clearInterval(interval);
     
       // Pronuncia o riproduce audio al cambio esercizio
-      if (soundMode === "beppe" && exercise.audioCambio) {
-        await playBeppeAudio(exercise.audioCambio);
-      } else if (useVoice) {
-        speak(`ora: ${exercise.name}`);
+      if (soundMode === "beppe") {
+        const next = exercises[currentStep + 1];
+        const sequence = [];
+      
+        if (next) {
+          sequence.push(beppeSounds.prossimo);
+          if (next.audio) sequence.push(next.audio);
+        }
+      
+        if (exercise.audioCambio) sequence.push(exercise.audioCambio);
+      
+        if (sequence.length > 0) {
+          await playBeppeAudioSequence(sequence);
+        }
       }
+
     
       if (useBip) playTransition();
     
