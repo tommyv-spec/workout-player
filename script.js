@@ -483,12 +483,12 @@ function playBeppeAudio(url) {
 }
 
 function convertGoogleDriveToDirect(link) {
-  // Estrae l'ID da un link Google Drive
-  const match = link.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-  if (!match) return "";
-  const id = match[1];
+  const idMatch = link.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
+  if (!idMatch) return "";
+  const id = idMatch[1];
   return `https://drive.google.com/uc?export=download&id=${id}`;
 }
+
 
 async function playBeppeAudioSequence(urls) {
   for (const url of urls) {
