@@ -293,11 +293,7 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
       const sequence = [];
       
       if (soundMode === "beppe") {
-        if (next) {
-          sequence.push(beppeSounds.prossimo);
-          if (next.audio) sequence.push(next.audio);
-        }
-      
+        // NON annunciare di nuovo il prossimo esercizio    
         if (exercise.audioCambio) sequence.push(exercise.audioCambio);
       
         if (sequence.length > 0) {
@@ -305,13 +301,9 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
         }
       }
     
-
-
-    
       if (useBip) playTransition();
     
       document.getElementById("next-exercise-preview").style.display = "none";
-      currentStep++;
       savedTimeLeft = null;
       setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
     }
