@@ -261,20 +261,23 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
           ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
           : "";
     
-        document.getElementById("exercise-name").innerHTML = `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
+        document.getElementById("exercise-name").innerHTML =
+          `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
     
+        // Riproduci annunci vocali a 10 secondi rimanenti
         if (soundMode === "beppe") {
           const urls = [beppeSounds.prossimo];
           if (nextExercise.audio) urls.push(nextExercise.audio);
           playBeppeAudioSequence(urls);
         } else if (useVoice) {
-          speak(`prossimo esercizio: ${nextExercise.name}`);
+          announceNextExercise(nextExercise);
         }
       }
     
       if (useBip) playBeep();
     }
+
 
 
     if (timeLeft === 5) {
@@ -283,24 +286,35 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     }
 
 
-    if (timeLeft <= 0) {   
+    if (timeLeft <= 0) {
       clearInterval(interval);
     
-      const nextStep = currentStep + 1;
-      const nextExercise = selectedWorkout.exercises[nextStep];
+      // Avanza l'indice ORA
+      currentStep++;
+      const nextExercise = selectedWorkout.exercises[currentStep];
     
-      // Riproduci solo l'audioCambio dell'esercizio che STA per iniziare
-      if (soundMode === "beppe" && nextExercise?.audioCambio) {
-        playBeppeAudio(nextExercise.audioCambio);
+      // Pronuncia l'audioCambio del NUOVO esercizio in arrivo
+      if (soundMode === "beppe") {
+        const sequence = [];
+        if (nextExercise?.audioCambio) {
+          sequence.push(nextExercise.audioCambio);
+        }
+        if (sequence.length > 0) {
+          await playBeppeAudioSequence(sequence);
+        }
+      } else if (useVoice && nextExercise) {
+        await speak(nextExercise.name, detectLang(nextExercise.name));
       }
     
       if (useBip) playTransition();
-      document.getElementById("next-exercise-preview").style.display = "none";
     
-      currentStep = nextStep;
+      document.getElementById("next-exercise-preview").style.display = "none";
       savedTimeLeft = null;
+    
+      // Aspetta un attimo prima di partire col nuovo esercizio
       setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
     }
+
 
   }, 1000);
 }
