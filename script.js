@@ -11,7 +11,7 @@ const ttsAudio = new Audio();
 const beppeSounds = {
   s60: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2060%20secondi.mp3",
   s30: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2030%20secondi.mp3",
-  countdown5: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/count%20down.MP3",
+  countdown5: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/count%20down%20pi%C3%B9%20veloce.MP3",
   prossimo: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/Prossimo%20esercizio.MP3"
 };
 
@@ -283,14 +283,16 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     }
 
 
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-    
+    if (timeLeft <= 0) {   
       // Pronuncia o riproduce audio al cambio esercizio
-      if (soundMode === "beppe") {
-        const next = exercises[currentStep + 1];
-        const sequence = [];
+      clearInterval(interval);
+
+      // Avanza subito per avere il nuovo esercizio
+      currentStep++;
+      const next = exercises[currentStep];
+      const sequence = [];
       
+      if (soundMode === "beppe") {
         if (next) {
           sequence.push(beppeSounds.prossimo);
           if (next.audio) sequence.push(next.audio);
@@ -302,6 +304,14 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
           await playBeppeAudioSequence(sequence);
         }
       }
+      
+      if (useBip) playTransition();
+      
+      document.getElementById("next-exercise-preview").style.display = "none";
+      savedTimeLeft = null;
+      
+      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
+
 
     
       if (useBip) playTransition();
