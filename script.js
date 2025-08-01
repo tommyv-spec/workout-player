@@ -289,7 +289,7 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
 
       // Avanza subito per avere il nuovo esercizio
       currentStep++;
-      const next = exercises[currentStep];
+      const next = selectedWorkout.exercises[currentStep];
       const sequence = [];
       
       if (soundMode === "beppe") {
@@ -304,13 +304,7 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
           await playBeppeAudioSequence(sequence);
         }
       }
-      
-      if (useBip) playTransition();
-      
-      document.getElementById("next-exercise-preview").style.display = "none";
-      savedTimeLeft = null;
-      
-      setTimeout(() => playExercise(currentStep, selectedWorkout.exercises), 300);
+    
 
 
     
