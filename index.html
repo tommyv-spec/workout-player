@@ -36,13 +36,16 @@
         <select id="workoutSelect"></select>
 
 
-        <label for="soundMode">Modalità audio:</label>
-        <select id="soundMode">
-          <option value="none">Nessun suono</option>
-          <option value="bip">Solo bip</option>
-          <option value="voice" selected>Voce</option>
-          <option value="beppe" selected>Beppe</option>
-        </select>
+        <div class="audio-setup-wrapper">
+          <label for="soundMode-setup">Modalità audio:</label>
+          <select id="soundMode-setup">
+            <option value="beppe">Beppe</option>
+            <option value="voice">Voice</option>
+            <option value="bip">Beep</option>
+            <option value="none">Nessun suono</option>
+          </select>
+        </div>
+
 
 
         <button id="start-button" class="start-button">Start Workout</button>
@@ -82,12 +85,15 @@
         <!-- 5. PAUSA -->
         <div id="controls-container">
           <button id="pause-button">⏸ Pausa</button>
-          <select id="soundMode">
-            <option value="none">🔇 Nessun suono</option>
-            <option value="bip">📢 Solo bip</option>
-            <option value="voice">🗣️ Voce</option>
-            <option value="beppe">🎙️ Beppe</option>
-          </select>
+          <div class="audio-workout-wrapper">
+            <label for="soundMode">Modalità audio:</label>
+            <select id="soundMode">
+              <option value="beppe">Beppe</option>
+              <option value="voice">Voice</option>
+              <option value="bip">Beep</option>
+              <option value="none">Nessun suono</option>
+            </select>
+          </div>
         </div>
 
 
