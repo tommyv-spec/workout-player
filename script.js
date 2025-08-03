@@ -254,16 +254,19 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     document.getElementById("timer").textContent = timeLeft;
 
     if (timeLeft === 60) {
+      const soundMode = document.getElementById("soundMode").value;
       if (useVoice) speak("mancano sessanta secondi");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.s60);
     }
 
     if (timeLeft === 30) {
+      const soundMode = document.getElementById("soundMode").value;
       if (useVoice) speak("mancano trenta secondi");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.s30);
     }
 
     if (timeLeft === 10) {
+      const soundMode = document.getElementById("soundMode").value;
       if (nextExercise) {
         const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
           ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
@@ -289,12 +292,14 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
 
 
     if (timeLeft === 5) {
+      const soundMode = document.getElementById("soundMode").value;
       if (useVoice) speak("cinque, quattro, tre, due, uno");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
     }
 
 
     if (timeLeft <= 0) {
+      const soundMode = document.getElementById("soundMode").value;
       clearInterval(interval);
     
       // Avanza l'indice ORA
