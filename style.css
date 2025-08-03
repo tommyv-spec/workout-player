@@ -414,3 +414,23 @@ audio {
     grid-template-columns: 1fr;
   }
 }
+
+
+.audio-setup-wrapper,
+.audio-workout-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.audio-setup-wrapper select,
+.audio-workout-wrapper select {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  background: #2d2b25;
+  color: #fff;
+  border: none;
+}
