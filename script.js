@@ -253,6 +253,11 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
+      // 🔁 LEGGI SEMPRE LA MODALITÀ ATTUALE
+      const soundMode = document.getElementById("soundMode").value;
+      const useVoice = soundMode === "voice";
+      const useBip = soundMode === "bip";
+
     if (timeLeft === 60) {
       const soundMode = document.getElementById("soundMode").value;
       if (useVoice) speak("mancano sessanta secondi");
