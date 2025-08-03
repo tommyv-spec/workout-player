@@ -80,7 +80,17 @@
         <img id="exercise-gif" src="" alt="Esercizio corrente" />
       
         <!-- 5. PAUSA -->
-        <button id="pause-button">⏸ Pausa</button>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button id="pause-button">⏸ Pausa</button>
+        
+          <select id="soundMode" style="padding: 6px 10px; border-radius: 6px; background: #111; color: white; border: 1px solid #333;">
+            <option value="voice">🎙 Voce</option>
+            <option value="beppe">🧔‍♂️ Beppe</option>
+            <option value="bip">📢 Beep</option>
+            <option value="off">🔇 Muto</option>
+          </select>
+        </div>
+
 
         <!-- FIX per JS -->
         <div id="next-exercise-preview" style="display: none;"></div>
