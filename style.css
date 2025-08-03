@@ -351,8 +351,16 @@ main {
   font-weight: bold;
 }
 
+#controls-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px; /* spazio tra i due elementi */
+  margin-top: 16px;
+}
 
-#pause-button {
+#pause-button,
+#soundMode {
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -367,6 +375,17 @@ main {
   z-index: 999;
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
+
+#soundMode {
+  background-color: #222;
+}
+
+@media (max-width: 500px) {
+  #controls-container {
+    flex-direction: column;
+  }
+}
+
 
 audio {
   display: none;
