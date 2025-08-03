@@ -28,6 +28,7 @@ function startWorkout() {
   currentStep = 0;
   savedTimeLeft = null;
   playExercise(currentStep, selectedWorkout.exercises);
+  document.getElementById("soundMode").value = document.getElementById("soundMode-setup").value;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -35,6 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   preloadAudio(Object.values(beppeSounds));
   preloadWorkoutAudios();
+
+  document.getElementById("soundMode-setup").addEventListener("change", () => {
+    const value = document.getElementById("soundMode-setup").value;
+    document.getElementById("soundMode").value = value;
+  });
 
   document.addEventListener("click", () => {
     if (!window.__audioUnlocked) {
