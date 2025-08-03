@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   warmUpServer();
 
   preloadAudio(Object.values(beppeSounds));
-  preloadWorkoutAudios(Object.values(beppeSounds));
+  preloadWorkoutAudios();
 
   document.addEventListener("click", () => {
     if (!window.__audioUnlocked) {
