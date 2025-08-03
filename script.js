@@ -8,6 +8,10 @@ let lastSpeakTime = 0;
 let currentSpeakId = 0;
 const ttsAudio = new Audio();
 
+let beppePlayer = new Audio();
+beppePlayer.preload = "auto";
+
+
 const beppeSounds = {
   s60: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2060%20secondi.mp3",
   s30: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2030%20secondi.mp3",
@@ -28,6 +32,10 @@ function startWorkout() {
 
 document.addEventListener("DOMContentLoaded", () => {
   warmUpServer();
+
+  preloadAudio(Object.values(beppeSounds));
+  preloadWorkoutAudios(Object.values(beppeSounds));
+
   document.addEventListener("click", () => {
     if (!window.__audioUnlocked) {
       ttsAudio.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA...";
@@ -419,9 +427,12 @@ function playTransition() {
 
 function playBeppeAudio(url) {
   if (!url) return;
-  const audio = new Audio(convertGoogleDriveToDirect(url));
-  audio.play();
+  beppePlayer.src = convertGoogleDriveToDirect(url);
+  beppePlayer.play().catch((e) => {
+    console.warn("❌ Errore audio:", e);
+  });
 }
+
 
 function convertGoogleDriveToDirect(link) {
   return link; // già diretto, non serve conversione
@@ -431,12 +442,49 @@ function convertGoogleDriveToDirect(link) {
 async function playBeppeAudioSequence(urls) {
   for (const url of urls) {
     if (!url) continue;
-    const directUrl = convertGoogleDriveToDirect(url);
-    await new Promise((resolve, reject) => {
-      const audio = new Audio(directUrl);
-      audio.onended = resolve;
-      audio.onerror = resolve;
-      audio.play();
+    beppePlayer.src = convertGoogleDriveToDirect(url);
+    await new Promise((resolve) => {
+      beppePlayer.onended = resolve;
+      beppePlayer.onerror = resolve;
+      beppePlayer.play().catch(resolve);
     });
   }
 }
+
+
+
+function preloadAudio(urls) {
+  urls.forEach(url => {
+    const audio = new Audio();
+    audio.src = convertGoogleDriveToDirect(url);
+    audio.preload = "auto";
+  });
+}
+
+
+function preloadWorkoutAudios() {
+  const audioUrls = [];
+
+  Object.values(workouts).forEach(workout => {
+    workout.exercises.forEach(ex => {
+      if (ex.audio) audioUrls.push(ex.audio);
+      if (ex.audioCambio) audioUrls.push(ex.audioCambio);
+    });
+  });
+
+  preloadAudio(audioUrls);
+}
+
+
+document.addEventListener("click", () => {
+  if (!window.__audioUnlocked) {
+    beppePlayer.src = "data:audio/mp3;base64,//uQxAAAAAA=="; // 0.1s silenzioso
+    beppePlayer.play().then(() => {
+      window.__audioUnlocked = true;
+      console.log("🔓 Audio sbloccato su iOS");
+    }).catch(() => {
+      console.warn("⚠️ Impossibile sbloccare audio su iOS");
+    });
+  }
+}, { once: true });
+
