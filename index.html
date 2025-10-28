@@ -27,49 +27,69 @@
 
     <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
-      <div id="setup-screen">
-        <div style="margin-top: 20px;">
-          <button id="logout-button">Logout</button>
-        </div>
-
+      <!-- TOP SELECTOR ABOVE THE SETUP CARD -->
+      <div id="topbar-select">
         <label for="workoutSelect">Seleziona workout:</label>
         <select id="workoutSelect"></select>
+      </div>
 
+      <div id="setup-screen">
+        <!-- INSTRUCTIONS SECTION (Collapsible) -->
+        <div id="instructions-section" style="display: none;">
+          <div class="instructions-header" id="instructions-header">
+            <span class="instructions-icon">📋</span>
+            <span class="instructions-title">ISTRUZIONI</span>
+            <span class="collapse-icon" id="instructions-collapse-icon">▼</span>
+          </div>
+          <div id="instructions-content" class="instructions-content">
+            <div id="instructions-box">
+              <p id="instructions-text"></p>
+              <img id="instructions-image" style="display: none;" />
+            </div>
+          </div>
+        </div>
 
-        <div class="audio-setup-wrapper">
+        <!-- MATERIALE SECTION -->
+        <div id="materiale-section" style="display: none;">
+          <div class="materiale-header">
+            <span class="materiale-icon">🏋️</span>
+            <span class="materiale-title">MATERIALE</span>
+          </div>
+          <div id="materiale-content" class="materiale-content">
+            <div id="materiale-list"></div>
+          </div>
+        </div>
+
+        <h3 id="workout-preview-title" style="display: none; text-align: center; color: #fff; margin: 30px 0 20px; font-size: 18px; text-transform: uppercase; letter-spacing: 1px;">Anteprima workout</h3>
+
+        <div id="exercise-visuals" style="display: none; margin-top: 20px;">
+          <div id="exercise-grid" style="display: grid; grid-template-columns: 1fr; gap: 20px;"></div>
+        </div>
+      </div>
+
+      <!-- SETUP SETTINGS POPUP -->
+      <div id="setup-settings-popup" style="display: none;">
+        <div class="settings-content">
+          <h3>Impostazioni</h3>
+          
           <label for="soundMode-setup">Modalità audio:</label>
           <select id="soundMode-setup">
-            <option value="beppe">Beppe</option>
             <option value="voice">Voice</option>
+            <option value="beppe">Beppe</option>
             <option value="bip">Beep</option>
             <option value="none">Nessun suono</option>
           </select>
+          
+          <button id="logout-button" style="margin-top: 20px;">Logout</button>
+          <button id="close-setup-settings">Chiudi</button>
         </div>
-
-
-
-        <button id="start-button" class="start-button">Start Workout</button>
-        
-        <div id="workout-preview" style="display: none;">
-          <h3>Esercizi nel workout:</h3>
-          <ul id="exercise-list"></ul>
-        </div>
-
-        <div id="exercise-visuals" style="display: none; margin-top: 20px;">
-          <!--
-          <h3>Anteprima visiva:</h3>
-          -->
-          <div id="exercise-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;"></div>
-        </div>
-
-        <div id="instructions-box">
-          <strong>Istruzioni:</strong>
-          <p id="instructions-text"></p>
-        </div>
-        <button id="start-button-bottom" class="start-button" disabled>Start Workout</button>
       </div>
 
-
+      <!-- STICKY BUTTONS AT BOTTOM -->
+      <div id="bottom-buttons-container">
+        <button id="setup-settings-button" class="settings-btn">⚙️</button>
+        <button id="start-button-bottom" class="start-button" disabled>Start Workout</button>
+      </div>
 
       <!-- SESSIONE ALLENAMENTO -->
       <div id="exercise-container" style="display: none; flex-direction: column;">
@@ -85,7 +105,13 @@
         <!-- 5. PAUSA -->
         <div id="controls-container">
           <button id="pause-button">⏸ Pausa</button>
-          <div class="audio-workout-wrapper">
+          <button id="settings-button" class="settings-btn">⚙️</button>
+        </div>
+
+        <!-- Settings Popup Overlay -->
+        <div id="settings-popup" style="display: none;">
+          <div class="settings-content">
+            <h3>Impostazioni</h3>
             <label for="soundMode">Modalità audio:</label>
             <select id="soundMode">
               <option value="beppe">Beppe</option>
@@ -93,6 +119,7 @@
               <option value="bip">Beep</option>
               <option value="none">Nessun suono</option>
             </select>
+            <button id="close-settings">Chiudi</button>
           </div>
         </div>
 

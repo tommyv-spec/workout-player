@@ -11,6 +11,22 @@ const ttsAudio = new Audio();
 let beppePlayer = new Audio();
 beppePlayer.preload = "auto";
 
+let beforeUnloadBound = false;
+function bindBeforeUnload() {
+  if (beforeUnloadBound) return;
+  window.addEventListener("beforeunload", onBeforeUnload);
+  beforeUnloadBound = true;
+}
+function unbindBeforeUnload() {
+  if (!beforeUnloadBound) return;
+  window.removeEventListener("beforeunload", onBeforeUnload);
+  beforeUnloadBound = false;
+}
+function onBeforeUnload(e) {
+  // Show native prompt
+  e.preventDefault();
+  e.returnValue = "";
+}
 
 const beppeSounds = {
   s60: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2060%20secondi.mp3",
@@ -21,15 +37,54 @@ const beppeSounds = {
 
 
 function startWorkout() {
-  document.getElementById("setup-screen").style.display = "none";
-  document.querySelector("header").style.display = "none";
-  document.getElementById("exercise-container").style.display = "flex";
-  document.getElementById("workout-preview").style.display = "none";
+  if (
+    !selectedWorkout ||
+    !Array.isArray(selectedWorkout.exercises) ||
+    selectedWorkout.exercises.length === 0
+  ) {
+    alert("Nessun workout valido selezionato.");
+    return;
+  }
+
+  // Hide setup UI
+  const setup = document.getElementById("setup-screen");
+  const header = document.querySelector("header");
+  const startBtn = document.getElementById("start-button-bottom");
+  const exerciseContainer = document.getElementById("exercise-container");
+
+  // NEW: hide the top selector and the setup gear as requested
+  const topbarSelect = document.getElementById("topbar-select");              // exists only if you moved it above the card
+  const setupGear = document.getElementById("setup-settings-button");         // bottom-left gear
+
+  if (topbarSelect) topbarSelect.style.display = "none";
+  if (setupGear) setupGear.style.display = "none";
+
+  // SAFE: workout-preview may not exist in your HTML, so guard it
+  const previewMaybe = document.getElementById("workout-preview");
+  if (previewMaybe) previewMaybe.style.display = "none";
+
+  // Show workout screen
+  if (setup) setup.style.display = "none";
+  if (header) header.style.display = "none";
+  if (startBtn) startBtn.style.display = "none";
+  if (exerciseContainer) exerciseContainer.style.display = "flex";
+
+  // Lock body scroll during session
+  document.body.style.overflow = "hidden";
+  document.body.style.position = "fixed";
+  document.body.style.width = "100%";
+  document.body.style.height = "100%";
+
+  // Start
   currentStep = 0;
   savedTimeLeft = null;
   playExercise(currentStep, selectedWorkout.exercises);
-  document.getElementById("soundMode").value = document.getElementById("soundMode-setup").value;
+
+  // carry over sound mode
+  document.getElementById("soundMode").value =
+    document.getElementById("soundMode-setup").value;
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   warmUpServer();
@@ -64,8 +119,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("login-button").addEventListener("click", login);
   document.getElementById("logout-button").addEventListener("click", logout);
-  document.getElementById("start-button").addEventListener("click", startWorkout);
-  document.getElementById("start-button-bottom").addEventListener("click", startWorkout);
+  const __topStart = document.getElementById("start-button");
+  if (__topStart) __topStart.addEventListener("click", startWorkout);
+  const __bottomStart = document.getElementById("start-button-bottom");
+  if (__bottomStart) __bottomStart.addEventListener("click", startWorkout);
 
   document.getElementById("pause-button").addEventListener("click", () => {
     isPaused = !isPaused;
@@ -77,6 +134,48 @@ document.addEventListener("DOMContentLoaded", () => {
       pauseBtn.textContent = "⏸ Pausa";
       resumeTimer();
     }
+  });
+
+  // Settings popup handlers
+  document.getElementById("settings-button").addEventListener("click", () => {
+    document.getElementById("settings-popup").style.display = "flex";
+  });
+
+  document.getElementById("close-settings").addEventListener("click", () => {
+    document.getElementById("settings-popup").style.display = "none";
+  });
+
+  // Close popup when clicking outside
+  document.getElementById("settings-popup").addEventListener("click", (e) => {
+    if (e.target.id === "settings-popup") {
+      document.getElementById("settings-popup").style.display = "none";
+    }
+  });
+
+  // Setup Settings popup handlers
+  document.getElementById("setup-settings-button").addEventListener("click", () => {
+    document.getElementById("setup-settings-popup").style.display = "flex";
+  });
+
+  document.getElementById("close-setup-settings").addEventListener("click", () => {
+    document.getElementById("setup-settings-popup").style.display = "none";
+  });
+
+  // Close setup settings popup when clicking outside
+  document.getElementById("setup-settings-popup").addEventListener("click", (e) => {
+    if (e.target.id === "setup-settings-popup") {
+      document.getElementById("setup-settings-popup").style.display = "none";
+    }
+  });
+
+  // Instructions collapse handler
+  document.getElementById("instructions-header").addEventListener("click", () => {
+    const header = document.getElementById("instructions-header");
+    const content = document.getElementById("instructions-content");
+    const icon = document.getElementById("instructions-collapse-icon");
+    
+    header.classList.toggle("collapsed");
+    content.classList.toggle("collapsed");
   });
 });
 
@@ -92,7 +191,7 @@ function login() {
     return;
   }
 
-  fetch(`https://script.google.com/macros/s/AKfycbwfJHC8f3tLhr4eT57KD9FKz0YmMy-tmt07hdOQQNwpi1FsGalrL4B-9lzRPoe0rW9A7A/exec?username=${username}&password=${password}`)
+  fetch(`https://script.google.com/macros/s/AKfycbz4_g-8ILVood23UimLreJMaAEd5LKvVVluVsGL9aa2N6Qn8O6JDMBxytSY1DEJA3QYVQ/exec?username=${username}&password=${password}`)
     .then(res => res.json())
     .then(data => {
       if (data.status === "success") {
@@ -118,7 +217,7 @@ function logout() {
 }
 
 function loadUserData(username) {
-  fetch("https://script.google.com/macros/s/AKfycbwfJHC8f3tLhr4eT57KD9FKz0YmMy-tmt07hdOQQNwpi1FsGalrL4B-9lzRPoe0rW9A7A/exec")
+  fetch("https://script.google.com/macros/s/AKfycbz4_g-8ILVood23UimLreJMaAEd5LKvVVluVsGL9aa2N6Qn8O6JDMBxytSY1DEJA3QYVQ/exec")
     .then(res => res.json())
     .then(data => {
       workouts = data.workouts;
@@ -136,8 +235,8 @@ function loadUserData(username) {
       if (select.options.length > 0) {
         select.selectedIndex = 0;
         selectedWorkout = workouts[select.value];
-        document.getElementById("start-button").disabled = false;
-        document.getElementById("start-button-bottom").disabled = false;
+        const __topStart2 = document.getElementById("start-button"); if (__topStart2) __topStart2.disabled = false;
+        const __bottomStart2 = document.getElementById("start-button-bottom"); if (__bottomStart2) __bottomStart2.disabled = false;
         updateWorkoutPreview();
       }
 
@@ -150,70 +249,219 @@ function loadUserData(username) {
 
 function updateWorkoutPreview() {
   const preview = document.getElementById("workout-preview");
+  const previewTitle = document.getElementById("workout-preview-title");
   const list = document.getElementById("exercise-list");
   const visuals = document.getElementById("exercise-visuals");
-  const instructionsBox = document.getElementById("instructions-box");
+  const instructionsSection = document.getElementById("instructions-section");
   const instructionsText = document.getElementById("instructions-text");
+  const instructionsImage = document.getElementById("instructions-image");
+  const materialeSection = document.getElementById("materiale-section");
+  const materialeList = document.getElementById("materiale-list");
 
-  list.innerHTML = "";
-  document.getElementById("exercise-grid").innerHTML = "";
+  if (list) list.innerHTML = "";
+  const __grid = document.getElementById("exercise-grid"); if (__grid) __grid.innerHTML = "";
+  if (materialeList) materialeList.innerHTML = "";
 
   const workout = selectedWorkout;
   if (!workout || !workout.exercises?.length) {
-    preview.style.display = "none";
-    visuals.style.display = "none";
-    instructionsBox.style.display = "none";
+    if (preview) preview.style.display = "none";
+    if (previewTitle) previewTitle.style.display = "none";
+    if (visuals) visuals.style.display = "none";
+    if (instructionsSection) instructionsSection.style.display = "none";
+    if (materialeSection) materialeSection.style.display = "none";
     return;
   }
 
+  // === HANDLE INSTRUCTIONS ===
+  const defaultInstructionsText = "Instructions test";
+  const defaultInstructionsImage = "https://lh3.googleusercontent.com/d/16uLdZNld58oCEUdmL96xzeFP43ZtNbSF";
+  
+  if (instructionsSection) instructionsSection.style.display = "block";
+  
+  if (workout.instructions && workout.instructions.trim()) {
+    // Use instructions from sheet
+    instructionsText.textContent = workout.instructions;
+    instructionsText.style.display = "block";
+    instructionsImage.style.display = "none";
+  } else {
+    // Use default - using image as default (you can switch to text by commenting/uncommenting)
+    // Option 1: Default text
+    // instructionsText.textContent = defaultInstructionsText;
+    // instructionsText.style.display = "block";
+    // instructionsImage.style.display = "none";
+    
+    // Option 2: Default image (currently active)
+    instructionsImage.src = defaultInstructionsImage;
+    instructionsImage.style.display = "block";
+    instructionsText.style.display = "none";
+  }
+
+  // === HANDLE MATERIALE (Unique equipment) ===
+  const uniqueMateriale = new Set();
   workout.exercises.forEach(ex => {
-    const li = document.createElement("li");
-    li.textContent = `${ex.name} (${ex.duration}s)`;
-    list.appendChild(li);
+    if (ex.tipoDiPeso && ex.tipoDiPeso.trim() && ex.block) {
+      uniqueMateriale.add(ex.tipoDiPeso.trim());
+    }
   });
 
-  const seen = new Set();
+  if (uniqueMateriale.size > 0) {
+    materialeSection.style.display = "block";
+    uniqueMateriale.forEach(item => {
+      const materialeItem = document.createElement('div');
+      materialeItem.className = 'materiale-item';
+      materialeItem.textContent = item;
+      materialeList.appendChild(materialeItem);
+    });
+  } else {
+    materialeSection.style.display = "none";
+  }
+
+  // Group exercises by block
+  const sections = {
+    blocco1: [],
+    blocco2: [],
+    blocco3: []
+  };
+
   workout.exercises.forEach(ex => {
-    if (seen.has(ex.name)) return;
-    seen.add(ex.name);
-
-    const card = document.createElement("div");
-    card.className = "exercise-card";
-
-    const name = document.createElement("div");
-    name.textContent = ex.name;
-    name.className = "exercise-name";
-
-    const img = document.createElement("img");
-    img.src = ex.imageUrl;
-    img.alt = ex.name;
-
-    card.appendChild(name);
-    card.appendChild(img);
-    document.getElementById("exercise-grid").appendChild(card);
+    // Use explicit block field
+    if (ex.block) {
+      const blockLower = ex.block.toLowerCase();
+      if (blockLower.includes('block 1') || blockLower.includes('blocco 1')) {
+        sections.blocco1.push(ex);
+      } else if (blockLower.includes('block 2') || blockLower.includes('blocco 2')) {
+        sections.blocco2.push(ex);
+      } else if (blockLower.includes('block 3') || blockLower.includes('blocco 3')) {
+        sections.blocco3.push(ex);
+      }
+    }
   });
 
-  instructionsBox.style.display = workout.instructions ? "block" : "none";
-  if (workout.instructions) instructionsText.textContent = workout.instructions;
+  const grid = document.getElementById("exercise-grid");
+  
+  const sectionConfigs = [
+    { key: 'blocco1', title: 'BLOCCO 1', color: '#27AE60', icon: '💪' },
+    { key: 'blocco2', title: 'BLOCCO 2', color: '#27AE60', icon: '💪' },
+    { key: 'blocco3', title: 'BLOCCO 3', color: '#27AE60', icon: '💪' }
+  ];
 
-  preview.style.display = "block";
-  visuals.style.display = "block";
+  sectionConfigs.forEach(config => {
+    const exercises = sections[config.key];
+    if (exercises.length === 0) return;
+
+    // Remove duplicates
+    const uniqueExercises = [];
+    const seen = new Set();
+    exercises.forEach(ex => {
+      if (!seen.has(ex.name)) {
+        seen.add(ex.name);
+        uniqueExercises.push(ex);
+      }
+    });
+
+    // Calculate rounds (use the first exercise's rounds value)
+    const rounds = exercises[0]?.rounds || 0;
+
+    const section = document.createElement('div');
+    section.className = 'workout-section';
+    
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.style.background = `linear-gradient(135deg, ${config.color}, ${config.color}dd)`;
+    header.innerHTML = `
+      <span class="section-icon">${config.icon}</span>
+      <span class="section-title">${config.title}</span>
+      <span class="section-count">${uniqueExercises.length} es. | ${rounds} round</span>
+    `;
+    
+    section.appendChild(header);
+
+    const cardsGrid = document.createElement('div');
+    cardsGrid.className = 'section-cards-grid';
+    
+    uniqueExercises.forEach(ex => {
+      const card = document.createElement("div");
+      card.className = "exercise-card";
+
+      const img = document.createElement("img");
+      img.src = ex.imageUrl;
+      img.alt = ex.name;
+
+      const name = document.createElement("div");
+      name.textContent = ex.name;
+      name.className = "exercise-name";
+
+      const details = document.createElement("div");
+      details.className = "exercise-details";
+
+      if (ex.tipoDiPeso) {
+        const equipment = document.createElement("div");
+        equipment.className = "exercise-equipment";
+        equipment.innerHTML = `<strong>🏋️</strong> ${ex.tipoDiPeso}`;
+        details.appendChild(equipment);
+      }
+
+      if (ex.reps) {
+        const reps = document.createElement("div");
+        reps.className = "exercise-reps";
+        reps.innerHTML = `<strong>Reps:</strong> ${ex.reps}`;
+        details.appendChild(reps);
+      }
+
+      card.appendChild(img);
+      card.appendChild(name);
+      card.appendChild(details);
+      cardsGrid.appendChild(card);
+    });
+
+    section.appendChild(cardsGrid);
+    grid.appendChild(section);
+  });
+
+  if (preview) preview.style.display = "block";
+  if (previewTitle) previewTitle.style.display = "block";
+  if (visuals) visuals.style.display = "block";
 }
 
 async function playExercise(index, exercises, resumeTime = null) {
   if (index >= exercises.length) {
+    // UI message (briefly show completion)
     document.getElementById("exercise-name").textContent = "Workout completato!";
     document.getElementById("exercise-gif").src = "";
     document.getElementById("timer").textContent = "";
-    document.getElementById("next-exercise-preview").style.display = "none";
+    const nextPrev = document.getElementById("next-exercise-preview");
+    if (nextPrev) nextPrev.style.display = "none";
+
+    // Unlock scroll
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    document.body.style.height = "";
+
+    // Restore setup UI
+    const header = document.querySelector("header");
+    const setup = document.getElementById("setup-screen");
+    const startBtn = document.getElementById("start-button-bottom");
+    const exerciseContainer = document.getElementById("exercise-container");
+    const topbarSelect = document.getElementById("topbar-select");
+    const setupGear = document.getElementById("setup-settings-button");
+
+    if (exerciseContainer) exerciseContainer.style.display = "none";
+    if (header) header.style.display = "";
+    if (setup) setup.style.display = "";
+    if (startBtn) startBtn.style.display = "";
+    if (topbarSelect) topbarSelect.style.display = "block";
+    if (setupGear) setupGear.style.display = "block";
+
     return;
   }
+
 
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
   const currentReps = (exercise.reps && !exercise.name.toLowerCase().includes("istruz"))
-    ? `<div style="font-size: 14px; font-weight: normal; margin-top: 4px;">${exercise.reps} reps</div>`
+    ? `<div style="font-size: 16px; font-weight: 600; margin-top: 8px; color: #FFD700;">${exercise.reps} reps</div>`
     : "";
 
   document.getElementById("exercise-name").innerHTML = `<strong>${exercise.name}</strong>${currentReps}`;
@@ -280,11 +528,11 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
       const soundMode = document.getElementById("soundMode").value;
       if (nextExercise) {
         const nextReps = (nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz"))
-          ? `<div style="font-size: 13px; font-weight: normal; margin-top: 2px;">${nextExercise.reps} reps</div>`
+          ? `<div style="font-size: 14px; font-weight: 600; margin-top: 4px; color: #FFD700;">${nextExercise.reps} reps</div>`
           : "";
     
         document.getElementById("exercise-name").innerHTML =
-          `prossimo esercizio:<br><strong>${nextExercise.name}</strong>${nextReps}`;
+          `<div style="font-size: 14px; opacity: 0.8; margin-bottom: 4px;">prossimo esercizio:</div><strong style="font-size: 18px;">${nextExercise.name}</strong>${nextReps}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
     
         // Riproduci annunci vocali a 10 secondi rimanenti
@@ -374,41 +622,155 @@ function detectLang(text) {
 
 
 
+// ===== CONFIG =====
+const GOOGLE_TTS_URL = "https://google-tts-server.onrender.com/speak"; // keep your endpoint if different
+const TTS_TIMEOUT_MS = 9000;
+const TTS_RETRIES = 2; // retry Google TTS a couple of times before falling back
+
 async function speak(text, lang = "it-IT") {
+  const mode = document.getElementById("soundMode")?.value 
+            || document.getElementById("soundMode-setup")?.value 
+            || "voice";
+
+  if (!text || mode === "none") return;
+
+  // quick modes
+  if (mode === "bip") { playBeep(); return; }
+  if (mode === "beppe") { await playPreRecorded(text, lang); return; } // your own implementation
+
+  // VOICE mode
   try {
-    const voice = lang === "it-IT" ? "it-IT-Wavenet-C" : "en-US-Wavenet-D";
-
-    const response = await fetch("https://google-tts-server.onrender.com/speak", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, lang, voice }),
-    });
-
-    if (!response.ok) throw new Error("Errore TTS");
-
-    const blob = await response.blob();
-    if (blob.size === 0) throw new Error("Audio vuoto");
-
-    const audioUrl = URL.createObjectURL(blob);
-    ttsAudio.src = audioUrl;
-
-    await new Promise((resolve, reject) => {
-      ttsAudio.onended = resolve;
-      ttsAudio.onerror = reject;
-      ttsAudio.play();
-    });
-  } catch (error) {
-    console.warn("❌ Google TTS fallito, uso fallback:", error);
-    await new Promise(resolve => {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = lang;
-      utter.rate = 1.0;
-      utter.onend = resolve;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utter);
-    });
+    await ensureAudioUnlocked();           // iOS gating
+    await tryGoogleTTS(text, lang);        // primary
+  } catch (err) {
+    console.warn("Google TTS failed, using Web Speech fallback:", err);
+    try {
+      await webSpeechSpeak(text, lang);    // fallback
+    } catch (e2) {
+      console.error("Web Speech also failed:", e2);
+      // don’t throw again; swallow to avoid Uncaught (in promise)
+    }
   }
 }
+
+
+async function tryGoogleTTS(text, lang) {
+  let lastErr;
+  for (let attempt = 0; attempt <= TTS_RETRIES; attempt++) {
+    try {
+      const audioUrl = await fetchTTS(text, lang);
+      await playAudioUrl(audioUrl);
+      URL.revokeObjectURL(audioUrl);
+      return;
+    } catch (e) {
+      lastErr = e;
+      await sleep(350 * (attempt + 1)); // tiny backoff for Render cold starts
+    }
+  }
+  throw lastErr;
+}
+
+async function fetchTTS(text, lang) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TTS_TIMEOUT_MS);
+
+  const res = await fetch(GOOGLE_TTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, lang }),
+    signal: controller.signal
+  }).catch(e => { throw new Error("Failed to fetch TTS: " + e.message); });
+
+  clearTimeout(timeoutId);
+
+  if (!res.ok) {
+    // turn non-2xx into real errors we can catch/retry
+    throw new Error(`TTS ${res.status} ${res.statusText}`);
+  }
+
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+async function playAudioUrl(url) {
+  let el = document.getElementById("tts-audio");
+  if (!el) {
+    el = new Audio();
+    el.id = "tts-audio";
+    el.preload = "auto";
+    // Attach to DOM only if you want; not required
+    document.body.appendChild(el);
+  }
+  el.src = url;
+  el.currentTime = 0;
+
+  // return a promise that resolves after playback starts (don’t block the app until "ended")
+  try {
+    await el.play();
+  } catch (err) {
+    // If autoplay policy resists, try user-gesture resume (ensureAudioUnlocked already tried)
+    console.warn("Audio play() rejected:", err);
+    throw err;
+  }
+}
+
+async function ensureAudioUnlocked() {
+  // One-time unlock pattern; safe to call many times
+  if (window.__audioUnlocked) return;
+
+  let ctx;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { window.__audioUnlocked = true; return; }
+    ctx = new AC();
+    if (ctx.state === "suspended") await ctx.resume();
+    // create a short silent buffer to satisfy iOS gesture requirement
+    const src = ctx.createBufferSource();
+    src.buffer = ctx.createBuffer(1, 1, 22050);
+    src.connect(ctx.destination);
+    src.start(0);
+    window.__audioUnlocked = true;
+  } catch (e) {
+    console.warn("Unable to unlock audio (iOS likely):", e);
+    // We don’t throw—fallback TTS may still work after user gesture
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function webSpeechSpeak(text, lang) {
+  if (!("speechSynthesis" in window)) throw new Error("Web Speech not supported");
+
+  return new Promise((resolve, reject) => {
+    try {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang || "it-IT";
+      utter.rate = 1.0; utter.pitch = 1.0; utter.volume = 1.0;
+
+      utter.onend = resolve;
+      utter.onerror = e => reject(new Error("WebSpeech error: " + (e?.error || "unknown")));
+
+      // Some browsers queue; cancel to keep it snappy
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function playBeep() {
+  const el = document.getElementById("beep-sound");
+  if (!el) return;
+  try { el.currentTime = 0; el.play(); } catch (_) {}
+}
+
+// stub for your pre-recorded audio mode if you use it
+async function playPreRecorded(text, lang) {
+  // Your mapping logic here (text -> file). Safe no-op by default.
+  console.log("Beppe mode (pre-recorded) not mapped for:", text);
+}
+
 
 
 
@@ -503,4 +865,3 @@ document.addEventListener("click", () => {
     });
   }
 }, { once: true });
-

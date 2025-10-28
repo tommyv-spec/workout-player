@@ -5,26 +5,31 @@
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #1e1e1e, #3a2f1f);
   color: #fff;
-  overflow-x: hidden;
 }
 
 header {
   text-align: center;
-  padding: 20px 0 10px;
+  padding: 12px 0 8px;
 }
 
 header img {
-  width: 250px;
+  width: 180px;
+  max-width: 70vw;
   border-radius: 8px;
 }
 
 header h1 {
-  margin-top: 10px;
-  font-size: 28px;
+  margin-top: 6px;
+  font-size: 22px;
   color: #fff;
 }
 
@@ -39,11 +44,8 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 88vh;
-  background: linear-gradient(to bottom right, #1e1e1e, #3a2f1f);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
-  overflow: hidden;
+  height: calc(100vh - 100px);
+  padding: 15px;
 }
 
 .login-card {
@@ -51,12 +53,13 @@ main {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 36px 24px;
+  padding: 30px 20px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.5);
   text-align: center;
   width: 100%;
   max-width: 340px;
   transition: all 0.3s ease;
+  margin: auto;
 }
 
 .login-card img {
@@ -66,7 +69,7 @@ main {
 }
 
 .login-card h1 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 10px;
@@ -121,7 +124,98 @@ main {
   transform: translateY(-1px);
 }
 
+/* Mobile optimizations for login */
+@media (max-width: 480px) {
+  header img {
+    width: 140px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  header {
+    padding: 10px 0 6px;
+  }
+
+  #login-screen {
+    height: calc(100vh - 80px);
+    padding: 12px;
+  }
+
+  .login-card {
+    padding: 22px 16px;
+    max-width: 100%;
+  }
+
+  .login-card h3 {
+    font-size: 14px;
+  }
+
+  .login-card input[type="text"],
+  .login-card input[type="password"] {
+    padding: 10px 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .login-card button {
+    padding: 11px;
+    font-size: 15px;
+  }
+}
+
+@media (max-height: 600px) {
+  header {
+    padding: 8px 0 4px;
+  }
+
+  header img {
+    width: 100px;
+  }
+
+  header h1 {
+    font-size: 16px;
+    margin-top: 4px;
+  }
+
+  #login-screen {
+    height: calc(100vh - 70px);
+    padding: 8px;
+  }
+
+  .login-card {
+    padding: 18px 15px;
+  }
+
+  .login-card h3 {
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
+  .login-card input[type="text"],
+  .login-card input[type="password"] {
+    margin-bottom: 10px;
+    padding: 9px;
+    font-size: 13px;
+  }
+
+  .login-card button {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
 /* ====== SETUP SCREEN ====== */
+#main-app {
+  height: calc(100vh - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 100px;
+}
+
 #setup-screen {
   display: flex;
   flex-direction: column;
@@ -131,77 +225,157 @@ main {
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   padding: 30px 20px;
-  margin: 30px auto;
+  margin: 20px auto;
   max-width: 420px;
   color: #fff;
   text-align: center;
 }
 
+#setup-screen h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #6ab04c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
 #setup-screen label {
-  font-weight: 600;
-  margin-top: 15px;
-  margin-bottom: 5px;
+  font-weight: 700;
+  margin-top: 20px;
+  margin-bottom: 10px;
   width: 100%;
-  max-width: 300px;
-  text-align: left;
-  font-size: 15px;
-  color: #ddd;
+  max-width: 340px;
+  text-align: center;
+  font-size: 16px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 #setup-screen select {
   width: 100%;
-  max-width: 300px;
-  padding: 12px;
+  max-width: 340px;
+  padding: 14px 16px;
   font-size: 16px;
-  border-radius: 8px;
-  background-color: rgba(255,255,255,0.1);
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.15), rgba(88, 160, 57, 0.15));
   color: #fff;
-  border: none;
+  border: 2px solid rgba(106, 176, 76, 0.4);
   margin-bottom: 10px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+#setup-screen select:hover {
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.25), rgba(88, 160, 57, 0.25));
+  border-color: rgba(106, 176, 76, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 176, 76, 0.3);
 }
 
 #setup-screen select:focus {
   outline: none;
-  background-color: rgba(255,255,255,0.2);
-  box-shadow: 0 0 0 2px #6ab04c80;
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.3), rgba(88, 160, 57, 0.3));
+  border-color: #6ab04c;
+  box-shadow: 0 0 0 3px rgba(106, 176, 76, 0.2);
 }
 
 /* Pulsante Start Workout */
 #start-button {
-  margin-top: 20px;
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #6ab04c, #58a039);
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  display: none;
 }
 
-#start-button:hover {
+.start-button {
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  font-weight: bold;
+  padding: 14px 24px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.start-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #7ddc5c, #58a039);
   transform: translateY(-2px);
 }
 
-.start-button {
-  background-color: #77b255;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
 .start-button:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
+/* BOTTOM BUTTONS CONTAINER - Settings + Start Workout */
+#bottom-buttons-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 400px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* START BUTTON - IN CONTAINER */
+#start-button-bottom {
+  flex: 1;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(106, 176, 76, 0.3);
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Settings button in bottom container */
+#bottom-buttons-container .settings-btn {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#start-button-bottom:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(106, 176, 76, 0.6), 0 0 0 2px rgba(106, 176, 76, 0.5);
+  background: linear-gradient(135deg, #7ddc5c, #6ab04c);
+}
+
+#start-button-bottom:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+#start-button-bottom:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #999, #777);
+}
+
+/* Hide button when workout is active */
+#exercise-container:not([style*="display: none"]) ~ #start-button-bottom,
+body:has(#exercise-container[style*="display: flex"]) #start-button-bottom {
+  display: none;
+}
 
 /* Pulsante Logout in alto a destra del blocco */
 #logout-button {
@@ -221,83 +395,352 @@ main {
   background-color: rgba(255,255,255,0.2);
 }
 
-
 /* ====== WORKOUT PREVIEW ====== */
 #exercise-list {
   display: none !important;
 }
 
 #workout-preview {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  margin-top: 20px;
+  display: block !important;
+  margin-top: 30px;
   width: 100%;
-  box-sizing: border-box;
-  padding: 0 10px;
+  max-width: 340px;
+}
+
+#workout-preview h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ====== INSTRUCTIONS SECTION (Collapsible) ====== */
+#instructions-section {
+  width: 100%;
+  max-width: 340px;
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.instructions-header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s;
+}
+
+.instructions-header:hover {
+  background: linear-gradient(135deg, #5BA3F5, #4A90E2);
+}
+
+.instructions-icon {
+  font-size: 20px;
+}
+
+.instructions-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.collapse-icon {
+  font-size: 14px;
+  transition: transform 0.3s;
+}
+
+.instructions-header.collapsed .collapse-icon {
+  transform: rotate(-90deg);
+}
+
+.instructions-content {
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.instructions-content.collapsed {
+  max-height: 0;
 }
 
 #instructions-box {
-  background-color: #fff;
-  padding: 16px 20px;
-  border-radius: 12px;
-  font-size: 16px;
-  width: 100%;
-  margin: 40px auto 40px;
-  color: #111;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
+  padding: 18px 20px;
+  font-size: 15px;
+  color: #2d2d2d;
   text-align: left;
+  line-height: 1.6;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+#instructions-text {
+  margin: 0;
+  color: #2d2d2d;
+}
+
+#instructions-image {
+  width: 100%;
   max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
 }
 
-
-@media (min-width: 768px) {
-  #instructions-box,
-  #exercise-visuals {
-    flex: 1 1 48%;
-    max-width: 48%;
-  }
+/* ====== MATERIALE SECTION ====== */
+#materiale-section {
+  width: 100%;
+  max-width: 340px;
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
+
+.materiale-header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #FF6B6B, #C92A2A);
+  color: #fff;
+}
+
+.materiale-icon {
+  font-size: 20px;
+}
+
+.materiale-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.materiale-content {
+  background: rgba(255, 255, 255, 0.98);
+  padding: 16px;
+}
+
+#materiale-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.materiale-item {
+  background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.materiale-item::before {
+  content: "•";
+  font-size: 18px;
+}
+
 
 #exercise-visuals {
+  display: block !important;
+  width: 100%;
+  max-width: 340px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+#exercise-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Workout Section */
+.workout-section {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  margin-bottom: 16px;
+}
+
+.section-header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.section-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.section-count {
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.section-cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .exercise-card {
-  background-color: #fff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
   padding: 10px;
   border-radius: 12px;
   color: #111;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   text-align: center;
+  border: 1px solid rgba(106, 176, 76, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+
+.exercise-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  border-color: rgba(106, 176, 76, 0.4);
 }
 
 .exercise-card img {
-  max-width: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
   border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  clip-path: inset(3% 0 3% 0);
 }
 
 .exercise-name {
-  font-weight: bold;
-  margin-bottom: 8px;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #2d2d2d;
+  line-height: 1.3;
+  margin-top: 8px;
+  text-align: center;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ====== INSTRUCTIONS ====== */
-#instructions-box {
-  background-color: #fff;
-  padding: 16px 18px;
+.exercise-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.exercise-equipment,
+.exercise-reps {
+  font-size: 11px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.exercise-equipment strong,
+.exercise-reps strong {
+  color: #27AE60;
+  font-weight: 700;
+}
+
+/* ====== SECTIONED PREVIEW STYLES ====== */
+.workout-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  font-size: 16px;
-  color: #111;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  text-align: left;
-  line-height: 1.5;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.section-header {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+
+.section-icon {
+  font-size: 20px;
+  margin-right: 8px;
+}
+
+.section-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.section-count {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.section-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px;
 }
 
 /* ====== WORKOUT MODE ====== */
@@ -305,40 +748,81 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   height: 100vh;
-  padding: 20px;
-  gap: 16px;
-  position: relative;
-  overflow-y: auto;
+  max-height: 100vh;
+  padding: 10px 15px;
+  gap: 12px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: none;
+  overscroll-behavior: none;
   text-align: center;
+}
+
+/* Prevent scrolling on body when workout is active */
+body:has(#exercise-container[style*="display: flex"]) {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 #timer.full-timer {
   display: block;
-  font-size: 6rem;
+  font-size: 3.5rem;
   font-weight: bold;
   color: #FFD700;
   text-align: center;
   z-index: 2;
+  line-height: 1;
+  margin: 0 0 5px 0;
+  flex-shrink: 0;
 }
 
 #exercise-name {
-  font-size: 42px;
+  font-size: 20px;
   font-weight: bold;
   color: #fff;
-  margin-bottom: 10px;
+  margin: 0 0 8px 0;
   text-align: center;
+  line-height: 1.3;
+  flex-shrink: 0;
+  min-height: 60px;
+  max-height: none;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 600px;
 }
 
 #exercise-gif,
-#next-exercise-gif{
+#next-exercise-gif {
   width: 100%;
+  max-width: 600px;
+  max-height: 62vh;
   object-fit: contain;
   object-position: center;
   display: block;
   margin: 0 auto;
-  border-radius: 10px;
+  border-radius: 12px;
+  flex-shrink: 1;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 #next-exercise-preview {
@@ -346,9 +830,12 @@ main {
 }
 
 #next-exercise-name {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-align: center;
   font-weight: bold;
+  line-height: 1.2;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 #controls-container {
@@ -356,14 +843,14 @@ main {
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-top: 24px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+  margin: 5px 0 0;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 #pause-button,
-#soundMode {
-  padding: 10px 18px;
+.settings-btn {
+  padding: 10px 20px;
   font-size: 16px;
   font-weight: bold;
   border: none;
@@ -372,49 +859,302 @@ main {
   color: white;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
 }
 
-#soundMode {
+#pause-button:hover,
+.settings-btn:hover {
   background-color: #222;
+  transform: translateY(-2px);
+}
+
+.settings-btn {
+  font-size: 20px;
+  padding: 10px 16px;
+}
+
+/* Settings Popup Overlay */
+#settings-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-content {
+  background: linear-gradient(135deg, #2d2d2d, #1e1e1e);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  text-align: center;
+  min-width: 300px;
+  border: 2px solid rgba(106, 176, 76, 0.3);
+}
+
+.settings-content h3 {
+  color: #6ab04c;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.settings-content label {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.settings-content select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.15), rgba(88, 160, 57, 0.15));
+  color: #fff;
+  border: 2px solid rgba(106, 176, 76, 0.4);
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.settings-content select:focus {
+  outline: none;
+  border-color: #6ab04c;
+  box-shadow: 0 0 0 3px rgba(106, 176, 76, 0.2);
+}
+
+#close-settings {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#close-settings:hover {
+  background: linear-gradient(135deg, #7ddc5c, #6ab04c);
+  transform: translateY(-2px);
+}
+
+/* Setup Settings Popup - Same styling as workout settings */
+#setup-settings-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#close-setup-settings,
+#logout-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+#close-setup-settings {
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+}
+
+#close-setup-settings:hover {
+  background: linear-gradient(135deg, #7ddc5c, #6ab04c);
+  transform: translateY(-2px);
+}
+
+#logout-button {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+#logout-button:hover {
+  background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 600px) {
-  #controls-container {
-    flex-direction: column;
+  #main-app {
+    height: calc(100vh - 80px);
   }
 
-  #pause-button,
-  #soundMode {
-    width: 90%;
-    text-align: center;
-  }
-}
-
-
-
-audio {
-  display: none;
-}
-
-@media (max-width: 600px) {
-  #exercise-name,
-  #next-exercise-name {
-    font-size: 30px;
+  #setup-screen {
+    margin: 15px auto;
+    padding: 25px 15px;
+    max-width: 100%;
   }
 
-  #timer.full-timer {
-    font-size: 50px;
+  #setup-screen h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  #setup-screen label {
+    font-size: 15px;
+    max-width: 100%;
+  }
+
+  #setup-screen select {
+    max-width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  #workout-preview {
+    max-width: 100%;
+  }
+
+  #workout-preview h3 {
+    font-size: 16px;
+  }
+
+  #exercise-visuals {
+    max-width: 100%;
+  }
+
+  #exercise-grid {
+    gap: 16px;
+  }
+
+  .section-header {
+    padding: 10px 14px;
+  }
+
+  .section-icon {
+    font-size: 18px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .section-count {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .section-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .exercise-card {
+    min-height: 130px;
+    padding: 8px;
+  }
+
+
+  .exercise-name {
+    font-size: 11px;
+    min-height: 28px;
   }
 
   #instructions-box {
     font-size: 14px;
+    padding: 16px 18px;
   }
 
-  #exercise-visuals {
-    grid-template-columns: 1fr;
+  #start-button-bottom {
+    bottom: 15px;
+    width: calc(100% - 30px);
+    padding: 14px 20px;
+    font-size: 16px;
+    max-width: calc(100% - 30px);
+  }
+
+  #exercise-name,
+  #next-exercise-name {
+    font-size: 18px;
+    min-height: 50px;
+    max-height: none;
+    overflow: visible;
+    padding: 10px 14px;
+    line-height: 1.35;
+    width: 95%;
+    max-width: 95%;
+  }
+
+  #timer.full-timer {
+    font-size: 2.8rem;
+    margin-bottom: 8px;
+  }
+
+  #exercise-gif,
+  #next-exercise-gif {
+    max-height: 58vh;
+    max-width: 95%;
+    width: 95%;
+  }
+
+  #controls-container {
+    flex-direction: row;
+    gap: 10px;
+    margin: 5px 0 0;
+  }
+
+  #pause-button,
+  .settings-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .settings-btn {
+    font-size: 18px;
+    padding: 8px 14px;
+  }
+
+  #exercise-container {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .settings-content {
+    min-width: 280px;
+    padding: 25px 20px;
+  }
+
+  #bottom-buttons-container {
+    bottom: 10px;
+    gap: 8px;
+    width: calc(100% - 20px);
+  }
+
+  #bottom-buttons-container .settings-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  #start-button-bottom {
+    padding: 14px 20px;
+    font-size: 16px;
   }
 }
-
 
 .audio-setup-wrapper,
 .audio-workout-wrapper {
@@ -433,4 +1173,46 @@ audio {
   background: #2d2b25;
   color: #fff;
   border: none;
+}
+
+audio {
+  display: none;
+}
+
+
+/* ====== TOP SELECTOR ABOVE SETUP CARD ====== */
+#topbar-select {
+  max-width: 420px;
+  margin: 10px auto 0;
+  padding: 14px 16px;
+  text-align: center;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+#topbar-select label {
+  display: block;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+#topbar-select select {
+  width: 100%;
+  max-width: 340px;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(106,176,76,0.15), rgba(88,160,57,0.15));
+  color: #fff;
+  border: 2px solid rgba(106,176,76,0.4);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
 }
