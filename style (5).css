@@ -1,0 +1,1586 @@
+/* ====== CSS VARIABLES FOR DYNAMIC LAYOUT ====== */
+:root {
+  /* Heights for precise calculation - adapts to ANY screen */
+  --header-height: 13vh;
+  --bottom-button-height: 8vh;
+  
+  /* Safe areas */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  
+  /* Calculated available height for main-app */
+  --main-app-height: calc(100vh - var(--header-height) - var(--bottom-button-height));
+  --main-app-height-dvh: calc(100dvh - var(--header-height) - var(--bottom-button-height));
+}
+
+/* ====== RESPONSIVE ADJUSTMENTS FOR VARIABLES ====== */
+
+/* Small mobile devices */
+
+/* Very small devices */
+
+/* Landscape orientation */
+
+
+/* ====== RESET BASE ====== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  height: 100dvh; /* Dynamic viewport height for mobile */
+  height: 100svh; /* Small viewport height fallback */
+  height: -webkit-fill-available; /* Safari fallback */
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  width: 100%;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: none;
+}
+
+/* CRITICAL: Force dark background on html too (Safari iOS) */
+html {
+  background: linear-gradient(to bottom, #1e1e1e, #3a2f1f);
+  background-color: #1e1e1e !important;
+}
+
+/* ====== iOS SAFARI BACKGROUND FIX ====== */
+
+/* CRITICAL: Safari iOS fix for white background issue */
+/* Create a fixed background layer that stays in place */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  height: 100svh;
+  background: linear-gradient(to bottom, #1e1e1e, #3a2f1f);
+  background-color: #1e1e1e;
+  z-index: -1; /* Behind all content */
+  pointer-events: none; /* Don't interfere with clicks */
+  /* Safari specific */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Ensure all main sections have transparent/inherit background to see through */
+#login-screen,
+#main-app,
+#setup-screen {
+  position: relative;
+  z-index: 1;
+}
+
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #1e1e1e, #3a2f1f);
+  background-color: #1e1e1e !important; /* Force dark background */
+  color: #fff;
+  /* CRITICAL: Ensure background fills everything */
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  /* Safari iOS specific */
+  -webkit-background-size: cover;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+header {
+  text-align: center;
+  padding: 1% 0;
+  /* CRITICAL: Fixed height so children can use % */
+  height: var(--header-height);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+header img {
+  /* Use % of parent height, not vh! */
+  height: 60%;
+  width: auto;
+  max-width: 70vw;
+  border-radius: 8px;
+}
+
+header h1 {
+  margin-top: 2%;
+  /* Font size relative to parent height */
+  font-size: clamp(0.9rem, 3vw, 1.2rem);
+  color: #fff;
+}
+
+main {
+  max-width: min(600px, 95vw);
+  margin: 0 auto;
+  padding: 0 20px;
+  /* CRITICAL: Explicit background for iOS */
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+/* ====== LOGIN SCREEN ====== */
+#login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 100px);
+  padding: clamp(12px, 2.5vw, 15px);
+  /* CRITICAL: Explicit background for iOS */
+  background: transparent;
+  position: relative;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(12px, 2.5vw, 16px);
+  padding: clamp(20px, 4vw, 30px) clamp(15px, 3vw, 20px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  text-align: center;
+  width: 100%;
+  max-width: min(340px, 85vw);
+  transition: all 0.3s ease;
+  margin: auto;
+}
+
+.login-card img {
+  width: 70px;
+  margin-bottom: clamp(12px, 2.5vw, 15px);
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
+}
+
+.login-card h1 {
+  font-size: clamp(17px, 3.5vw, 20px);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.login-card h3 {
+  font-size: clamp(14px, 2.8vw, 16px);
+  color: #dddddd;
+  margin-bottom: clamp(15px, 3vw, 20px);
+  font-weight: 500;
+}
+
+.login-card input[type="text"],
+.login-card input[type="password"] {
+  width: 100%;
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.3vw, 14px);
+  margin-bottom: clamp(12px, 2.5vw, 15px);
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: clamp(13px, 2.5vw, 15px);
+  outline: none;
+  transition: background 0.2s ease;
+}
+
+.login-card input::placeholder {
+  color: #ccc;
+}
+
+.login-card input:focus {
+  background-color: rgba(255,255,255,0.2);
+  box-shadow: 0 0 0 2px #58a03944;
+}
+
+.login-card button {
+  width: 100%;
+  padding: clamp(10px, 2vw, 12px);
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.login-card button:hover {
+  background: linear-gradient(135deg, #7ddc5c, #58a039);
+  transform: translateY(-1px);
+}
+
+/* Mobile optimizations for login */
+
+
+/* ====== SETUP SCREEN ====== */
+#main-app {
+  background: linear-gradient(to bottom, #1e1e1e, #3a2f1f);
+  background-color: #1e1e1e !important;
+  
+  /* CRITICAL: Precise height calculation - ends exactly where button starts */
+  height: var(--main-app-height-dvh);
+  height: var(--main-app-height); /* Fallback */
+  /* NO max-height - would override the calculated height! */
+  
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  
+  /* NO padding-bottom - height is calculated precisely */
+  padding-bottom: 0;
+}
+
+#setup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: clamp(16px, 3vw, 20px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  /* Normal padding - no extra space needed */
+  padding: clamp(18px, 3.5vw, 25px) clamp(15px, 3vw, 20px);
+  margin: 20px auto;
+  max-width: min(420px, 90vw);
+  color: #fff;
+  text-align: center;
+}
+
+#setup-screen h2 {
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: 800;
+  color: #6ab04c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: clamp(18px, 3.5vw, 25px);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+#setup-screen label {
+  font-weight: 700;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: min(340px, 85vw);
+  text-align: center;
+  font-size: clamp(14px, 2.8vw, 16px);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#setup-screen select {
+  width: 100%;
+  max-width: min(340px, 85vw);
+  padding: 14px 16px;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: 600;
+  border-radius: clamp(10px, 2vw, 12px);
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.15), rgba(88, 160, 57, 0.15));
+  color: #fff;
+  border: 2px solid rgba(106, 176, 76, 0.4);
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+#setup-screen select:hover {
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.25), rgba(88, 160, 57, 0.25));
+  border-color: rgba(106, 176, 76, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 176, 76, 0.3);
+}
+
+#setup-screen select:focus {
+  outline: none;
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.3), rgba(88, 160, 57, 0.3));
+  border-color: #6ab04c;
+  box-shadow: 0 0 0 3px rgba(106, 176, 76, 0.2);
+}
+
+/* Pulsante Start Workout */
+#start-button {
+  display: none;
+}
+
+.start-button {
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  font-weight: bold;
+  padding: 14px 24px;
+  font-size: clamp(16px, 3vw, 18px);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.start-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7ddc5c, #58a039);
+  transform: translateY(-2px);
+}
+
+.start-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* BOTTOM BUTTONS CONTAINER - Settings + Start Workout */
+#bottom-buttons-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  
+  /* CRITICAL: Fixed height so children can use % */
+  height: var(--bottom-button-height);
+  
+  display: flex;
+  gap: 1%;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  
+  /* Padding relative to container height */
+  padding: 8% 3%;
+  padding-bottom: max(8%, var(--safe-area-bottom));
+  box-sizing: border-box;
+  
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 80%, transparent 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* START BUTTON - IN CONTAINER */
+#start-button-bottom {
+  flex: 1;
+  max-width: min(400px, 70vw);
+  /* Height relative to parent */
+  height: 65%;
+  padding: 0 5%;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(106, 176, 76, 0.3);
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Settings button in bottom container */
+#bottom-buttons-container .settings-btn {
+  flex-shrink: 0;
+  /* Square button, height relative to parent */
+  height: 65%;
+  aspect-ratio: 1;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#start-button-bottom:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(106, 176, 76, 0.6), 0 0 0 2px rgba(106, 176, 76, 0.5);
+  background: linear-gradient(135deg, #7ddc5c, #6ab04c);
+}
+
+#start-button-bottom:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+#start-button-bottom:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #999, #777);
+}
+
+/* Hide button when workout is active */
+#exercise-container:not([style*="display: none"]) ~ #start-button-bottom,
+body:has(#exercise-container[style*="display: flex"]) #start-button-bottom {
+  display: none;
+}
+
+/* Pulsante Logout in alto a destra del blocco */
+#logout-button {
+  align-self: flex-end;
+  margin-bottom: clamp(15px, 3vw, 20px);
+  background-color: rgba(255,255,255,0.1);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#logout-button:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+/* ====== WORKOUT PREVIEW ====== */
+#exercise-list {
+  display: none !important;
+}
+
+#workout-preview {
+  display: block !important;
+  margin-top: 30px;
+  width: 100%;
+  max-width: min(340px, 85vw);
+}
+
+#workout-preview h3 {
+  font-size: clamp(16px, 3vw, 18px);
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: clamp(12px, 2.5vw, 15px);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ====== INSTRUCTIONS SECTION (Collapsible) ====== */
+#instructions-section {
+  width: 100%;
+  max-width: min(340px, 85vw);
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(10px, 2vw, 12px);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.instructions-header {
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 16px);
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.5vw, 10px);
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s;
+}
+
+.instructions-header:hover {
+  background: linear-gradient(135deg, #5BA3F5, #4A90E2);
+}
+
+.instructions-icon {
+  font-size: clamp(17px, 3.5vw, 20px);
+}
+
+.instructions-title {
+  flex: 1;
+  font-size: clamp(13px, 2.5vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.collapse-icon {
+  font-size: clamp(12px, 2.3vw, 14px);
+  transition: transform 0.3s;
+}
+
+.instructions-header.collapsed .collapse-icon {
+  transform: rotate(-90deg);
+}
+
+.instructions-content {
+  max-height: min(500px, 60vh);
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.instructions-content.collapsed {
+  max-height: 0;
+}
+
+#instructions-box {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
+  padding: clamp(14px, 2.8vw, 18px) clamp(15px, 3vw, 20px);
+  font-size: clamp(13px, 2.5vw, 15px);
+  color: #2d2d2d;
+  text-align: left;
+  line-height: 1.6;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+#instructions-text {
+  margin: 0;
+  color: #2d2d2d;
+}
+
+#instructions-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* ====== MATERIALE SECTION ====== */
+#materiale-section {
+  width: 100%;
+  max-width: min(600px, 95vw); /* Increased from 340px to allow more items per row */
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(10px, 2vw, 12px);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.materiale-header {
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 16px);
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.5vw, 10px);
+  background: linear-gradient(135deg, #FF6B6B, #C92A2A);
+  color: #fff;
+}
+
+.materiale-icon {
+  font-size: clamp(17px, 3.5vw, 20px);
+}
+
+.materiale-title {
+  flex: 1;
+  font-size: clamp(13px, 2.5vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.materiale-content {
+  background: rgba(255, 255, 255, 0.98);
+  padding: clamp(12px, 2.5vw, 16px);
+}
+
+#materiale-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: clamp(8px, 1.5vw, 10px);
+  justify-items: center;
+}
+
+/* Small screens: force 2 columns max */
+
+/* Medium screens: 3 columns */
+
+/* Larger screens: auto-fit with minimum 120px items */
+
+.materiale-item {
+  background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+  color: white;
+  padding: 10px 16px;
+  border-radius: clamp(16px, 3vw, 20px);
+  font-size: clamp(12px, 2.3vw, 14px);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%; /* Make items fill their grid cell */
+  max-width: min(160px, 75vw);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.materiale-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+.materiale-item::before {
+  content: "•";
+  font-size: clamp(16px, 3vw, 18px);
+}
+
+
+#exercise-visuals {
+  display: block !important;
+  width: 100%;
+  max-width: min(340px, 85vw);
+  margin-top: clamp(18px, 3.5vw, 25px);
+  margin-bottom: clamp(18px, 3.5vw, 25px);
+}
+
+#exercise-grid {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(15px, 3vw, 20px);
+  width: 100%;
+}
+
+/* Workout Section */
+.workout-section {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: clamp(12px, 2.3vw, 14px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  margin-bottom: clamp(12px, 2.5vw, 16px);
+}
+
+.section-header {
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 16px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.section-icon {
+  font-size: clamp(17px, 3.5vw, 20px);
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: clamp(13px, 2.5vw, 15px);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.section-count {
+  font-size: clamp(11px, 2.2vw, 13px);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: clamp(10px, 2vw, 12px);
+  font-weight: 600;
+}
+
+.section-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(10px, 2vw, 12px);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.exercise-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+  padding: 10px;
+  border-radius: clamp(10px, 2vw, 12px);
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  text-align: center;
+  border: 1px solid rgba(106, 176, 76, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+
+.exercise-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  border-color: rgba(106, 176, 76, 0.4);
+}
+
+.exercise-card img {
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  clip-path: inset(3% 0 3% 0);
+}
+
+.exercise-name {
+  font-weight: 700;
+  font-size: clamp(10px, 2vw, 12px);
+  color: #2d2d2d;
+  line-height: 1.3;
+  margin-top: 8px;
+  text-align: center;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exercise-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.exercise-equipment,
+.exercise-reps {
+  font-size: clamp(9px, 1.8vw, 11px);
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.exercise-equipment strong,
+.exercise-reps strong {
+  color: #27AE60;
+  font-weight: 700;
+}
+
+/* ====== SECTIONED PREVIEW STYLES ====== */
+.workout-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(10px, 2vw, 12px);
+  overflow: hidden;
+  margin-bottom: clamp(12px, 2.5vw, 16px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.section-header {
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 16px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: clamp(13px, 2.5vw, 15px);
+  color: #fff;
+}
+
+.section-icon {
+  font-size: clamp(17px, 3.5vw, 20px);
+  margin-right: 8px;
+}
+
+.section-title {
+  flex: 1;
+  font-size: clamp(13px, 2.5vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.section-count {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: clamp(10px, 2vw, 12px);
+  font-size: clamp(11px, 2.2vw, 13px);
+  font-weight: 600;
+}
+
+.section-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(10px, 2vw, 12px);
+}
+
+/* ====== WORKOUT SECTION - CLEAN RESPONSIVE ====== */
+
+#exercise-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  height: 100svh;
+  max-height: 100vh;
+  max-height: 100svh;
+  /* Responsive padding with safe areas */
+  padding: max(0.5vh, env(safe-area-inset-top)) clamp(8px, 2vw, 10px) max(0.5vh, env(safe-area-inset-bottom)) clamp(8px, 2vw, 10px);
+  gap: clamp(2px, 0.5vh, 4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: none;
+  overscroll-behavior: none;
+  text-align: center;
+}
+
+/* Prevent scrolling on body when workout is active */
+body:has(#exercise-container[style*="display: flex"]) {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* ====== TIMER - RESPONSIVE SIZE ====== */
+#timer.full-timer {
+  display: block;
+  /* Responsive font size - scales with viewport */
+  font-size: clamp(2.5rem, 8vw, 3.8rem);
+  font-weight: bold;
+  color: #FFD700;
+  text-align: center;
+  z-index: 2;
+  line-height: 1;
+  margin: 0;
+  padding: clamp(4px, 1vh, 8px) clamp(8px, 2vw, 10px);
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 100%;
+}
+
+/* ====== EXERCISE NAME - RESPONSIVE SIZE ====== */
+#exercise-name {
+  /* Responsive font size */
+  font-size: clamp(15px, 4vw, 18px);
+  font-weight: bold;
+  color: #fff;
+  margin: 0 clamp(8px, 2vw, 10px) clamp(2px, 0.5vh, 4px) clamp(8px, 2vw, 10px);
+  text-align: center;
+  line-height: 1.2;
+  flex-shrink: 0;
+  flex-grow: 0;
+  /* Responsive min-height */
+  min-height: clamp(42px, 8vh, 48px);
+  max-height: none;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(6px, 1.5vh, 8px) clamp(10px, 2.5vw, 14px);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  width: clamp(calc(100% - 16px), 95%, calc(100% - 20px));
+  max-width: min(600px, 95vw);
+}
+
+/* ====== GIF - ALWAYS 9:16 VERTICAL ====== */
+#exercise-gif,
+#next-exercise-gif {
+  /* CRITICAL: Responsive width that maintains 9:16 aspect ratio */
+  width: min(85vw, 75vh);
+  max-width: 90vw;
+  /* CRITICAL: Force 9:16 vertical aspect ratio */
+  aspect-ratio: 9 / 16;
+  /* Let height be calculated by aspect-ratio */
+  height: auto;
+  /* Cover and center the image */
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  margin: 0 auto;
+  border-radius: clamp(10px, 2vw, 12px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  /* CRITICAL: Crop 5% from top and bottom */
+  clip-path: inset(5% 0 5% 0);
+  flex-shrink: 0;
+}
+
+/* ====== CONTROLS - RESPONSIVE ====== */
+#controls-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(6px, 2vw, 12px);
+  margin: 0;
+  padding: clamp(6px, 1.5vh, 8px) clamp(8px, 2vw, 10px);
+  padding-bottom: max(clamp(6px, 1.5vh, 8px), env(safe-area-inset-bottom, 8px));
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 100%;
+}
+
+#pause-button,
+.settings-btn,
+.nav-btn {
+  /* Responsive padding and font */
+  padding: clamp(7px, 2vh, 10px) clamp(12px, 3vw, 20px);
+  font-size: clamp(13px, 3.5vw, 16px);
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  background-color: #111;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+}
+
+#pause-button:hover,
+.settings-btn:hover,
+.nav-btn:hover {
+  background-color: #222;
+  transform: translateY(-2px);
+}
+
+.nav-btn {
+  font-size: clamp(15px, 4vw, 18px);
+  padding: clamp(7px, 2vh, 10px) clamp(10px, 2.5vw, 15px);
+  background-color: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.nav-btn:hover {
+  background-color: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.nav-btn:active {
+  transform: scale(0.95);
+}
+
+.settings-btn {
+  font-size: clamp(16px, 4.5vw, 20px);
+  padding: clamp(7px, 2vh, 10px) clamp(12px, 3vw, 16px);
+}
+
+/* Settings Popup Overlay */
+#settings-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-content {
+  background: linear-gradient(135deg, #2d2d2d, #1e1e1e);
+  padding: clamp(20px, 4vw, 30px);
+  border-radius: clamp(12px, 2.5vw, 16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  text-align: center;
+  min-width: 300px;
+  border: 2px solid rgba(106, 176, 76, 0.3);
+}
+
+.settings-content h3 {
+  color: #6ab04c;
+  font-size: clamp(20px, 4.5vw, 24px);
+  margin-bottom: clamp(15px, 3vw, 20px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.settings-content label {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: clamp(14px, 2.8vw, 16px);
+}
+
+.settings-content select {
+  width: 100%;
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 16px);
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: 600;
+  border-radius: clamp(10px, 2vw, 12px);
+  background: linear-gradient(135deg, rgba(106, 176, 76, 0.15), rgba(88, 160, 57, 0.15));
+  color: #fff;
+  border: 2px solid rgba(106, 176, 76, 0.4);
+  margin-bottom: clamp(15px, 3vw, 20px);
+  cursor: pointer;
+}
+
+.settings-content select:focus {
+  outline: none;
+  border-color: #6ab04c;
+  box-shadow: 0 0 0 3px rgba(106, 176, 76, 0.2);
+}
+
+#close-settings {
+  width: 100%;
+  padding: clamp(10px, 2vw, 12px);
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#close-settings:hover {
+  background: linear-gradient(135deg, #7ddc5c, #6ab04c);
+  transform: translateY(-2px);
+}
+
+/* Exit Workout Button - Red warning style */
+#exit-workout-button {
+  width: 100%;
+  padding: clamp(10px, 2vw, 12px);
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white !important;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px !important;
+}
+
+#exit-workout-button:hover {
+  background: linear-gradient(135deg, #ff6b6b, #e74c3c) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+#exit-workout-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+}
+
+/* Setup Settings Popup - Same styling as workout settings */
+#setup-settings-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#close-setup-settings,
+#logout-button {
+  width: 100%;
+  padding: clamp(10px, 2vw, 12px);
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+#close-setup-settings {
+  background: linear-gradient(135deg, #6ab04c, #58a039);
+  color: white;
+}
+
+#close-setup-settings:hover {
+  background: linear-gradient(135deg, #7ddc5c, #6ab04c);
+  transform: translateY(-2px);
+}
+
+#logout-button {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+#logout-button:hover {
+  background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+  transform: translateY(-2px);
+}
+
+
+.audio-setup-wrapper,
+.audio-workout-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.audio-setup-wrapper select,
+.audio-workout-wrapper select {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  background: #2d2b25;
+  color: #fff;
+  border: none;
+}
+
+audio {
+  display: none;
+}
+
+
+/* ====== TOP SELECTOR ABOVE SETUP CARD ====== */
+#topbar-select {
+  max-width: min(420px, 90vw);
+  margin: 10px auto 0;
+  padding: 14px 16px;
+  text-align: center;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border-radius: clamp(12px, 2.5vw, 16px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+#topbar-select label {
+  display: block;
+  font-weight: 700;
+  font-size: clamp(14px, 2.8vw, 16px);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+#topbar-select select {
+  width: 100%;
+  max-width: min(340px, 85vw);
+  padding: 14px 16px;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: 600;
+  border-radius: clamp(10px, 2vw, 12px);
+  background: linear-gradient(135deg, rgba(106,176,76,0.15), rgba(88,160,57,0.15));
+  color: #fff;
+  border: 2px solid rgba(106,176,76,0.4);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+
+/* ====== COMPREHENSIVE SPACE OPTIMIZATION ====== */
+/* Ensures no content is hidden behind sticky buttons and optimizes space usage */
+
+/* Setup Screen Sections - Tighter spacing */
+#instructions-section,
+#materiale-section {
+  margin-bottom: clamp(15px, 3vw, 20px); /* Reduced from default */
+}
+
+#workout-preview-title {
+  margin: 20px 0 15px !important; /* Reduced from 30px 0 20px */
+}
+
+#exercise-visuals {
+  margin-top: 15px !important; /* Reduced from 20px */
+  margin-bottom: clamp(15px, 3vw, 20px);
+}
+
+#start-point-selector {
+  margin: 20px 0 30px !important; /* Optimized margins */
+}
+
+/* Exercise cards - more compact on mobile */
+.exercise-card {
+  min-height: 130px; /* Reduced from 140px */
+  padding: 8px; /* Reduced from 10px */
+}
+
+.exercise-card img {
+  margin-bottom: 6px; /* Reduced from 8px */
+}
+
+.exercise-name {
+  margin-top: 6px; /* Reduced from 8px */
+  font-size: clamp(9px, 1.8vw, 11px); /* Slightly smaller */
+  min-height: clamp(24px, 4.5vw, 28px); /* Reduced from 30px */
+}
+
+.exercise-details {
+  margin-top: 4px; /* Reduced from 6px */
+  padding-top: 4px; /* Reduced from 6px */
+}
+
+/* Workout sections - tighter spacing */
+.workout-section {
+  margin-bottom: clamp(12px, 2.5vw, 15px); /* Reduced spacing between sections */
+}
+
+.section-header {
+  padding: 10px 14px; /* Slightly reduced */
+}
+
+.section-cards-grid {
+  padding: 10px; /* Reduced from 12px */
+  gap: clamp(8px, 1.5vw, 10px); /* Reduced from 12px */
+}
+
+/* Bottom button container - ensure it doesn't overlap */
+#bottom-buttons-container {
+  bottom: 0;
+  padding: 12px 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 80%, transparent 100%);
+  backdrop-filter: blur(10px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: none;
+  transform: none;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 12px);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+#start-button-bottom {
+  max-width: min(400px, 90vw);
+  margin: 0 auto;
+}
+
+/* Mobile optimizations */
+
+/* Small phones (< 375px) */
+
+/* Tablets and larger phones */
+
+/* Desktop and large tablets */
+
+
+/* Very small phones during workout */
+
+
+/* Ensure content is never cut off - force scroll if needed */
+#main-app {
+  scroll-behavior: smooth;
+  scroll-padding-bottom: 120px; /* Extra padding when scrolling to anchors */
+}
+
+/* Improve scrollbar appearance */
+#main-app::-webkit-scrollbar {
+  width: 8px;
+}
+
+#main-app::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+#main-app::-webkit-scrollbar-thumb {
+  background: rgba(106, 176, 76, 0.5);
+  border-radius: 10px;
+}
+
+#main-app::-webkit-scrollbar-thumb:hover {
+  background: rgba(106, 176, 76, 0.7);
+}
+/* ====== TRIPLE VISUAL CUE SYSTEM ====== */
+
+
+/* 1. EXERCISE NAME BAR - GOLDEN EFFECT at 10 seconds */
+#exercise-name.next-preview-active {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 193, 7, 0.95)) !important;
+  border: 3px solid #FFD700 !important;
+  box-shadow: 
+    0 8px 32px rgba(255, 215, 0, 0.5),
+    0 0 60px rgba(255, 215, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  animation: barPulse 2s ease-in-out infinite !important;
+  color: #000 !important;
+}
+
+#exercise-name.next-preview-active strong {
+  color: #000 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+#exercise-name.next-preview-active div {
+  color: #1a1a1a !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+@keyframes barPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 8px 32px rgba(255, 215, 0, 0.5),
+      0 0 60px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 
+      0 10px 40px rgba(255, 215, 0, 0.7),
+      0 0 80px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* 2. TIMER COLOR TRANSITIONS */
+#timer.full-timer.warning-10 {
+  color: #FFD700;
+  text-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.8),
+    0 0 40px rgba(255, 215, 0, 0.5);
+  animation: timerGlow 1s ease-in-out infinite;
+}
+
+#timer.full-timer.warning-6 {
+  color: #FF8C00;
+  text-shadow: 
+    0 0 25px rgba(255, 140, 0, 0.9),
+    0 0 50px rgba(255, 140, 0, 0.6);
+  animation: timerGlow 0.8s ease-in-out infinite;
+}
+
+#timer.full-timer.warning-3 {
+  color: #FF4444;
+  text-shadow: 
+    0 0 30px rgba(255, 68, 68, 1),
+    0 0 60px rgba(255, 68, 68, 0.7);
+  animation: timerGlow 0.5s ease-in-out infinite;
+}
+
+@keyframes timerGlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* 3. GIF BORDER GLOW (at 10 seconds) */
+#exercise-gif.gif-glow {
+  border: 4px solid #FFD700;
+  box-shadow: 
+    0 0 30px rgba(255, 215, 0, 0.8),
+    0 0 60px rgba(255, 215, 0, 0.5),
+    0 4px 20px rgba(0,0,0,0.3);
+  animation: gifPulse 2s ease-in-out infinite;
+}
+
+@keyframes gifPulse {
+  0%, 100% {
+    border-color: #FFD700;
+    box-shadow: 
+      0 0 30px rgba(255, 215, 0, 0.8),
+      0 0 60px rgba(255, 215, 0, 0.5),
+      0 4px 20px rgba(0,0,0,0.3);
+  }
+  50% {
+    border-color: #FFC700;
+    box-shadow: 
+      0 0 40px rgba(255, 215, 0, 1),
+      0 0 80px rgba(255, 215, 0, 0.7),
+      0 6px 25px rgba(0,0,0,0.4);
+  }
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+
+/* ====== WORKOUT PROGRESS BAR ====== */
+
+#workout-progress-container {
+  width: 100%;
+  /* CRITICAL: Add safe area for notch/status bar */
+  padding-top: max(12px, env(safe-area-inset-top, 12px));
+  padding-left: clamp(12px, 2.5vw, 16px);
+  padding-right: 16px;
+  padding-bottom: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+  /* CRITICAL: Don't shrink, reserve space */
+  flex-shrink: 0;
+  flex-grow: 0;
+  z-index: 100;
+}
+
+#progress-bar-wrapper {
+  margin-bottom: 8px;
+}
+
+#progress-bar {
+  position: relative;
+  width: 100%;
+  height: clamp(20px, 3.5vh, 24px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: clamp(10px, 2vw, 12px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  border-radius: clamp(10px, 2vw, 12px);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#progress-percentage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(10px, 2vw, 12px);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+#progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+#progress-info span {
+  font-size: clamp(9px, 1.8vw, 11px);
+  font-weight: 600;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive adjustments */
+
+
+
+/* ====== MOBILE VIEWPORT FIX ====== */
+
+/* Ensure exercise container uses all available space on all browsers */
+@supports (height: 100dvh) {
+  #exercise-container {
+    height: 100dvh !important;
+  }
+}
+
+/* Safari fallback */
+@supports (height: -webkit-fill-available) {
+  #exercise-container {
+    height: -webkit-fill-available !important;
+  }
+}
+
+/* Prevent any scrolling during workout */
+body:has(#exercise-container[style*="display: flex"]),
+body:has(#exercise-container[style*="display: flex"]) html {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  overscroll-behavior: none !important;
+}
+/* ====== RESPONSIVE ADJUSTMENTS - ORIENTATION BASED ====== */
+
+/* Landscape optimization - reduce vertical space usage */
+@media (orientation: landscape) {
+  :root {
+    --header-height: 10vh;
+    --bottom-button-height: 10vh;
+  }
+
+  #exercise-gif {
+    width: min(40vw, 65vh);
+  }
+
+  #timer {
+    font-size: clamp(6vh, 12vw, 10vh);
+  }
+
+  .section-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Portrait is default - no override needed since main definition already handles it */
+
+
+#exercise-container {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+}
+
+/* Non-GIF parts keep their natural size */
+#workout-progress-container,
+#timer,
+#exercise-name,
+#controls-container {
+  flex-shrink: 0;
+}
+
+
+/* --- Cropped GIF fills the leftover height, for ANY crop % --- */
+#exercise-gif-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Set crop as FRACTIONS (0–1). Change these two only. */
+#exercise-gif {
+  --clip-top: 0.13;      /* 13% top crop  → set 0.05 for 5%, etc. */
+  --clip-bottom: 0.07;   /*  7% bottom crop */
+
+  /* After cropping (top+bottom), the visible height = 100% */
+  height: calc(100% / (1 - (var(--clip-top) + var(--clip-bottom)))) !important;
+  width: auto !important;
+  max-width: none !important;
+
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  object-position: center;
+
+  /* Convert the FRACTIONS above into percentages for clip-path */
+  clip-path: inset(calc(var(--clip-top) * 100%) 0 calc(var(--clip-bottom) * 100%) 0);
+
+  display: block;
+  margin: 0;
+  border-radius: clamp(10px, 2vw, 12px);
+}
+
+/* Remove #main-app background during workout */
+#main-app:has(#exercise-container[style*="display: flex"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+}
