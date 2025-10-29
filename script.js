@@ -438,7 +438,7 @@ function startWorkout() {
 document.addEventListener("DOMContentLoaded", () => {
   warmUpServer();
 
-  // iOS audio unlock for ttsAudio
+  // iOS audio unlock  
   document.addEventListener("click", () => {
     if (!window.__audioUnlocked) {
       ttsAudio.src = "data:audio/mp3;base64,//uQxAAAAAA==";
@@ -1274,6 +1274,7 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
 
     if (timeLeft === 5) {
       const soundMode = document.getElementById("soundMode").value;
+      const useVoice = soundMode === "voice";
       if (useVoice) speak("cinque, quattro, tre, due, uno");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
     }
@@ -1281,6 +1282,8 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
 
     if (timeLeft <= 0) {
       const soundMode = document.getElementById("soundMode").value;
+      const useVoice = soundMode === "voice";
+      const useBip = soundMode === "bip";
       clearInterval(interval);
       
       // 🧹 CLEAN UP ALL VISUAL CUE EFFECTS
