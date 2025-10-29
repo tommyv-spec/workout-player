@@ -53,7 +53,34 @@ function __unlockAudioOnce() {
       src.buffer = ctx.createBuffer(1, 1, 22050);
       src.connect(ctx.destination);
       src.start(0);
+      window.__audioCtx = ctx;
     }
+  } catch (_) { /* ignore */ }
+
+  // Also initialize TTS audio element for iOS
+  try {
+    let el = document.getElementById("tts-audio");
+    if (!el) {
+      el = new Audio();
+      el.id = "tts-audio";
+      el.preload = "auto";
+      el.playsInline = true;
+      el.setAttribute("playsinline", "");
+      el.setAttribute("webkit-playsinline", "");
+      el.autoplay = false;
+      el.muted = false;
+      el.volume = 1.0;
+      el.crossOrigin = "anonymous";
+      document.body.appendChild(el);
+    }
+    
+    // Play silent audio to unlock iOS audio for this element
+    el.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7v///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAUHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxBYDwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxDYDwAABpAAAACAAADSAAAAEUExBTTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    el.play().then(() => {
+      console.log("✅ TTS audio unlocked for iOS");
+    }).catch(() => {
+      console.log("⚠️ TTS audio unlock attempt (might need user gesture)");
+    });
   } catch (_) { /* ignore */ }
 
   window.__audioUnlocked = true;
@@ -1464,23 +1491,53 @@ async function playAudioUrl(url) {
 
 async function ensureAudioUnlocked() {
   // One-time unlock pattern; safe to call many times
-  if (window.__audioUnlocked) return;
+  if (window.__audioUnlocked) {
+    // Even if unlocked, try to resume AudioContext
+    try {
+      if (window.__audioCtx && window.__audioCtx.state === "suspended") {
+        await window.__audioCtx.resume();
+      }
+    } catch (_) {}
+    return;
+  }
 
   let ctx;
   try {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) { window.__audioUnlocked = true; return; }
-    ctx = new AC();
+    
+    // Use existing context if available
+    ctx = window.__audioCtx || new AC();
+    if (!window.__audioCtx) window.__audioCtx = ctx;
+    
     if (ctx.state === "suspended") await ctx.resume();
     // create a short silent buffer to satisfy iOS gesture requirement
     const src = ctx.createBufferSource();
     src.buffer = ctx.createBuffer(1, 1, 22050);
     src.connect(ctx.destination);
     src.start(0);
+    
+    // Ensure TTS audio element exists and is ready
+    let el = document.getElementById("tts-audio");
+    if (!el) {
+      el = new Audio();
+      el.id = "tts-audio";
+      el.preload = "auto";
+      el.playsInline = true;
+      el.setAttribute("playsinline", "");
+      el.setAttribute("webkit-playsinline", "");
+      el.autoplay = false;
+      el.muted = false;
+      el.volume = 1.0;
+      el.crossOrigin = "anonymous";
+      document.body.appendChild(el);
+    }
+    
     window.__audioUnlocked = true;
+    console.log("✅ Audio fully unlocked");
   } catch (e) {
     console.warn("Unable to unlock audio (iOS likely):", e);
-    // We don’t throw—fallback TTS may still work after user gesture
+    // We don't throw—fallback TTS may still work after user gesture
   }
 }
 
