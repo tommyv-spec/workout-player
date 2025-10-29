@@ -40,56 +40,23 @@ const beppeSounds = {
 
 
 
-// === iOS audio unlock (run once after first tap) ===
-function __unlockAudioOnce() {
-  if (window.__audioUnlocked) return;
-
-  const AC = window.AudioContext || window.webkitAudioContext;
-  try {
-    if (AC) {
-      const ctx = new AC();
-      if (ctx.state === "suspended") { ctx.resume(); }
-      const src = ctx.createBufferSource();
-      src.buffer = ctx.createBuffer(1, 1, 22050);
-      src.connect(ctx.destination);
-      src.start(0);
-      window.__audioCtx = ctx;
-    }
-  } catch (_) { /* ignore */ }
-
-  // Also initialize TTS audio element for iOS
-  try {
-    let el = document.getElementById("tts-audio");
-    if (!el) {
-      el = new Audio();
-      el.id = "tts-audio";
-      el.preload = "auto";
-      el.playsInline = true;
-      el.setAttribute("playsinline", "");
-      el.setAttribute("webkit-playsinline", "");
-      el.autoplay = false;
-      el.muted = false;
-      el.volume = 1.0;
-      el.crossOrigin = "anonymous";
-      document.body.appendChild(el);
-    }
+// === iOS audio unlock (simple version that works on iOS) ===
+document.addEventListener("click", () => {
+  if (!window.__audioUnlocked) {
+    ttsAudio.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7v///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAUHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxBYDwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxDYDwAABpAAAACAAADSAAAAEUExBTTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    ttsAudio.play().then(() => {
+      window.__audioUnlocked = true;
+      console.log("🔓 Audio sbloccato su iOS");
+    }).catch(() => console.warn("⚠️ Audio unlock fallito"));
     
-    // Play silent audio to unlock iOS audio for this element
-    el.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7v///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAUHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxBYDwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxDYDwAABpAAAACAAADSAAAAEUExBTTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    el.play().then(() => {
-      console.log("✅ TTS audio unlocked for iOS");
-    }).catch(() => {
-      console.log("⚠️ TTS audio unlock attempt (might need user gesture)");
-    });
-  } catch (_) { /* ignore */ }
-
-  window.__audioUnlocked = true;
-  window.removeEventListener("touchstart", __unlockAudioOnce, { capture: true });
-  window.removeEventListener("click", __unlockAudioOnce, { capture: true });
-}
-// unlock on the first real user gesture
-window.addEventListener("touchstart", __unlockAudioOnce, { once: true, passive: true, capture: true });
-window.addEventListener("click", __unlockAudioOnce, { once: true, capture: true });
+    // Unlock beppe player (silent)
+    if (beppePlayer) {
+      beppePlayer.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7v///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAUHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxBYDwAABpAAAACAAADSAAAAETEFNRTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxDYDwAABpAAAACAAADSAAAAEUExBTTMuOThyAaoAAAAAAAAAABRAJAWHQQABzAAAg4QfkBTOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+      beppePlayer.volume = 0;
+      beppePlayer.play().then(() => beppePlayer.volume = 1.0).catch(() => {});
+    }
+  }
+}, { once: true });
 
 
 
@@ -1380,204 +1347,62 @@ const TTS_TIMEOUT_MS = 9000;
 const TTS_RETRIES = 2; // retry Google TTS a couple of times before falling back
 
 async function speak(text, lang = "it-IT") {
-  const mode = document.getElementById("soundMode")?.value 
+  const soundMode = document.getElementById("soundMode")?.value 
             || document.getElementById("soundMode-setup")?.value 
             || "voice";
 
-  if (!text || mode === "none") return;
+  if (!text || soundMode === "none") return;
 
-  // quick modes
-  if (mode === "bip") { playBeep(); return; }
-  if (mode === "beppe") { await playPreRecorded(text, lang); return; } // your own implementation
+  // Quick modes
+  if (soundMode === "bip") { 
+    playBeep(); 
+    return; 
+  }
+  
+  if (soundMode === "beppe") { 
+    await playPreRecorded(text, lang); 
+    return; 
+  }
 
-  // VOICE mode
+  // Voice mode - simple and direct (works on iOS)
   try {
-    await ensureAudioUnlocked();           // iOS gating
-    await tryGoogleTTS(text, lang);        // primary
-  } catch (err) {
-    console.warn("Google TTS failed, using Web Speech fallback:", err);
-    try {
-      await webSpeechSpeak(text, lang);    // fallback
-    } catch (e2) {
-      console.error("Web Speech also failed:", e2);
-      // don’t throw again; swallow to avoid Uncaught (in promise)
-    }
-  }
-}
+    const voice = lang === "it-IT" ? "it-IT-Wavenet-C" : "en-US-Wavenet-D";
 
+    const response = await fetch("https://google-tts-server.onrender.com/speak", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, lang, voice }),
+    });
 
-async function tryGoogleTTS(text, lang) {
-  let lastErr;
-  for (let attempt = 0; attempt <= TTS_RETRIES; attempt++) {
-    try {
-      const audioUrl = await fetchTTS(text, lang);
-      await playAudioUrl(audioUrl);
-      return;
-    } catch (e) {
-      lastErr = e;
-      await sleep(350 * (attempt + 1)); // tiny backoff for Render cold starts
-    }
-  }
-  throw lastErr;
-}
+    if (!response.ok) throw new Error("Errore TTS");
 
-async function fetchTTS(text, lang) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TTS_TIMEOUT_MS);
+    const blob = await response.blob();
+    if (blob.size === 0) throw new Error("Audio vuoto");
 
-  const res = await fetch(GOOGLE_TTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, lang }),
-    signal: controller.signal
-  }).catch(e => { throw new Error("Failed to fetch TTS: " + e.message); });
+    const audioUrl = URL.createObjectURL(blob);
+    ttsAudio.src = audioUrl;
 
-  clearTimeout(timeoutId);
-
-  if (!res.ok) {
-    // turn non-2xx into real errors we can catch/retry
-    throw new Error(`TTS ${res.status} ${res.statusText}`);
-  }
-
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
-}
-
-// REPLACE the whole playAudioUrl function with this version
-async function playAudioUrl(url) {
-  let el = document.getElementById("tts-audio");
-  if (!el) {
-    el = new Audio();
-    el.id = "tts-audio";
-    el.preload = "auto";
-    el.playsInline = true;
-    el.setAttribute("playsinline", "");
-    el.setAttribute("webkit-playsinline", "");
-    el.autoplay = false;
-    el.muted = false;
-    el.crossOrigin = "anonymous";
-    document.body.appendChild(el);
-  }
-
-  // If it's a blob:, DO NOT append cache-buster (iOS breaks)
-  const isBlob = typeof url === "string" && url.startsWith("blob:");
-  const src = isBlob ? url : url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
-
-  el.pause();
-  el.src = src;
-  el.currentTime = 0;
-  el.load();
-
-  // Resume AudioContext if you’re using one (safe no-op otherwise)
-  try { await (window.__audioCtx?.resume?.() || Promise.resolve()); } catch (_) {}
-
-  // Play and resolve on end; if we used a blob URL, revoke it AFTER playback
-  await new Promise((resolve, reject) => {
-    const cleanup = () => {
-      el.onended = null;
-      el.onerror = null;
-      if (isBlob) {
-        try { URL.revokeObjectURL(url); } catch {}
-      }
-    };
-    el.onended = () => { cleanup(); resolve(); };
-    el.onerror = (e) => { cleanup(); reject(e); };
-    const p = el.play();
-    if (p && typeof p.then === "function") p.catch(reject);
-  });
-}
-
-
-
-async function ensureAudioUnlocked() {
-  // One-time unlock pattern; safe to call many times
-  if (window.__audioUnlocked) {
-    // Even if unlocked, try to resume AudioContext
-    try {
-      if (window.__audioCtx && window.__audioCtx.state === "suspended") {
-        await window.__audioCtx.resume();
-      }
-    } catch (_) {}
-    return;
-  }
-
-  let ctx;
-  try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { window.__audioUnlocked = true; return; }
-    
-    // Use existing context if available
-    ctx = window.__audioCtx || new AC();
-    if (!window.__audioCtx) window.__audioCtx = ctx;
-    
-    if (ctx.state === "suspended") await ctx.resume();
-    // create a short silent buffer to satisfy iOS gesture requirement
-    const src = ctx.createBufferSource();
-    src.buffer = ctx.createBuffer(1, 1, 22050);
-    src.connect(ctx.destination);
-    src.start(0);
-    
-    // Ensure TTS audio element exists and is ready
-    let el = document.getElementById("tts-audio");
-    if (!el) {
-      el = new Audio();
-      el.id = "tts-audio";
-      el.preload = "auto";
-      el.playsInline = true;
-      el.setAttribute("playsinline", "");
-      el.setAttribute("webkit-playsinline", "");
-      el.autoplay = false;
-      el.muted = false;
-      el.volume = 1.0;
-      el.crossOrigin = "anonymous";
-      document.body.appendChild(el);
-    }
-    
-    window.__audioUnlocked = true;
-    console.log("✅ Audio fully unlocked");
-  } catch (e) {
-    console.warn("Unable to unlock audio (iOS likely):", e);
-    // We don't throw—fallback TTS may still work after user gesture
-  }
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function webSpeechSpeak(text, lang) {
-  if (!("speechSynthesis" in window)) throw new Error("Web Speech not supported");
-
-  return new Promise((resolve, reject) => {
-    try {
+    await new Promise((resolve, reject) => {
+      ttsAudio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        resolve();
+      };
+      ttsAudio.onerror = reject;
+      ttsAudio.play().catch(reject);
+    });
+  } catch (error) {
+    console.warn("❌ Google TTS fallito, uso fallback:", error);
+    // Fallback to Web Speech API
+    await new Promise(resolve => {
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = lang || "it-IT";
-      utter.rate = 1.0; utter.pitch = 1.0; utter.volume = 1.0;
-
+      utter.lang = lang;
+      utter.rate = 1.0;
       utter.onend = resolve;
-      utter.onerror = e => reject(new Error("WebSpeech error: " + (e?.error || "unknown")));
-
-      // Some browsers queue; cancel to keep it snappy
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
-    } catch (err) {
-      reject(err);
-    }
-  });
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    });
+  }
 }
-
-function playBeep() {
-  const el = document.getElementById("beep-sound");
-  if (!el) return;
-  try { el.currentTime = 0; el.play(); } catch (_) {}
-}
-
-// stub for your pre-recorded audio mode if you use it
-async function playPreRecorded(text, lang) {
-  // Your mapping logic here (text -> file). Safe no-op by default.
-  console.log("Beppe mode (pre-recorded) not mapped for:", text);
-}
-
-
-
 
 async function speakSequence(segments) {
   for (const segment of segments) {
