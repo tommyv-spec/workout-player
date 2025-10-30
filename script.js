@@ -7,6 +7,16 @@ let savedTimeLeft = null;
 let lastSpeakTime = 0;
 let currentSpeakId = 0;
 
+
+function getSoundMode() {
+  const v = (document.getElementById("soundMode")?.value || "").toLowerCase();
+  // Accetta sia "beep" che "bip", internamente usiamo "bip"
+  if (v === "beep") return "bip";
+  return v;
+}
+
+
+
 // ============================================================
 // 🔊 Persistent audio players (clean, iOS-safe)
 // ============================================================
@@ -421,12 +431,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // (Audio unlock centralizzato in alto — niente duplicati qui)
   warmUpServer();
 
+  // Pre-warm per Safari: forza il populate delle voci
+  if ("speechSynthesis" in window) {
+    // Trigghera la popolazione iniziale
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => { getUnifiedVoice(); };
+  }
+
+
   preloadAudio(Object.values(beppeSounds));
   preloadWorkoutAudios();
 
   document.getElementById("soundMode-setup").addEventListener("change", () => {
-    const value = document.getElementById("soundMode-setup").value;
-    document.getElementById("soundMode").value = value;
+  const raw = (document.getElementById("soundMode-setup").value || "").toLowerCase();
+  document.getElementById("soundMode").value = (raw === "beep") ? "bip" : raw;
+
   });
 
   const savedWarmupPref = localStorage.getItem("warmupEnabled");
@@ -1028,8 +1047,10 @@ async function playExercise(index, exercises, resumeTime = null) {
 
   updateProgressBar();
 
-  const soundMode = document.getElementById("soundMode").value;
+  const soundMode = getSoundMode();
   const useVoice = soundMode === "voice";
+  const useBip = soundMode === "bip";
+
 
   if (useVoice) speak(exercise.name, detectLang(exercise.name));
 
@@ -1235,7 +1256,9 @@ async function fetchTTS(text, lang) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text, lang }),
-    signal: controller.signal
+    signal: controller.signal,
+    cache: "no-store",
+    mode: "cors"
   }).catch(e => { throw new Error("Failed to fetch TTS: " + e.message); });
 
   clearTimeout(timeoutId);
@@ -1288,12 +1311,27 @@ async function ensureAudioUnlocked() {
       src.connect(window.__audioCtx.destination);
       src.start(0);
     }
+
+    // Primer extra sugli <audio> nel caso il primo click non sia ancora avvenuto
+    const blip = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
+    try {
+      ttsAudio.src = blip;
+      await ttsAudio.play().catch(()=>{});
+      ttsAudio.pause(); ttsAudio.currentTime = 0;
+    } catch {}
+    try {
+      beppePlayer.src = blip;
+      await beppePlayer.play().catch(()=>{});
+      beppePlayer.pause(); beppePlayer.currentTime = 0;
+    } catch {}
+
     window.__audioUnlocked = true;
-    console.log("✅ AudioContext unlocked");
+    console.log("✅ Audio unlocked (context + players)");
   } catch (e) {
     console.warn("Unable to fully unlock audio:", e);
   }
 }
+
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -1328,12 +1366,13 @@ function playBeep() {
       const gain = ctx.createGain();
       osc.type = "sine";
       osc.frequency.setValueAtTime(880, ctx.currentTime);
+      // attacco/decadimento un filo più lunghi per sicurezza su mobile
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
       osc.connect(gain).connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.2);
+      osc.stop(ctx.currentTime + 0.27);
       return;
     }
   } catch (e) {
@@ -1342,6 +1381,7 @@ function playBeep() {
   const beep = document.getElementById("beep-sound");
   if (beep) { try { beep.currentTime = 0; beep.play(); } catch {} }
 }
+
 
 // stub for your pre-recorded audio mode if you use it
 async function playPreRecorded(text, lang) {
