@@ -6,35 +6,26 @@ let isPaused = false;
 let savedTimeLeft = null;
 let lastSpeakTime = 0;
 let currentSpeakId = 0;
+
+// ============================================================
+// 🔊 Persistent audio players (clean, iOS-safe)
+// ============================================================
 const ttsAudio = new Audio();
-
-
-
 ttsAudio.preload = "auto";
 ttsAudio.playsInline = true;
 ttsAudio.setAttribute("playsinline", "");
 ttsAudio.setAttribute("webkit-playsinline", "");
 ttsAudio.crossOrigin = "anonymous";
-ttsAudio.preload = "auto";
-ttsAudio.playsInline = true;
-ttsAudio.setAttribute("playsinline", "");
-ttsAudio.setAttribute("webkit-playsinline", "");
-// NEW: Full workout sequence (warm-up + main workout)
-let fullWorkoutSequence = [];
 
 let beppePlayer = new Audio();
-
-
 beppePlayer.preload = "auto";
 beppePlayer.playsInline = true;
 beppePlayer.setAttribute("playsinline", "");
 beppePlayer.setAttribute("webkit-playsinline", "");
 beppePlayer.crossOrigin = "anonymous";
-beppePlayer.preload = "auto";
-beppePlayer.playsInline = true;
-beppePlayer.setAttribute("playsinline", "");
-beppePlayer.setAttribute("webkit-playsinline", "");
-beppePlayer.preload = "auto";
+
+// NEW: Full workout sequence (warm-up + main workout)
+let fullWorkoutSequence = [];
 
 // ============================================================
 // 🔊 SIMPLE iOS AUDIO UNLOCK - ONE UNIFIED FUNCTION
@@ -49,7 +40,7 @@ function unlockAllAudio() {
     if (AC) {
       window.__audioCtx = window.__audioCtx || new AC();
       if (window.__audioCtx.state === "suspended") {
-        window.__audioCtx.resume().catch(()=>{});
+        window.__audioCtx.resume().catch(() => {});
       }
       const tick = window.__audioCtx.createBufferSource();
       tick.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
@@ -67,7 +58,7 @@ function unlockAllAudio() {
       ttsAudio.play().then(() => {
         ttsAudio.pause(); ttsAudio.currentTime = 0; ttsAudio.volume = 1.0;
         console.log("  ✅ ttsAudio unlocked");
-      }).catch(()=>{});
+      }).catch(() => {});
     } catch {}
 
     // Unlock beppePlayer
@@ -77,7 +68,7 @@ function unlockAllAudio() {
       beppePlayer.play().then(() => {
         beppePlayer.pause(); beppePlayer.currentTime = 0; beppePlayer.volume = 1.0;
         console.log("  ✅ beppePlayer unlocked");
-      }).catch(()=>{});
+      }).catch(() => {});
     } catch {}
 
     // Unlock optional elements if present
@@ -88,7 +79,7 @@ function unlockAllAudio() {
       beepEl.play().then(() => {
         beepEl.pause(); beepEl.currentTime = 0; beepEl.volume = 1.0;
         console.log("  ✅ beep-sound unlocked");
-      }).catch(()=>{});
+      }).catch(() => {});
     }
 
     const transitionEl = document.getElementById("transition-sound");
@@ -98,7 +89,7 @@ function unlockAllAudio() {
       transitionEl.play().then(() => {
         transitionEl.pause(); transitionEl.currentTime = 0; transitionEl.volume = 1.0;
         console.log("  ✅ transition-sound unlocked");
-      }).catch(()=>{});
+      }).catch(() => {});
     }
 
     window.__audioUnlocked = true;
@@ -108,10 +99,9 @@ function unlockAllAudio() {
   }
 }
 
-// Attach to first user interaction
+// Attach to first user interaction (single source of truth)
 document.addEventListener("touchstart", unlockAllAudio, { once: true, passive: true });
 document.addEventListener("click", unlockAllAudio, { once: true });
-
 
 let beforeUnloadBound = false;
 function bindBeforeUnload() {
@@ -125,7 +115,6 @@ function unbindBeforeUnload() {
   beforeUnloadBound = false;
 }
 function onBeforeUnload(e) {
-  // Show native prompt
   e.preventDefault();
   e.returnValue = "";
 }
@@ -137,33 +126,23 @@ const beppeSounds = {
   prossimo: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/Prossimo%20esercizio.MP3"
 };
 
-
-
-
-
-
-
-
 /**
  * Build complete workout sequence with optional warm-up
  */
 function buildFullWorkoutSequence(workout, includeWarmup = true) {
   const sequence = [];
-  
   console.log("🔨 Building workout sequence...");
   console.log("📦 Workout data:", workout);
-  
+
   if (!workout || !Array.isArray(workout.exercises) || workout.exercises.length === 0) {
     console.error("❌ No valid workout data");
     return sequence;
   }
 
-  // Helper function: check if an exercise is a block marker (not a real exercise)
   const isBlockMarker = (ex) => {
     const nameLower = ex.name.toLowerCase();
     const blockLower = (ex.block || "").toLowerCase();
-    // If exercise name contains "blocco" or "block", it's likely a marker
-    return nameLower.includes("blocco") || nameLower.includes("block") || 
+    return nameLower.includes("blocco") || nameLower.includes("block") ||
            nameLower === blockLower || ex.duration <= 5;
   };
 
@@ -172,8 +151,7 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
     console.log("🔥 Building warm-up phase...");
     const uniqueExercises = [];
     const seenNames = new Set();
-    
-    // Get unique exercises that are NOT block markers
+
     workout.exercises.forEach(ex => {
       if (ex.block && !seenNames.has(ex.name) && !isBlockMarker(ex)) {
         seenNames.add(ex.name);
@@ -184,7 +162,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
     console.log(`📋 Found ${uniqueExercises.length} unique exercises for warm-up`);
 
     if (uniqueExercises.length > 0) {
-      // Add "Riscaldamento" label
       sequence.push({
         name: "Riscaldamento",
         duration: 5,
@@ -192,18 +169,15 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
         isLabel: true
       });
 
-      // Add each unique exercise ONCE at practice duration
       uniqueExercises.forEach(ex => {
-        // DEBUG: Check what data we have
         console.log(`  🔍 Exercise data for ${ex.name}:`, {
           practiceDuration: ex.practiceDuration,
           duration: ex.duration,
           hasP: 'practiceDuration' in ex
         });
-        
         const warmupDuration = ex.practiceDuration || ex.duration || 20;
         console.log(`  ➕ Warm-up: ${ex.name} (${warmupDuration}s) ${ex.practiceDuration ? '✅ usando practiceDuration' : '⚠️ usando duration (fallback)'}`);
-        
+
         sequence.push({
           name: ex.name,
           duration: warmupDuration,
@@ -214,7 +188,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
           audio: ex.audio,
           audioCambio: ex.audioCambio,
           isWarmup: true,
-          // No block/round/exercise numbers for warmup
           blockNumber: null,
           totalBlocks: null,
           roundNumber: null,
@@ -224,7 +197,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
         });
       });
 
-      // Add "Are you ready?" transition
       sequence.push({
         name: "Are you ready?",
         duration: 15,
@@ -237,19 +209,14 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
   // PHASE 2: MAIN WORKOUT
   console.log("💪 Building main workout phase...");
   const blockGroups = {};
-  
-  // Group exercises by block, excluding block markers
   workout.exercises.forEach(ex => {
     if (ex.block && !isBlockMarker(ex)) {
-      if (!blockGroups[ex.block]) {
-        blockGroups[ex.block] = [];
-      }
+      if (!blockGroups[ex.block]) blockGroups[ex.block] = [];
       blockGroups[ex.block].push(ex);
     }
   });
 
   console.log("📊 Block groups:", Object.keys(blockGroups));
-
   const blockNames = Object.keys(blockGroups);
   const totalBlocks = blockNames.length;
   let blockNumber = 0;
@@ -260,14 +227,9 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
 
     blockNumber++;
     console.log(`\n🎯 Processing block ${blockNumber}/${totalBlocks}: ${blockName} (${exercises.length} exercises)`);
-
-    // REMOVED: No block label in the workout sequence
-    // The blocks are just organizational, not separate steps
-
     const rounds = exercises[0]?.rounds || 1;
     console.log(`  🔁 Rounds: ${rounds}`);
 
-    // Repeat exercises by rounds
     for (let round = 0; round < rounds; round++) {
       console.log(`  📍 Round ${round + 1}/${rounds}`);
       let exerciseNumber = 0;
@@ -275,7 +237,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
         exerciseNumber++;
         const exDuration = ex.duration || 30;
         console.log(`    ➕ ${ex.name} (${exDuration}s)`);
-        
         sequence.push({
           name: ex.name,
           duration: exDuration,
@@ -286,7 +247,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
           audio: ex.audio,
           audioCambio: ex.audioCambio,
           isWarmup: false,
-          // Progress tracking metadata
           blockNumber: blockNumber,
           totalBlocks: totalBlocks,
           roundNumber: round + 1,
@@ -298,7 +258,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
     }
   });
 
-  // Add completion
   sequence.push({
     name: "Good Job",
     duration: 20,
@@ -308,7 +267,6 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
 
   console.log(`\n✅ Workout sequence built: ${sequence.length} total steps`);
   console.log("📝 Full sequence:", sequence.map(s => `${s.name} (${s.duration}s)`));
-  
   return sequence;
 }
 
@@ -317,32 +275,22 @@ function buildFullWorkoutSequence(workout, includeWarmup = true) {
  */
 function updateProgressBar() {
   if (!fullWorkoutSequence || fullWorkoutSequence.length === 0) return;
-  
   const currentExercise = fullWorkoutSequence[currentStep];
   if (!currentExercise) return;
-  
-  // Calculate overall progress
+
   const totalSteps = fullWorkoutSequence.length;
   const progressPercent = Math.round(((currentStep + 1) / totalSteps) * 100);
-  
-  // Update progress bar
+
   const progressFill = document.getElementById("progress-fill");
   const progressPercentage = document.getElementById("progress-percentage");
-  
-  if (progressFill) {
-    progressFill.style.width = progressPercent + "%";
-  }
-  
-  if (progressPercentage) {
-    progressPercentage.textContent = progressPercent + "%";
-  }
-  
-  // Update info sections
+
+  if (progressFill) progressFill.style.width = progressPercent + "%";
+  if (progressPercentage) progressPercentage.textContent = progressPercent + "%";
+
   const progressBlock = document.getElementById("progress-block");
   const progressRound = document.getElementById("progress-round");
   const progressExercise = document.getElementById("progress-exercise");
-  
-  // For warmup and labels, show different info
+
   if (currentExercise.isWarmup) {
     if (progressBlock) progressBlock.textContent = "Warm-up";
     if (progressRound) progressRound.textContent = "";
@@ -352,181 +300,126 @@ function updateProgressBar() {
     if (progressRound) progressRound.textContent = "";
     if (progressExercise) progressExercise.textContent = "";
   } else {
-    // Main workout: show block/round/exercise numbers
     if (progressBlock && currentExercise.blockNumber) {
       progressBlock.textContent = `Block ${currentExercise.blockNumber}/${currentExercise.totalBlocks}`;
     }
-    
     if (progressRound && currentExercise.roundNumber) {
       progressRound.textContent = `Round ${currentExercise.roundNumber}/${currentExercise.totalRounds}`;
     }
-    
     if (progressExercise && currentExercise.exerciseNumber) {
       progressExercise.textContent = `Exercise ${currentExercise.exerciseNumber}/${currentExercise.totalExercises}`;
     }
   }
-  
+
   console.log(`📊 Progress: ${progressPercent}% | Step ${currentStep + 1}/${totalSteps}`);
 }
-
-
 
 /**
  * Exit workout and return to setup menu
  */
 function exitWorkout() {
   console.log("🏠 Exiting workout...");
-  
-  // Stop any running timer
-  if (interval) {
-    clearInterval(interval);
-    interval = null;
-  }
-  
-  // Reset workout state
+  if (interval) { clearInterval(interval); interval = null; }
   isPaused = false;
   savedTimeLeft = null;
   currentStep = 0;
-  
-  // Hide settings popup if open
+
   const settingsPopup = document.getElementById("settings-popup");
   if (settingsPopup) settingsPopup.style.display = "none";
-  
-  // Unlock body scroll
+
   document.body.style.overflow = "";
   document.body.style.position = "";
   document.body.style.width = "";
   document.body.style.height = "";
-  
-  // Restore setup UI
+
   const header = document.querySelector("header");
   const setup = document.getElementById("setup-screen");
   const startBtn = document.getElementById("start-button-bottom");
   const exerciseContainer = document.getElementById("exercise-container");
   const topbarSelect = document.getElementById("topbar-select");
   const setupGear = document.getElementById("setup-settings-button");
-  const bottomButtonsContainer = document.getElementById("bottom-buttons-container"); // FIX: Get container reference
-  
+  const bottomButtonsContainer = document.getElementById("bottom-buttons-container");
+
   if (exerciseContainer) exerciseContainer.style.display = "none";
   if (header) header.style.display = "";
   if (setup) setup.style.display = "";
   if (startBtn) startBtn.style.display = "";
-  if (bottomButtonsContainer) bottomButtonsContainer.style.display = ""; // FIX: Show container again!
+  if (bottomButtonsContainer) bottomButtonsContainer.style.display = "";
   if (topbarSelect) topbarSelect.style.display = "block";
   if (setupGear) setupGear.style.display = "block";
-  
-  // Unbind beforeunload warning
+
   unbindBeforeUnload();
-  
   console.log("✅ Returned to menu");
 }
 
-
 function startWorkout() {
-  if (
-    !selectedWorkout ||
-    !Array.isArray(selectedWorkout.exercises) ||
-    selectedWorkout.exercises.length === 0
-  ) {
+  if (!selectedWorkout || !Array.isArray(selectedWorkout.exercises) || selectedWorkout.exercises.length === 0) {
     alert("Nessun workout valido selezionato.");
     return;
   }
 
-  // NEW: Check if warm-up is enabled
   const warmupEnabled = document.getElementById("warmup-toggle")?.checked ?? true;
-  
-  // NEW: Build complete workout sequence
   fullWorkoutSequence = buildFullWorkoutSequence(selectedWorkout, warmupEnabled);
-  
+
   if (fullWorkoutSequence.length === 0) {
     alert("Impossibile costruire la sequenza di allenamento.");
     return;
   }
 
-  // Hide setup UI
   const setup = document.getElementById("setup-screen");
   const header = document.querySelector("header");
   const startBtn = document.getElementById("start-button-bottom");
   const exerciseContainer = document.getElementById("exercise-container");
-  const bottomButtonsContainer = document.getElementById("bottom-buttons-container"); // FIX: Get container reference
+  const bottomButtonsContainer = document.getElementById("bottom-buttons-container");
 
-  // NEW: hide the top selector and the setup gear as requested
   const topbarSelect = document.getElementById("topbar-select");
   const setupGear = document.getElementById("setup-settings-button");
-
   if (topbarSelect) topbarSelect.style.display = "none";
   if (setupGear) setupGear.style.display = "none";
 
-  // SAFE: workout-preview may not exist in your HTML, so guard it
   const previewMaybe = document.getElementById("workout-preview");
   if (previewMaybe) previewMaybe.style.display = "none";
 
-  // Show workout screen
   if (setup) setup.style.display = "none";
   if (header) header.style.display = "none";
   if (startBtn) startBtn.style.display = "none";
-  if (bottomButtonsContainer) bottomButtonsContainer.style.display = "none"; // FIX: Hide entire bottom container!
+  if (bottomButtonsContainer) bottomButtonsContainer.style.display = "none";
   if (exerciseContainer) exerciseContainer.style.display = "flex";
 
-  // Lock body scroll during session
   document.body.style.overflow = "hidden";
   document.body.style.position = "fixed";
   document.body.style.width = "100%";
   document.body.style.height = "100%";
 
-  // NEW: Check if user selected a custom start point (Block → Round → Exercise)
   let startIndex = 0;
   const phaseSelect = document.getElementById("start-phase-select");
   const roundSelect = document.getElementById("start-round-select");
   const exerciseSelect = document.getElementById("start-exercise-select");
-  
+
   if (phaseSelect && phaseSelect.value !== "0") {
-    // User selected a block
-    
-    // Priority 1: Specific exercise selected
     if (exerciseSelect?.value && exerciseSelect.value !== "") {
       startIndex = parseInt(exerciseSelect.value);
       console.log(`🎯 Starting from specific exercise: index ${startIndex}`);
-    }
-    // Priority 2: Round selected (but not specific exercise)
-    else if (roundSelect?.value && roundSelect.value !== "") {
-      // The round select now stores the firstExerciseIndex directly in its value
+    } else if (roundSelect?.value && roundSelect.value !== "") {
       startIndex = parseInt(roundSelect.value);
       console.log(`🎯 Starting from Round: index ${startIndex}`);
-    }
-    // Priority 3: Just block selected
-    else {
+    } else {
       startIndex = parseInt(phaseSelect.value);
       console.log(`🎯 Starting from block start: index ${startIndex}`);
     }
   }
 
-  // Start with the NEW full sequence
   currentStep = startIndex;
   savedTimeLeft = null;
   playExercise(currentStep, fullWorkoutSequence);
 
-  // carry over sound mode
   document.getElementById("soundMode").value =
     document.getElementById("soundMode-setup").value;
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Ensure iOS unlock on first gesture
-  document.addEventListener('touchstart', async () => { if (!window.__audioUnlocked) await ensureAudioUnlocked(); }, { once: true, passive: true });
+  // (Audio unlock centralizzato in alto — niente duplicati qui)
   warmUpServer();
-
-  // iOS audio unlock  
-  document.addEventListener("click", () => {
-    if (!window.__audioUnlocked) {
-      ttsAudio.src = "data:audio/mp3;base64,//uQxAAAAAA==";
-      ttsAudio.play().then(() => {
-        window.__audioUnlocked = true;
-        console.log("🔓 Audio sbloccato su iOS");
-      }).catch(() => console.warn("⚠️ Audio unlock fallito"));
-    }
-  }, { once: true });
 
   preloadAudio(Object.values(beppeSounds));
   preloadWorkoutAudios();
@@ -536,14 +429,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("soundMode").value = value;
   });
 
-  // NEW: Load warm-up preference from localStorage
   const savedWarmupPref = localStorage.getItem("warmupEnabled");
   if (savedWarmupPref !== null) {
     const toggle = document.getElementById("warmup-toggle");
     if (toggle) toggle.checked = savedWarmupPref === "true";
   }
 
-  // NEW: Save warm-up preference when changed
   const warmupToggle = document.getElementById("warmup-toggle");
   if (warmupToggle) {
     warmupToggle.addEventListener("change", (e) => {
@@ -551,18 +442,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  document.addEventListener("click", () => {
-    if (!window.__audioUnlocked) {
-      ttsAudio.src = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA...";
-      ttsAudio.play().then(() => {
-        window.__audioUnlocked = true;
-        console.log("🔓 Audio sbloccato su iOS");
-      }).catch(() => console.warn("⚠️ Audio unlock fallito"));
-    }
-  }, { once: true });
+  // Safari loads voices asynchronously → pick a valid voice when ready
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = () => { getUnifiedVoice(); };
+  }
 
   const savedUser = localStorage.getItem("loggedUser");
-
   if (savedUser) {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("main-app").style.display = "block";
@@ -590,7 +475,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // NEW: Navigation arrows
   document.getElementById("prev-exercise-button").addEventListener("click", () => {
     if (currentStep > 0) {
       clearInterval(interval);
@@ -613,7 +497,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Settings popup handlers
   document.getElementById("settings-button").addEventListener("click", () => {
     document.getElementById("settings-popup").style.display = "flex";
   });
@@ -622,22 +505,18 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("settings-popup").style.display = "none";
   });
 
-  // NEW: Exit workout button - return to menu
   document.getElementById("exit-workout-button").addEventListener("click", () => {
-    // Confirm with user
     if (confirm("Sei sicuro di voler terminare l'allenamento?")) {
       exitWorkout();
     }
   });
 
-  // Close popup when clicking outside
   document.getElementById("settings-popup").addEventListener("click", (e) => {
     if (e.target.id === "settings-popup") {
       document.getElementById("settings-popup").style.display = "none";
     }
   });
 
-  // Setup Settings popup handlers
   document.getElementById("setup-settings-button").addEventListener("click", () => {
     document.getElementById("setup-settings-popup").style.display = "flex";
   });
@@ -646,29 +525,24 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("setup-settings-popup").style.display = "none";
   });
 
-  // Close setup settings popup when clicking outside
   document.getElementById("setup-settings-popup").addEventListener("click", (e) => {
     if (e.target.id === "setup-settings-popup") {
       document.getElementById("setup-settings-popup").style.display = "none";
     }
   });
 
-  // Instructions collapse handler
   document.getElementById("instructions-header").addEventListener("click", () => {
     const header = document.getElementById("instructions-header");
     const content = document.getElementById("instructions-content");
     const icon = document.getElementById("instructions-collapse-icon");
-    
     header.classList.toggle("collapsed");
     content.classList.toggle("collapsed");
   });
 
-  // NEW: Keyboard navigation (arrow keys)
   document.addEventListener("keydown", (e) => {
     const exerciseContainer = document.getElementById("exercise-container");
-    // Only work if workout is active
     if (!exerciseContainer || exerciseContainer.style.display === "none") return;
-    
+
     if (e.key === "ArrowLeft") {
       e.preventDefault();
       document.getElementById("prev-exercise-button")?.click();
@@ -778,22 +652,13 @@ function updateWorkoutPreview() {
   // === HANDLE INSTRUCTIONS ===
   const defaultInstructionsText = "Instructions test";
   const defaultInstructionsImage = "https://lh3.googleusercontent.com/d/16uLdZNld58oCEUdmL96xzeFP43ZtNbSF";
-  
   if (instructionsSection) instructionsSection.style.display = "block";
-  
+
   if (workout.instructions && workout.instructions.trim()) {
-    // Use instructions from sheet
     instructionsText.textContent = workout.instructions;
     instructionsText.style.display = "block";
     instructionsImage.style.display = "none";
   } else {
-    // Use default - using image as default (you can switch to text by commenting/uncommenting)
-    // Option 1: Default text
-    // instructionsText.textContent = defaultInstructionsText;
-    // instructionsText.style.display = "block";
-    // instructionsImage.style.display = "none";
-    
-    // Option 2: Default image (currently active)
     instructionsImage.src = defaultInstructionsImage;
     instructionsImage.style.display = "block";
     instructionsText.style.display = "none";
@@ -820,14 +685,8 @@ function updateWorkoutPreview() {
   }
 
   // Group exercises by block
-  const sections = {
-    blocco1: [],
-    blocco2: [],
-    blocco3: []
-  };
-
+  const sections = { blocco1: [], blocco2: [], blocco3: [] };
   workout.exercises.forEach(ex => {
-    // Use explicit block field
     if (ex.block) {
       const blockLower = ex.block.toLowerCase();
       if (blockLower.includes('block 1') || blockLower.includes('blocco 1')) {
@@ -841,7 +700,6 @@ function updateWorkoutPreview() {
   });
 
   const grid = document.getElementById("exercise-grid");
-  
   const sectionConfigs = [
     { key: 'blocco1', title: 'BLOCCO 1', color: '#27AE60', icon: '💪' },
     { key: 'blocco2', title: 'BLOCCO 2', color: '#27AE60', icon: '💪' },
@@ -852,7 +710,6 @@ function updateWorkoutPreview() {
     const exercises = sections[config.key];
     if (exercises.length === 0) return;
 
-    // Remove duplicates
     const uniqueExercises = [];
     const seen = new Set();
     exercises.forEach(ex => {
@@ -862,12 +719,11 @@ function updateWorkoutPreview() {
       }
     });
 
-    // Calculate rounds (use the first exercise's rounds value)
     const rounds = exercises[0]?.rounds || 0;
 
     const section = document.createElement('div');
     section.className = 'workout-section';
-    
+
     const header = document.createElement('div');
     header.className = 'section-header';
     header.style.background = `linear-gradient(135deg, ${config.color}, ${config.color}dd)`;
@@ -876,12 +732,11 @@ function updateWorkoutPreview() {
       <span class="section-title">${config.title}</span>
       <span class="section-count">${uniqueExercises.length} es. | ${rounds} round</span>
     `;
-    
     section.appendChild(header);
 
     const cardsGrid = document.createElement('div');
     cardsGrid.className = 'section-cards-grid';
-    
+
     uniqueExercises.forEach(ex => {
       const card = document.createElement("div");
       card.className = "exercise-card";
@@ -924,7 +779,7 @@ function updateWorkoutPreview() {
   if (preview) preview.style.display = "block";
   if (previewTitle) previewTitle.style.display = "block";
   if (visuals) visuals.style.display = "block";
-  
+
   // NEW: Build start point selector
   buildStartPointSelector();
 }
@@ -939,52 +794,39 @@ function buildStartPointSelector() {
   const roundSelect = document.getElementById("start-round-select");
   const exerciseContainer = document.getElementById("start-exercise-container");
   const exerciseSelect = document.getElementById("start-exercise-select");
-  
+
   if (!selector || !phaseSelect || !selectedWorkout) return;
-  
-  // Show selector
   selector.style.display = "block";
-  
-  // Get warm-up enabled state
+
   const warmupEnabled = document.getElementById("warmup-toggle")?.checked ?? true;
-  
-  // Build temp sequence to get structure
   const tempSequence = buildFullWorkoutSequence(selectedWorkout, warmupEnabled);
-  
   if (tempSequence.length === 0) return;
-  
-  // Clear existing options
+
   phaseSelect.innerHTML = '<option value="0">Inizio workout (con riscaldamento)</option>';
   roundSelect.innerHTML = '';
   exerciseSelect.innerHTML = '';
-  
-  // Filter ONLY main workout exercises (exclude warm-up and labels)
-  const mainWorkoutExercises = tempSequence.filter(ex => 
-    !ex.isWarmup && // Exclude warm-up exercises
-    ex.block && // Must have a block (real exercises)
-    !ex.isLabel // Exclude labels like "Riscaldamento", "Are you ready", "Good Job"
+
+  const mainWorkoutExercises = tempSequence.filter(ex =>
+    !ex.isWarmup && ex.block && !ex.isLabel
   );
-  
+
   console.log(`📊 Start Point Selector - Filtered to ${mainWorkoutExercises.length} main workout exercises (warm-up excluded)`);
-  
+
   if (mainWorkoutExercises.length === 0) return;
-  
-  // Group exercises by block and identify rounds correctly
+
   const blocks = [];
   let currentBlock = null;
   let blockStartIndex = -1;
-  const exerciseSeenInCurrentBlock = new Map(); // Track first occurrence of each exercise in current block
-  
+  const exerciseSeenInCurrentBlock = new Map();
+
   mainWorkoutExercises.forEach((ex, relativeIndex) => {
-    // Find original index in full sequence
     const originalIndex = tempSequence.indexOf(ex);
-    
-    // Detect block changes
+
     if (ex.block !== currentBlock) {
       currentBlock = ex.block;
       blockStartIndex = relativeIndex;
       exerciseSeenInCurrentBlock.clear();
-      
+
       blocks.push({
         name: ex.block,
         index: originalIndex,
@@ -992,151 +834,118 @@ function buildStartPointSelector() {
         rounds: [],
         uniqueExercises: []
       });
-      
+
       console.log(`🆕 New block detected: ${currentBlock} at index ${originalIndex}`);
     }
-    
+
     const block = blocks[blocks.length - 1];
-    
-    // Track unique exercises for this block
+
     if (!block.uniqueExercises.includes(ex.name)) {
       block.uniqueExercises.push(ex.name);
     }
-    
-    // Determine round number by checking if we've seen this exercise before
+
     const firstOccurrenceIndex = exerciseSeenInCurrentBlock.get(ex.name);
-    
+
     if (firstOccurrenceIndex === undefined) {
-      // First time seeing this exercise in this block = Round 1
       exerciseSeenInCurrentBlock.set(ex.name, relativeIndex);
-      
-      // Find or create Round 1
       let round = block.rounds.find(r => r.number === 1);
       if (!round) {
-        round = {
-          number: 1,
-          firstExerciseIndex: originalIndex,
-          exercises: []
-        };
+        round = { number: 1, firstExerciseIndex: originalIndex, exercises: [] };
         block.rounds.push(round);
         console.log(`  📍 Created Round 1 for ${currentBlock}`);
       }
-      
-      round.exercises.push({
-        name: ex.name,
-        index: originalIndex
-      });
+      round.exercises.push({ name: ex.name, index: originalIndex });
     } else {
-      // We've seen this exercise before - calculate which round
       const positionInBlock = relativeIndex - blockStartIndex;
       const uniqueCount = block.uniqueExercises.length;
       const roundNumber = Math.floor(positionInBlock / uniqueCount) + 1;
-      
-      // Find or create this round
+
       let round = block.rounds.find(r => r.number === roundNumber);
       if (!round) {
-        round = {
-          number: roundNumber,
-          firstExerciseIndex: originalIndex,
-          exercises: []
-        };
+        round = { number: roundNumber, firstExerciseIndex: originalIndex, exercises: [] };
         block.rounds.push(round);
         console.log(`  📍 Created Round ${roundNumber} for ${currentBlock} at index ${originalIndex}`);
       }
-      
-      round.exercises.push({
-        name: ex.name,
-        index: originalIndex
-      });
+      round.exercises.push({ name: ex.name, index: originalIndex });
     }
   });
-  
+
   console.log("📊 Start Point Selector - Blocks with Rounds:", blocks);
-  
-  // Populate block selector
+
   blocks.forEach((block, idx) => {
     const option = document.createElement('option');
     option.value = block.index;
     option.textContent = `${idx + 1}. ${block.name} (${block.rounds.length} rounds)`;
     phaseSelect.appendChild(option);
   });
-  
-  // Remove old event listeners by cloning
+
   const newPhaseSelect = phaseSelect.cloneNode(true);
   phaseSelect.parentNode.replaceChild(newPhaseSelect, phaseSelect);
   const newRoundSelect = roundSelect.cloneNode(true);
   roundSelect.parentNode.replaceChild(newRoundSelect, roundSelect);
-  
-  // Update references
+
   const phaseSelectFinal = document.getElementById("start-phase-select");
   const roundSelectFinal = document.getElementById("start-round-select");
   const exerciseSelectFinal = document.getElementById("start-exercise-select");
-  
-  // Handle block selection change
-  phaseSelectFinal.addEventListener('change', function() {
+
+  phaseSelectFinal.addEventListener('change', function () {
     const selectedIndex = parseInt(this.value);
-    
+
     if (selectedIndex === 0 || isNaN(selectedIndex)) {
       roundContainer.style.display = 'none';
       exerciseContainer.style.display = 'none';
       return;
     }
-    
-    // Find selected block
+
     const block = blocks.find(b => b.index === selectedIndex);
     if (!block || block.rounds.length === 0) {
       roundContainer.style.display = 'none';
       exerciseContainer.style.display = 'none';
       return;
     }
-    
-    // Show round selector
+
     roundContainer.style.display = 'block';
     exerciseContainer.style.display = 'none';
     roundSelectFinal.innerHTML = '<option value="">Inizio blocco (Round 1)</option>';
-    
-    block.rounds.forEach((round, idx) => {
+
+    block.rounds.forEach((round) => {
       const option = document.createElement('option');
-      option.value = round.firstExerciseIndex; // Use the actual index where round starts
+      option.value = round.firstExerciseIndex;
       option.textContent = `Round ${round.number}`;
-      option.dataset.roundNumber = round.number; // Store round number for reference
+      option.dataset.roundNumber = round.number;
       roundSelectFinal.appendChild(option);
     });
   });
-  
-  // Handle round selection change
-  roundSelectFinal.addEventListener('change', function() {
+
+  roundSelectFinal.addEventListener('change', function () {
     const selectedBlockIndex = parseInt(phaseSelectFinal.value);
-    const selectedRoundFirstIndex = parseInt(this.value); // This is now firstExerciseIndex
-    
+    const selectedRoundFirstIndex = parseInt(this.value);
+
     if (isNaN(selectedBlockIndex) || selectedBlockIndex === 0) {
       exerciseContainer.style.display = 'none';
       return;
     }
-    
+
     const block = blocks.find(b => b.index === selectedBlockIndex);
     if (!block) {
       exerciseContainer.style.display = 'none';
       return;
     }
-    
-    // If no round selected, hide exercises
+
     if (isNaN(selectedRoundFirstIndex) || this.value === "") {
       exerciseContainer.style.display = 'none';
       return;
     }
-    
-    // Find selected round by firstExerciseIndex
+
     const round = block.rounds.find(r => r.firstExerciseIndex === selectedRoundFirstIndex);
     if (!round || round.exercises.length === 0) {
       exerciseContainer.style.display = 'none';
       return;
     }
-    
-    // Show exercise selector
+
     exerciseContainer.style.display = 'block';
     exerciseSelectFinal.innerHTML = '<option value="">Inizio round</option>';
-    
+
     round.exercises.forEach((ex, idx) => {
       const option = document.createElement('option');
       option.value = ex.index;
@@ -1144,9 +953,8 @@ function buildStartPointSelector() {
       exerciseSelectFinal.appendChild(option);
     });
   });
-  
-  // Reset button
-  document.getElementById('reset-start-point').addEventListener('click', function() {
+
+  document.getElementById('reset-start-point').addEventListener('click', function () {
     phaseSelectFinal.value = '0';
     roundContainer.style.display = 'none';
     exerciseContainer.style.display = 'none';
@@ -1156,20 +964,17 @@ function buildStartPointSelector() {
 
 async function playExercise(index, exercises, resumeTime = null) {
   if (index >= exercises.length) {
-    // UI message (briefly show completion)
     document.getElementById("exercise-name").textContent = "Workout completato!";
     document.getElementById("exercise-gif").src = "";
     document.getElementById("timer").textContent = "";
     const nextPrev = document.getElementById("next-exercise-preview");
     if (nextPrev) nextPrev.style.display = "none";
 
-    // Unlock scroll
     document.body.style.overflow = "";
     document.body.style.position = "";
     document.body.style.width = "";
     document.body.style.height = "";
 
-    // Restore setup UI
     const header = document.querySelector("header");
     const setup = document.getElementById("setup-screen");
     const startBtn = document.getElementById("start-button-bottom");
@@ -1187,14 +992,12 @@ async function playExercise(index, exercises, resumeTime = null) {
     return;
   }
 
-
   const exercise = exercises[index];
   const nextExercise = exercises[index + 1];
 
-  // Build reps and equipment info
   const hasReps = exercise.reps && !exercise.name.toLowerCase().includes("istruz");
   const hasEquipment = exercise.tipoDiPeso && !exercise.name.toLowerCase().includes("istruz") && !exercise.isLabel;
-  
+
   let infoText = "";
   if (hasReps && hasEquipment) {
     infoText = `${exercise.reps} reps | ${exercise.tipoDiPeso}`;
@@ -1203,20 +1006,19 @@ async function playExercise(index, exercises, resumeTime = null) {
   } else if (hasEquipment) {
     infoText = exercise.tipoDiPeso;
   }
-  
-  const currentInfo = infoText 
+
+  const currentInfo = infoText
     ? `<div style="font-size: 16px; font-weight: 600; margin-top: 8px; color: #FFD700;">${infoText}</div>`
     : "";
 
   document.getElementById("exercise-name").innerHTML = `<strong>${exercise.name}</strong>${currentInfo}`;
   document.getElementById("exercise-gif").src = exercise.imageUrl;
   document.getElementById("next-exercise-preview").style.display = "none";
-  
-  // 🧹 CLEAN UP all visual cue effects from previous exercise
+
   const timerEl = document.getElementById("timer");
   const gifEl = document.getElementById("exercise-gif");
   const exerciseNameBar = document.getElementById("exercise-name");
-  
+
   timerEl.classList.remove("warning-10", "warning-6", "warning-3");
   gifEl.classList.remove("gif-glow");
   exerciseNameBar.classList.remove("next-preview-active");
@@ -1224,7 +1026,6 @@ async function playExercise(index, exercises, resumeTime = null) {
   const duration = resumeTime !== null ? resumeTime : savedTimeLeft ?? parseInt(exercise.duration);
   savedTimeLeft = null;
 
-  // Update progress bar
   updateProgressBar();
 
   const soundMode = document.getElementById("soundMode").value;
@@ -1248,11 +1049,9 @@ function resumeTimer() {
 }
 
 async function startExerciseTimer(timeLeft, exercise, nextExercise) {
-  const soundMode = document.getElementById("soundMode").value;
-  const useVoice = soundMode === "voice";
-  const useBip = soundMode === "bip";
-
+  const soundModeInit = document.getElementById("soundMode").value;
   clearInterval(interval);
+
   interval = setInterval(async () => {
     if (isPaused) {
       savedTimeLeft = timeLeft;
@@ -1263,45 +1062,34 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     timeLeft--;
     document.getElementById("timer").textContent = timeLeft;
 
-      // 🔁 LEGGI SEMPRE LA MODALITÀ ATTUALE
-      const soundMode = document.getElementById("soundMode").value;
-      const useVoice = soundMode === "voice";
-      const useBip = soundMode === "bip";
+    // 🔁 Always read current mode (allow mid-workout toggle)
+    const soundMode = document.getElementById("soundMode").value;
+    const useVoice = soundMode === "voice";
+    const useBip = soundMode === "bip";
 
     if (timeLeft === 60) {
-      const soundMode = document.getElementById("soundMode").value;
       if (useVoice) speak("mancano sessanta secondi");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.s60);
     }
 
     if (timeLeft === 30) {
-      const soundMode = document.getElementById("soundMode").value;
       if (useVoice) speak("mancano trenta secondi");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.s30);
     }
 
     if (timeLeft === 10) {
-      const soundMode = document.getElementById("soundMode").value;
-      
-      // ✨ TRIPLE VISUAL CUE ACTIVATION ✨
       const timerEl = document.getElementById("timer");
       const gifEl = document.getElementById("exercise-gif");
       const exerciseNameBar = document.getElementById("exercise-name");
-      
-      // 1. Activate timer warning color (yellow)
+
       timerEl.classList.add("warning-10");
-      
-      // 2. Activate GIF glow border
       gifEl.classList.add("gif-glow");
-      
-      // 3. Activate golden bar effect
       exerciseNameBar.classList.add("next-preview-active");
-      
+
       if (nextExercise) {
-        // Build next exercise info (reps + equipment)
         const hasNextReps = nextExercise.reps && !nextExercise.name.toLowerCase().includes("istruz");
         const hasNextEquipment = nextExercise.tipoDiPeso && !nextExercise.name.toLowerCase().includes("istruz") && !nextExercise.isLabel;
-        
+
         let nextInfoText = "";
         if (hasNextReps && hasNextEquipment) {
           nextInfoText = `${nextExercise.reps} reps | ${nextExercise.tipoDiPeso}`;
@@ -1310,16 +1098,15 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
         } else if (hasNextEquipment) {
           nextInfoText = nextExercise.tipoDiPeso;
         }
-        
+
         const nextInfo = nextInfoText
           ? `<div style="font-size: 14px; font-weight: 600; margin-top: 4px;">${nextInfoText}</div>`
           : "";
-    
+
         document.getElementById("exercise-name").innerHTML =
           `<div style="font-size: 14px; opacity: 0.8; margin-bottom: 4px;">prossimo esercizio:</div><strong style="font-size: 18px;">${nextExercise.name}</strong>${nextInfo}`;
         document.getElementById("exercise-gif").src = nextExercise.imageUrl;
-    
-        // Riproduci annunci vocali a 10 secondi rimanenti
+
         if (soundMode === "beppe") {
           const urls = [beppeSounds.prossimo];
           if (nextExercise.audio) urls.push(nextExercise.audio);
@@ -1328,23 +1115,16 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
           announceNextExercise(nextExercise);
         }
       }
-    
+
       if (useBip) playBeep();
     }
 
-
-
-
-
-    // Timer transition to ORANGE at 6 seconds
     if (timeLeft === 6) {
       const timerEl = document.getElementById("timer");
       timerEl.classList.remove("warning-10");
       timerEl.classList.add("warning-6");
     }
 
-
-    // Timer transition to RED at 3 seconds
     if (timeLeft === 3) {
       const timerEl = document.getElementById("timer");
       timerEl.classList.remove("warning-6");
@@ -1352,64 +1132,41 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
     }
 
     if (timeLeft === 5) {
-      const soundMode = document.getElementById("soundMode").value;
-      const useVoice = soundMode === "voice";
-      if (useVoice) speak("cinque, quattro, tre, due, uno");
       if (soundMode === "beppe") playBeppeAudio(beppeSounds.countdown5);
+      else if (useVoice) speak("cinque, quattro, tre, due, uno");
     }
 
-
     if (timeLeft <= 0) {
-      const soundMode = document.getElementById("soundMode").value;
-      const useVoice = soundMode === "voice";
-      const useBip = soundMode === "bip";
       clearInterval(interval);
-      
-      // 🧹 CLEAN UP ALL VISUAL CUE EFFECTS
+
       const timerEl = document.getElementById("timer");
       const gifEl = document.getElementById("exercise-gif");
       const exerciseNameBar = document.getElementById("exercise-name");
-      
-      // Remove all timer warning classes
+
       timerEl.classList.remove("warning-10", "warning-6", "warning-3");
-      
-      // Remove GIF glow
       gifEl.classList.remove("gif-glow");
-      
-      // Remove golden bar effect
       exerciseNameBar.classList.remove("next-preview-active");
-    
-      // Avanza l'indice ORA
+
       currentStep++;
       const nextExercise = fullWorkoutSequence[currentStep];
-    
-      // Pronuncia l'audioCambio del NUOVO esercizio in arrivo
+
       if (soundMode === "beppe") {
         const sequence = [];
-        if (nextExercise?.audioCambio) {
-          sequence.push(nextExercise.audioCambio);
-        }
-        if (sequence.length > 0) {
-          playBeppeAudioSequence(sequence);
-        }
-      } else if (useVoice && nextExercise) {
-            speak(nextExercise.name, detectLang(nextExercise.name));
+        if (nextExercise?.audioCambio) sequence.push(nextExercise.audioCambio);
+        if (sequence.length > 0) playBeppeAudioSequence(sequence);
+      } else if (soundMode === "voice" && nextExercise) {
+        speak(nextExercise.name, detectLang(nextExercise.name));
       }
 
-    
-      if (useBip) playTransition();
-    
+      if (soundMode === "bip") playTransition();
+
       document.getElementById("next-exercise-preview").style.display = "none";
       savedTimeLeft = null;
-    
-      // Aspetta un attimo prima di partire col nuovo esercizio
+
       setTimeout(() => playExercise(currentStep, fullWorkoutSequence), 300);
     }
-
-
   }, 1000);
 }
-
 
 // 🔊 Text-to-speech (Google + fallback)
 let fallbackVoice = null;
@@ -1418,32 +1175,28 @@ function getUnifiedVoice() {
   const voices = speechSynthesis.getVoices();
   if (fallbackVoice) return fallbackVoice;
 
-  // Prefer voices that support both it-IT and en-US
   const priorityNames = [
-    "Google italiano", "Google UK English", "Google US English", "Microsoft Elsa", "Microsoft Aria", "Microsoft Francesco"
+    "Google italiano", "Google UK English", "Google US English",
+    "Microsoft Elsa", "Microsoft Aria", "Microsoft Francesco"
   ];
 
   fallbackVoice = voices.find(v => priorityNames.includes(v.name))
-               || voices.find(v => v.lang.startsWith("en") || v.lang.startsWith("it"))
-               || voices[0];
+    || voices.find(v => v.lang?.startsWith("it") || v.lang?.startsWith("en"))
+    || voices[0];
 
   return fallbackVoice;
 }
 
-
 function detectLang(text) {
   const italianIndicators = /[àèéìòù]|mancano|secondi|esercizio|istruz|riposo|pausa/i;
   if (italianIndicators.test(text)) return "it-IT";
-
-  return "en-US"; // default fallback
+  return "en-US";
 }
 
-
-
 // ===== CONFIG =====
-const GOOGLE_TTS_URL = "https://google-tts-server.onrender.com/speak"; // keep your endpoint if different
+const GOOGLE_TTS_URL = "https://google-tts-server.onrender.com/speak";
 const TTS_TIMEOUT_MS = 9000;
-const TTS_RETRIES = 2; // retry Google TTS a couple of times before falling back
+const TTS_RETRIES = 2;
 
 async function speak(text, lang = "it-IT") {
   try {
@@ -1464,11 +1217,11 @@ async function tryGoogleTTS(text, lang) {
   for (let attempt = 0; attempt <= TTS_RETRIES; attempt++) {
     try {
       const audioUrl = await fetchTTS(text, lang);
-      await playAudioUrl(audioUrl);
+      await playAudioUrl(audioUrl); // now uses persistent ttsAudio
       return;
     } catch (e) {
       lastErr = e;
-      await sleep(350 * (attempt + 1)); // tiny backoff for Render cold starts
+      await sleep(350 * (attempt + 1));
     }
   }
   throw lastErr;
@@ -1488,7 +1241,6 @@ async function fetchTTS(text, lang) {
   clearTimeout(timeoutId);
 
   if (!res.ok) {
-    // turn non-2xx into real errors we can catch/retry
     throw new Error(`TTS ${res.status} ${res.statusText}`);
   }
 
@@ -1496,51 +1248,30 @@ async function fetchTTS(text, lang) {
   return URL.createObjectURL(blob);
 }
 
-// REPLACE the whole playAudioUrl function with this version
+// ✅ Use the PERSISTENT ttsAudio (no temp element)
 async function playAudioUrl(url) {
-  let el = document.getElementById("tts-audio");
-  if (!el) {
-    el = new Audio();
-    el.id = "tts-audio";
-    el.preload = "auto";
-    el.playsInline = true;
-    el.setAttribute("playsinline", "");
-    el.setAttribute("webkit-playsinline", "");
-    el.autoplay = false;
-    el.muted = false;
-    el.crossOrigin = "anonymous";
-    document.body.appendChild(el);
-  }
-
-  // If it's a blob:, DO NOT append cache-buster (iOS breaks)
+  // If it's a blob:, don't add cache-buster (iOS breaks)
   const isBlob = typeof url === "string" && url.startsWith("blob:");
   const src = isBlob ? url : url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
 
-  el.pause();
-  el.src = src;
-  el.currentTime = 0;
-  el.load();
+  try { await (window.__audioCtx?.resume?.() || Promise.resolve()); } catch {}
 
-  // Resume AudioContext if you’re using one (safe no-op otherwise)
-  try { await (window.__audioCtx?.resume?.() || Promise.resolve()); } catch (_) {}
+  ttsAudio.pause();
+  ttsAudio.src = src;
+  ttsAudio.currentTime = 0;
 
-  // Play and resolve on end; if we used a blob URL, revoke it AFTER playback
   await new Promise((resolve, reject) => {
     const cleanup = () => {
-      el.onended = null;
-      el.onerror = null;
-      if (isBlob) {
-        try { URL.revokeObjectURL(url); } catch {}
-      }
+      ttsAudio.onended = null;
+      ttsAudio.onerror = null;
+      if (isBlob) { try { URL.revokeObjectURL(url); } catch {} }
     };
-    el.onended = () => { cleanup(); resolve(); };
-    el.onerror = (e) => { cleanup(); reject(e); };
-    const p = el.play();
+    ttsAudio.onended = () => { cleanup(); resolve(); };
+    ttsAudio.onerror = (e) => { cleanup(); reject(e); };
+    const p = ttsAudio.play();
     if (p && typeof p.then === "function") p.catch(reject);
   });
 }
-
-
 
 async function ensureAudioUnlocked() {
   if (window.__audioUnlocked) return;
@@ -1548,12 +1279,10 @@ async function ensureAudioUnlocked() {
   try {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (AC) {
-      // Create or reuse a single shared context (critical on iOS)
       window.__audioCtx = window.__audioCtx || new AC();
       if (window.__audioCtx.state === "suspended") {
         await window.__audioCtx.resume();
       }
-      // Perform a tiny silent tick to satisfy iOS gesture gating
       const src = window.__audioCtx.createBufferSource();
       src.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
       src.connect(window.__audioCtx.destination);
@@ -1577,10 +1306,12 @@ async function webSpeechSpeak(text, lang) {
       utter.lang = lang || "it-IT";
       utter.rate = 1.0; utter.pitch = 1.0; utter.volume = 1.0;
 
+      const voice = getUnifiedVoice();
+      if (voice) utter.voice = voice;
+
       utter.onend = resolve;
       utter.onerror = e => reject(new Error("WebSpeech error: " + (e?.error || "unknown")));
 
-      // Some browsers queue; cancel to keep it snappy
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     } catch (err) {
@@ -1608,19 +1339,14 @@ function playBeep() {
   } catch (e) {
     console.warn("WebAudio beep failed:", e);
   }
-  // Fallback to element if present
   const beep = document.getElementById("beep-sound");
   if (beep) { try { beep.currentTime = 0; beep.play(); } catch {} }
 }
 
 // stub for your pre-recorded audio mode if you use it
 async function playPreRecorded(text, lang) {
-  // Your mapping logic here (text -> file). Safe no-op by default.
   console.log("Beppe mode (pre-recorded) not mapped for:", text);
 }
-
-
-
 
 async function speakSequence(segments) {
   for (const segment of segments) {
@@ -1640,8 +1366,6 @@ function warmUpServer() {
     .then(() => console.log("✅ TTS server attivo"))
     .catch(() => console.warn("⚠️ Server TTS non raggiungibile"));
 }
-
-
 
 function playTransition() {
   try {
@@ -1674,11 +1398,9 @@ function playBeppeAudio(url) {
   });
 }
 
-
 function convertGoogleDriveToDirect(link) {
   return link; // già diretto, non serve conversione
 }
-
 
 async function playBeppeAudioSequence(urls) {
   for (const url of urls) {
@@ -1692,8 +1414,6 @@ async function playBeppeAudioSequence(urls) {
   }
 }
 
-
-
 function preloadAudio(urls) {
   urls.forEach(url => {
     const audio = new Audio();
@@ -1702,29 +1422,13 @@ function preloadAudio(urls) {
   });
 }
 
-
 function preloadWorkoutAudios() {
   const audioUrls = [];
-
   Object.values(workouts).forEach(workout => {
     workout.exercises.forEach(ex => {
       if (ex.audio) audioUrls.push(ex.audio);
       if (ex.audioCambio) audioUrls.push(ex.audioCambio);
     });
   });
-
   preloadAudio(audioUrls);
 }
-
-
-document.addEventListener("click", () => {
-  if (!window.__audioUnlocked) {
-    beppePlayer.src = "data:audio/mp3;base64,//uQxAAAAAA=="; // 0.1s silenzioso
-    beppePlayer.play().then(() => {
-      window.__audioUnlocked = true;
-      console.log("🔓 Audio sbloccato su iOS");
-    }).catch(() => {
-      console.warn("⚠️ Impossibile sbloccare audio su iOS");
-    });
-  }
-}, { once: true });
