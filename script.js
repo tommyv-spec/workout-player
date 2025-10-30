@@ -9,6 +9,12 @@ let currentSpeakId = 0;
 const ttsAudio = new Audio();
 
 
+
+ttsAudio.preload = "auto";
+ttsAudio.playsInline = true;
+ttsAudio.setAttribute("playsinline", "");
+ttsAudio.setAttribute("webkit-playsinline", "");
+ttsAudio.crossOrigin = "anonymous";
 ttsAudio.preload = "auto";
 ttsAudio.playsInline = true;
 ttsAudio.setAttribute("playsinline", "");
@@ -18,6 +24,12 @@ let fullWorkoutSequence = [];
 
 let beppePlayer = new Audio();
 
+
+beppePlayer.preload = "auto";
+beppePlayer.playsInline = true;
+beppePlayer.setAttribute("playsinline", "");
+beppePlayer.setAttribute("webkit-playsinline", "");
+beppePlayer.crossOrigin = "anonymous";
 beppePlayer.preload = "auto";
 beppePlayer.playsInline = true;
 beppePlayer.setAttribute("playsinline", "");
@@ -32,44 +44,61 @@ function unlockAllAudio() {
   console.log("🔊 Unlocking iOS audio...");
 
   try {
-    // Unlock ttsAudio (voice mode)
-    ttsAudio.src = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
-    ttsAudio.volume = 0.01;
-    ttsAudio.play().then(() => {
-      ttsAudio.volume = 1.0;
-      console.log("  ✅ ttsAudio unlocked");
-    }).catch(() => {});
-
-    // Unlock beppePlayer (beppe mode)
-    beppePlayer.src = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
-    beppePlayer.volume = 0.01;
-    beppePlayer.play().then(() => {
-      beppePlayer.volume = 1.0;
-      console.log("  ✅ beppePlayer unlocked");
-    }).catch(() => {});
-
-    // Unlock beep-sound element (beep mode)
-    const beepEl = document.getElementById("beep-sound");
-    if (beepEl) {
-      beepEl.volume = 0.01;
-      beepEl.play().then(() => {
-        beepEl.pause();
-        beepEl.currentTime = 0;
-        beepEl.volume = 1.0;
-        console.log("  ✅ beep-sound unlocked");
-      }).catch(() => {});
+    // Prime shared context
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) {
+      window.__audioCtx = window.__audioCtx || new AC();
+      if (window.__audioCtx.state === "suspended") {
+        window.__audioCtx.resume().catch(()=>{});
+      }
+      const tick = window.__audioCtx.createBufferSource();
+      tick.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
+      tick.connect(window.__audioCtx.destination);
+      tick.start(0);
     }
 
-    // Unlock transition-sound
+    // Prime HTMLAudio elements with a tiny inline MP3
+    const blip = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
+
+    // Unlock ttsAudio
+    try {
+      ttsAudio.src = blip;
+      ttsAudio.volume = 0.01;
+      ttsAudio.play().then(() => {
+        ttsAudio.pause(); ttsAudio.currentTime = 0; ttsAudio.volume = 1.0;
+        console.log("  ✅ ttsAudio unlocked");
+      }).catch(()=>{});
+    } catch {}
+
+    // Unlock beppePlayer
+    try {
+      beppePlayer.src = blip;
+      beppePlayer.volume = 0.01;
+      beppePlayer.play().then(() => {
+        beppePlayer.pause(); beppePlayer.currentTime = 0; beppePlayer.volume = 1.0;
+        console.log("  ✅ beppePlayer unlocked");
+      }).catch(()=>{});
+    } catch {}
+
+    // Unlock optional elements if present
+    const beepEl = document.getElementById("beep-sound");
+    if (beepEl) {
+      beepEl.src = beepEl.src || blip;
+      beepEl.volume = 0.01;
+      beepEl.play().then(() => {
+        beepEl.pause(); beepEl.currentTime = 0; beepEl.volume = 1.0;
+        console.log("  ✅ beep-sound unlocked");
+      }).catch(()=>{});
+    }
+
     const transitionEl = document.getElementById("transition-sound");
     if (transitionEl) {
+      transitionEl.src = transitionEl.src || blip;
       transitionEl.volume = 0.01;
       transitionEl.play().then(() => {
-        transitionEl.pause();
-        transitionEl.currentTime = 0;
-        transitionEl.volume = 1.0;
+        transitionEl.pause(); transitionEl.currentTime = 0; transitionEl.volume = 1.0;
         console.log("  ✅ transition-sound unlocked");
-      }).catch(() => {});
+      }).catch(()=>{});
     }
 
     window.__audioUnlocked = true;
@@ -484,6 +513,8 @@ function startWorkout() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Ensure iOS unlock on first gesture
+  document.addEventListener('touchstart', async () => { if (!window.__audioUnlocked) await ensureAudioUnlocked(); }, { once: true, passive: true });
   warmUpServer();
 
   // iOS audio unlock  
@@ -1416,37 +1447,15 @@ const TTS_RETRIES = 2; // retry Google TTS a couple of times before falling back
 
 async function speak(text, lang = "it-IT") {
   try {
-    const voice = lang === "it-IT" ? "it-IT-Wavenet-C" : "en-US-Wavenet-D";
-
-    const response = await fetch("https://google-tts-server.onrender.com/speak", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, lang, voice }),
-    });
-
-    if (!response.ok) throw new Error("Errore TTS");
-
-    const blob = await response.blob();
-    if (blob.size === 0) throw new Error("Audio vuoto");
-
-    const audioUrl = URL.createObjectURL(blob);
-    ttsAudio.src = audioUrl;
-
-    await new Promise((resolve, reject) => {
-      ttsAudio.onended = resolve;
-      ttsAudio.onerror = reject;
-      ttsAudio.play();
-    });
+    await ensureAudioUnlocked();
+    await tryGoogleTTS(text, lang);
   } catch (error) {
-    console.warn("❌ Google TTS fallito, uso fallback:", error);
-    await new Promise(resolve => {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = lang;
-      utter.rate = 1.0;
-      utter.onend = resolve;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utter);
-    });
+    console.warn("❌ Google TTS failed, using Web Speech fallback:", error);
+    try {
+      await webSpeechSpeak(text, lang);
+    } catch (e2) {
+      console.warn("Web Speech fallback also failed:", e2);
+    }
   }
 }
 
@@ -1534,24 +1543,26 @@ async function playAudioUrl(url) {
 
 
 async function ensureAudioUnlocked() {
-  // One-time unlock pattern; safe to call many times
   if (window.__audioUnlocked) return;
 
-  let ctx;
   try {
     const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { window.__audioUnlocked = true; return; }
-    ctx = new AC();
-    if (ctx.state === "suspended") await ctx.resume();
-    // create a short silent buffer to satisfy iOS gesture requirement
-    const src = ctx.createBufferSource();
-    src.buffer = ctx.createBuffer(1, 1, 22050);
-    src.connect(ctx.destination);
-    src.start(0);
+    if (AC) {
+      // Create or reuse a single shared context (critical on iOS)
+      window.__audioCtx = window.__audioCtx || new AC();
+      if (window.__audioCtx.state === "suspended") {
+        await window.__audioCtx.resume();
+      }
+      // Perform a tiny silent tick to satisfy iOS gesture gating
+      const src = window.__audioCtx.createBufferSource();
+      src.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
+      src.connect(window.__audioCtx.destination);
+      src.start(0);
+    }
     window.__audioUnlocked = true;
+    console.log("✅ AudioContext unlocked");
   } catch (e) {
-    console.warn("Unable to unlock audio (iOS likely):", e);
-    // We don’t throw—fallback TTS may still work after user gesture
+    console.warn("Unable to fully unlock audio:", e);
   }
 }
 
@@ -1579,8 +1590,27 @@ async function webSpeechSpeak(text, lang) {
 }
 
 function playBeep() {
+  try {
+    const ctx = window.__audioCtx;
+    if (ctx) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+      return;
+    }
+  } catch (e) {
+    console.warn("WebAudio beep failed:", e);
+  }
+  // Fallback to element if present
   const beep = document.getElementById("beep-sound");
-  if (beep) beep.play();
+  if (beep) { try { beep.currentTime = 0; beep.play(); } catch {} }
 }
 
 // stub for your pre-recorded audio mode if you use it
@@ -1614,8 +1644,26 @@ function warmUpServer() {
 
 
 function playTransition() {
+  try {
+    const ctx = window.__audioCtx;
+    if (ctx) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.36);
+      return;
+    }
+  } catch (e) {
+    console.warn("WebAudio transition failed:", e);
+  }
   const transition = document.getElementById("transition-sound");
-  if (transition) transition.play();
+  if (transition) { try { transition.currentTime = 0; transition.play(); } catch {} }
 }
 
 function playBeppeAudio(url) {
