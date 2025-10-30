@@ -41,6 +41,40 @@ let fullWorkoutSequence = [];
 // 🔊 SIMPLE iOS AUDIO UNLOCK - ONE UNIFIED FUNCTION
 // ============================================================
 let audioUnlockPromise = null;
+const AUDIO_UNLOCK_EVENTS = ["pointerdown", "touchstart", "click"];
+const AUDIO_UNLOCK_EVENT_OPTIONS = {
+  pointerdown: { passive: true },
+  touchstart: { passive: true },
+  click: { passive: true }
+};
+let audioUnlockListenersAttached = false;
+
+function addAudioUnlockListeners() {
+  if (audioUnlockListenersAttached) return;
+  AUDIO_UNLOCK_EVENTS.forEach(evt => {
+    document.addEventListener(evt, handleAudioUnlockEvent, AUDIO_UNLOCK_EVENT_OPTIONS[evt]);
+  });
+  audioUnlockListenersAttached = true;
+}
+
+function removeAudioUnlockListeners() {
+  if (!audioUnlockListenersAttached) return;
+  AUDIO_UNLOCK_EVENTS.forEach(evt => {
+    document.removeEventListener(evt, handleAudioUnlockEvent, AUDIO_UNLOCK_EVENT_OPTIONS[evt]);
+  });
+  audioUnlockListenersAttached = false;
+}
+
+async function handleAudioUnlockEvent() {
+  try {
+    const success = await unlockAllAudio();
+    if (success) {
+      removeAudioUnlockListeners();
+    }
+  } catch (err) {
+    console.warn("Audio unlock handler error:", err);
+  }
+}
 
 async function unlockAllAudio(force = false) {
   if (window.__audioUnlocked && !force) return true;
@@ -63,9 +97,16 @@ async function unlockAllAudio(force = false) {
       tempApplied = true;
     }
 
-    el.muted = true;
+    let didAdjustVolume = false;
     if (typeof el.volume === "number") {
-      el.volume = tempApplied ? 0.01 : previousVolume;
+      const targetVolume = tempApplied ? 0.01 : previousVolume;
+      if (el.volume !== targetVolume) {
+        el.volume = targetVolume;
+        didAdjustVolume = true;
+      }
+    }
+    if (el.muted) {
+      el.muted = false;
     }
 
     try {
@@ -79,10 +120,10 @@ async function unlockAllAudio(force = false) {
     } catch (err) {
       return false;
     } finally {
-      el.muted = previousMuted;
-      if (typeof el.volume === "number") {
+      if (didAdjustVolume && typeof el.volume === "number") {
         el.volume = previousVolume;
       }
+      el.muted = previousMuted;
       if (tempApplied) {
         if (previousSrc) {
           el.src = previousSrc;
@@ -140,6 +181,11 @@ async function unlockAllAudio(force = false) {
       }
     }
 
+    if (unlocked) {
+      removeAudioUnlockListeners();
+    } else {
+      addAudioUnlockListeners();
+    }
     return unlocked;
   })();
 
@@ -147,9 +193,7 @@ async function unlockAllAudio(force = false) {
 }
 
 // Attach to first user interaction (single source of truth)
-document.addEventListener("pointerdown", () => { unlockAllAudio(); }, { once: true, passive: true });
-document.addEventListener("touchstart", () => { unlockAllAudio(); }, { once: true, passive: true });
-document.addEventListener("click", () => { unlockAllAudio(); }, { once: true });
+addAudioUnlockListeners();
 
 let beforeUnloadBound = false;
 function bindBeforeUnload() {
@@ -1368,7 +1412,13 @@ async function webSpeechSpeak(text, lang) {
   });
 }
 
-function playBeep() {
+async function playBeep() {
+  try {
+    await ensureAudioUnlocked();
+  } catch (err) {
+    console.debug("Audio unlock skipped for beep:", err?.message || err);
+  }
+
   try {
     const ctx = window.__audioCtx;
     if (ctx) {
@@ -1389,7 +1439,14 @@ function playBeep() {
     console.warn("WebAudio beep failed:", e);
   }
   const beep = document.getElementById("beep-sound");
-  if (beep) { try { beep.currentTime = 0; beep.play(); } catch {} }
+  if (beep) {
+    try {
+      beep.currentTime = 0;
+      await beep.play();
+    } catch (playErr) {
+      console.debug("Fallback beep audio failed:", playErr);
+    }
+  }
 }
 
 
@@ -1417,7 +1474,13 @@ function warmUpServer() {
     .catch(() => console.warn("⚠️ Server TTS non raggiungibile"));
 }
 
-function playTransition() {
+async function playTransition() {
+  try {
+    await ensureAudioUnlocked();
+  } catch (err) {
+    console.debug("Audio unlock skipped for transition:", err?.message || err);
+  }
+
   try {
     const ctx = window.__audioCtx;
     if (ctx) {
@@ -1437,7 +1500,14 @@ function playTransition() {
     console.warn("WebAudio transition failed:", e);
   }
   const transition = document.getElementById("transition-sound");
-  if (transition) { try { transition.currentTime = 0; transition.play(); } catch {} }
+  if (transition) {
+    try {
+      transition.currentTime = 0;
+      await transition.play();
+    } catch (playErr) {
+      console.debug("Fallback transition audio failed:", playErr);
+    }
+  }
 }
 
 async function playBeppeAudio(url) {
