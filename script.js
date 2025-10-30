@@ -1363,6 +1363,7 @@ async function playAudioUrl(url) {
 
   ttsAudio.pause();
   ttsAudio.src = src;
+  ttsAudio.load(); // Critical for iOS
   ttsAudio.currentTime = 0;
 
   await new Promise((resolve, reject) => {
@@ -1427,9 +1428,9 @@ async function playBeep() {
       osc.type = "sine";
       osc.frequency.setValueAtTime(880, ctx.currentTime);
       // attacco/decadimento un filo più lunghi per sicurezza su mobile
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
       osc.connect(gain).connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.27);
@@ -1488,9 +1489,9 @@ async function playTransition() {
       const gain = ctx.createGain();
       osc.type = "square";
       osc.frequency.setValueAtTime(440, ctx.currentTime);
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
       osc.connect(gain).connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.36);
@@ -1519,6 +1520,7 @@ async function playBeppeAudio(url) {
   }
 
   beppePlayer.src = convertGoogleDriveToDirect(url);
+  beppePlayer.load(); // Critical for iOS
   try {
     await beppePlayer.play();
   } catch (e) {
@@ -1542,6 +1544,7 @@ async function playBeppeAudioSequence(urls) {
   for (const url of urls) {
     if (!url) continue;
     beppePlayer.src = convertGoogleDriveToDirect(url);
+    beppePlayer.load(); // Critical for iOS
     await new Promise((resolve) => {
       const clear = () => {
         beppePlayer.onended = null;
@@ -1560,6 +1563,7 @@ function preloadAudio(urls) {
     const audio = new Audio();
     audio.src = convertGoogleDriveToDirect(url);
     audio.preload = "auto";
+    audio.load(); // Ensure preloading works on iOS
   });
 }
 
