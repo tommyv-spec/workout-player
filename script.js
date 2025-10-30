@@ -7,7 +7,6 @@ let savedTimeLeft = null;
 let lastSpeakTime = 0;
 let currentSpeakId = 0;
 
-
 function getSoundMode() {
   const v = (document.getElementById("soundMode")?.value || "").toLowerCase();
   // Accetta sia "beep" che "bip", internamente usiamo "bip"
@@ -15,201 +14,13 @@ function getSoundMode() {
   return v;
 }
 
-
-
 // ============================================================
-// 🔊 Persistent audio players (clean, iOS-safe)
+// 🔊 Audio initialization from script__5_.js
 // ============================================================
 const ttsAudio = new Audio();
-ttsAudio.preload = "auto";
-ttsAudio.playsInline = true;
-ttsAudio.setAttribute("playsinline", "");
-ttsAudio.setAttribute("webkit-playsinline", "");
-ttsAudio.crossOrigin = "anonymous";
 
 let beppePlayer = new Audio();
 beppePlayer.preload = "auto";
-beppePlayer.playsInline = true;
-beppePlayer.setAttribute("playsinline", "");
-beppePlayer.setAttribute("webkit-playsinline", "");
-beppePlayer.crossOrigin = "anonymous";
-
-// NEW: Full workout sequence (warm-up + main workout)
-let fullWorkoutSequence = [];
-
-// ============================================================
-// 🔊 SIMPLE iOS AUDIO UNLOCK - ONE UNIFIED FUNCTION
-// ============================================================
-let audioUnlockPromise = null;
-const AUDIO_UNLOCK_EVENTS = ["pointerdown", "touchstart", "click"];
-const AUDIO_UNLOCK_EVENT_OPTIONS = {
-  pointerdown: { passive: true },
-  touchstart: { passive: true },
-  click: { passive: true }
-};
-let audioUnlockListenersAttached = false;
-
-function addAudioUnlockListeners() {
-  if (audioUnlockListenersAttached) return;
-  AUDIO_UNLOCK_EVENTS.forEach(evt => {
-    document.addEventListener(evt, handleAudioUnlockEvent, AUDIO_UNLOCK_EVENT_OPTIONS[evt]);
-  });
-  audioUnlockListenersAttached = true;
-}
-
-function removeAudioUnlockListeners() {
-  if (!audioUnlockListenersAttached) return;
-  AUDIO_UNLOCK_EVENTS.forEach(evt => {
-    document.removeEventListener(evt, handleAudioUnlockEvent, AUDIO_UNLOCK_EVENT_OPTIONS[evt]);
-  });
-  audioUnlockListenersAttached = false;
-}
-
-async function handleAudioUnlockEvent() {
-  try {
-    const success = await unlockAllAudio();
-    if (success) {
-      removeAudioUnlockListeners();
-    }
-  } catch (err) {
-    console.warn("Audio unlock handler error:", err);
-  }
-}
-
-async function unlockAllAudio(force = false) {
-  if (window.__audioUnlocked && !force) return true;
-  if (audioUnlockPromise) return audioUnlockPromise;
-
-  console.log("🔊 Unlocking iOS audio...");
-
-  const blip = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
-
-  const primeElement = async (el, useTempSrc = false) => {
-    if (!el) return false;
-
-    const previousSrc = el.src;
-    const previousVolume = typeof el.volume === "number" ? el.volume : 1;
-    const previousMuted = el.muted;
-    let tempApplied = false;
-
-    if (useTempSrc || !el.src) {
-      el.src = blip;
-      tempApplied = true;
-    }
-
-    let didAdjustVolume = false;
-    if (typeof el.volume === "number") {
-      const targetVolume = tempApplied ? 0.01 : previousVolume;
-      if (el.volume !== targetVolume) {
-        el.volume = targetVolume;
-        didAdjustVolume = true;
-      }
-    }
-    if (el.muted) {
-      el.muted = false;
-    }
-
-    try {
-      const playPromise = el.play();
-      if (playPromise && typeof playPromise.then === "function") {
-        await playPromise;
-      }
-      el.pause();
-      el.currentTime = 0;
-      return true;
-    } catch (err) {
-      return false;
-    } finally {
-      if (didAdjustVolume && typeof el.volume === "number") {
-        el.volume = previousVolume;
-      }
-      el.muted = previousMuted;
-      if (tempApplied) {
-        if (previousSrc) {
-          el.src = previousSrc;
-        } else {
-          el.removeAttribute("src");
-        }
-        if (typeof el.load === "function") {
-          try { el.load(); } catch {}
-        }
-      }
-    }
-  };
-
-  audioUnlockPromise = (async () => {
-    let unlocked = false;
-
-    try {
-      // Prime shared context
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) {
-        window.__audioCtx = window.__audioCtx || new AC();
-        try {
-          if (window.__audioCtx.state === "suspended") {
-            await window.__audioCtx.resume();
-          }
-          const tick = window.__audioCtx.createBufferSource();
-          tick.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
-          tick.connect(window.__audioCtx.destination);
-          tick.start(0);
-          unlocked = true;
-        } catch (ctxErr) {
-          console.warn("AudioContext unlock failed:", ctxErr);
-        }
-      }
-
-      const elementUnlocks = [
-        await primeElement(ttsAudio, true),
-        await primeElement(beppePlayer, true),
-        await primeElement(document.getElementById("beep-sound"), true),
-        await primeElement(document.getElementById("transition-sound"), true)
-      ];
-
-      if (!unlocked && elementUnlocks.some(Boolean)) {
-        unlocked = true;
-      }
-    } catch (error) {
-      console.error("❌ Audio unlock error:", error);
-    } finally {
-      audioUnlockPromise = null;
-      window.__audioUnlocked = unlocked;
-      if (unlocked) {
-        console.log("✅ iOS audio unlock complete!");
-      } else {
-        console.warn("⚠️ Audio still locked, will retry on next interaction.");
-      }
-    }
-
-    if (unlocked) {
-      removeAudioUnlockListeners();
-    } else {
-      addAudioUnlockListeners();
-    }
-    return unlocked;
-  })();
-
-  return audioUnlockPromise;
-}
-
-// Attach to first user interaction (single source of truth)
-addAudioUnlockListeners();
-
-let beforeUnloadBound = false;
-function bindBeforeUnload() {
-  if (beforeUnloadBound) return;
-  window.addEventListener("beforeunload", onBeforeUnload);
-  beforeUnloadBound = true;
-}
-function unbindBeforeUnload() {
-  if (!beforeUnloadBound) return;
-  window.removeEventListener("beforeunload", onBeforeUnload);
-  beforeUnloadBound = false;
-}
-function onBeforeUnload(e) {
-  e.preventDefault();
-  e.returnValue = "";
-}
 
 const beppeSounds = {
   s60: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/mancano%2060%20secondi.mp3",
@@ -218,9 +29,9 @@ const beppeSounds = {
   prossimo: "https://github.com/tommyv-spec/workout-audio/raw/refs/heads/main/docs/Prossimo%20esercizio.MP3"
 };
 
-/**
- * Build complete workout sequence with optional warm-up
- */
+// NEW: Full workout sequence (warm-up + main workout)
+let fullWorkoutSequence = [];
+
 function buildFullWorkoutSequence(workout, includeWarmup = true) {
   const sequence = [];
   console.log("🔨 Building workout sequence...");
@@ -1271,190 +1082,74 @@ async function startExerciseTimer(timeLeft, exercise, nextExercise) {
   }, 1000);
 }
 
-// 🔊 Text-to-speech (Google + fallback)
+// ============================================================
+// 🔊 Text-to-speech and audio functions from script__5_.js
+// ============================================================
 let fallbackVoice = null;
 
 function getUnifiedVoice() {
   const voices = speechSynthesis.getVoices();
   if (fallbackVoice) return fallbackVoice;
 
+  // Prefer voices that support both it-IT and en-US
   const priorityNames = [
-    "Google italiano", "Google UK English", "Google US English",
-    "Microsoft Elsa", "Microsoft Aria", "Microsoft Francesco"
+    "Google italiano", "Google UK English", "Google US English", "Microsoft Elsa", "Microsoft Aria", "Microsoft Francesco"
   ];
 
   fallbackVoice = voices.find(v => priorityNames.includes(v.name))
-    || voices.find(v => v.lang?.startsWith("it") || v.lang?.startsWith("en"))
-    || voices[0];
+               || voices.find(v => v.lang.startsWith("en") || v.lang.startsWith("it"))
+               || voices[0];
 
   return fallbackVoice;
 }
 
+
 function detectLang(text) {
   const italianIndicators = /[àèéìòù]|mancano|secondi|esercizio|istruz|riposo|pausa/i;
   if (italianIndicators.test(text)) return "it-IT";
-  return "en-US";
+
+  return "en-US"; // default fallback
 }
 
-// ===== CONFIG =====
-const GOOGLE_TTS_URL = "https://google-tts-server.onrender.com/speak";
-const TTS_TIMEOUT_MS = 9000;
-const TTS_RETRIES = 2;
+
 
 async function speak(text, lang = "it-IT") {
   try {
-    await ensureAudioUnlocked();
-    await tryGoogleTTS(text, lang);
+    const voice = lang === "it-IT" ? "it-IT-Wavenet-C" : "en-US-Wavenet-D";
+
+    const response = await fetch("https://google-tts-server.onrender.com/speak", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, lang, voice }),
+    });
+
+    if (!response.ok) throw new Error("Errore TTS");
+
+    const blob = await response.blob();
+    if (blob.size === 0) throw new Error("Audio vuoto");
+
+    const audioUrl = URL.createObjectURL(blob);
+    ttsAudio.src = audioUrl;
+
+    await new Promise((resolve, reject) => {
+      ttsAudio.onended = resolve;
+      ttsAudio.onerror = reject;
+      ttsAudio.play();
+    });
   } catch (error) {
-    console.warn("❌ Google TTS failed, using Web Speech fallback:", error);
-    try {
-      await webSpeechSpeak(text, lang);
-    } catch (e2) {
-      console.warn("Web Speech fallback also failed:", e2);
-    }
-  }
-}
-
-async function tryGoogleTTS(text, lang) {
-  let lastErr;
-  for (let attempt = 0; attempt <= TTS_RETRIES; attempt++) {
-    try {
-      const audioUrl = await fetchTTS(text, lang);
-      await playAudioUrl(audioUrl); // now uses persistent ttsAudio
-      return;
-    } catch (e) {
-      lastErr = e;
-      await sleep(350 * (attempt + 1));
-    }
-  }
-  throw lastErr;
-}
-
-async function fetchTTS(text, lang) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TTS_TIMEOUT_MS);
-
-  const res = await fetch(GOOGLE_TTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, lang }),
-    signal: controller.signal,
-    cache: "no-store",
-    mode: "cors"
-  }).catch(e => { throw new Error("Failed to fetch TTS: " + e.message); });
-
-  clearTimeout(timeoutId);
-
-  if (!res.ok) {
-    throw new Error(`TTS ${res.status} ${res.statusText}`);
-  }
-
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
-}
-
-// ✅ Use the PERSISTENT ttsAudio (no temp element)
-async function playAudioUrl(url) {
-  // If it's a blob:, don't add cache-buster (iOS breaks)
-  const isBlob = typeof url === "string" && url.startsWith("blob:");
-  const src = isBlob ? url : url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
-
-  try { await (window.__audioCtx?.resume?.() || Promise.resolve()); } catch {}
-
-  ttsAudio.pause();
-  ttsAudio.src = src;
-  ttsAudio.load(); // Critical for iOS
-  ttsAudio.currentTime = 0;
-
-  await new Promise((resolve, reject) => {
-    const cleanup = () => {
-      ttsAudio.onended = null;
-      ttsAudio.onerror = null;
-      if (isBlob) { try { URL.revokeObjectURL(url); } catch {} }
-    };
-    ttsAudio.onended = () => { cleanup(); resolve(); };
-    ttsAudio.onerror = (e) => { cleanup(); reject(e); };
-    const p = ttsAudio.play();
-    if (p && typeof p.then === "function") p.catch(reject);
-  });
-}
-
-async function ensureAudioUnlocked() {
-  if (window.__audioUnlocked) return;
-  const unlocked = await unlockAllAudio(true);
-  if (!unlocked) {
-    throw new Error("Audio unlock attempt failed");
-  }
-}
-
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function webSpeechSpeak(text, lang) {
-  if (!("speechSynthesis" in window)) throw new Error("Web Speech not supported");
-
-  return new Promise((resolve, reject) => {
-    try {
+    console.warn("❌ Google TTS fallito, uso fallback:", error);
+    await new Promise(resolve => {
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = lang || "it-IT";
-      utter.rate = 1.0; utter.pitch = 1.0; utter.volume = 1.0;
-
-      const voice = getUnifiedVoice();
-      if (voice) utter.voice = voice;
-
+      utter.lang = lang;
+      utter.rate = 1.0;
       utter.onend = resolve;
-      utter.onerror = e => reject(new Error("WebSpeech error: " + (e?.error || "unknown")));
-
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
-    } catch (err) {
-      reject(err);
-    }
-  });
-}
-
-async function playBeep() {
-  try {
-    await ensureAudioUnlocked();
-  } catch (err) {
-    console.debug("Audio unlock skipped for beep:", err?.message || err);
-  }
-
-  try {
-    const ctx = window.__audioCtx;
-    if (ctx) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(880, ctx.currentTime);
-      // attacco/decadimento un filo più lunghi per sicurezza su mobile
-      gain.gain.setValueAtTime(0.001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.27);
-      return;
-    }
-  } catch (e) {
-    console.warn("WebAudio beep failed:", e);
-  }
-  const beep = document.getElementById("beep-sound");
-  if (beep) {
-    try {
-      beep.currentTime = 0;
-      await beep.play();
-    } catch (playErr) {
-      console.debug("Fallback beep audio failed:", playErr);
-    }
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    });
   }
 }
 
 
-// stub for your pre-recorded audio mode if you use it
-async function playPreRecorded(text, lang) {
-  console.log("Beppe mode (pre-recorded) not mapped for:", text);
-}
 
 async function speakSequence(segments) {
   for (const segment of segments) {
@@ -1475,105 +1170,78 @@ function warmUpServer() {
     .catch(() => console.warn("⚠️ Server TTS non raggiungibile"));
 }
 
-async function playTransition() {
-  try {
-    await ensureAudioUnlocked();
-  } catch (err) {
-    console.debug("Audio unlock skipped for transition:", err?.message || err);
-  }
+function playBeep() {
+  const beep = document.getElementById("beep-sound");
+  if (beep) beep.play();
+}
 
-  try {
-    const ctx = window.__audioCtx;
-    if (ctx) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "square";
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      gain.gain.setValueAtTime(0.001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.36);
-      return;
-    }
-  } catch (e) {
-    console.warn("WebAudio transition failed:", e);
-  }
+function playTransition() {
   const transition = document.getElementById("transition-sound");
-  if (transition) {
-    try {
-      transition.currentTime = 0;
-      await transition.play();
-    } catch (playErr) {
-      console.debug("Fallback transition audio failed:", playErr);
-    }
-  }
+  if (transition) transition.play();
 }
 
-async function playBeppeAudio(url) {
+function playBeppeAudio(url) {
   if (!url) return;
-  try {
-    await ensureAudioUnlocked();
-  } catch (err) {
-    console.warn("Audio unlock skipped for beppePlayer:", err?.message || err);
-  }
-
   beppePlayer.src = convertGoogleDriveToDirect(url);
-  beppePlayer.load(); // Critical for iOS
-  try {
-    await beppePlayer.play();
-  } catch (e) {
+  beppePlayer.play().catch((e) => {
     console.warn("❌ Errore audio:", e);
-  }
+  });
 }
+
 
 function convertGoogleDriveToDirect(link) {
   return link; // già diretto, non serve conversione
 }
 
+
 async function playBeppeAudioSequence(urls) {
-  if (!Array.isArray(urls) || urls.length === 0) return;
-
-  try {
-    await ensureAudioUnlocked();
-  } catch (err) {
-    console.warn("Audio unlock skipped for sequence:", err?.message || err);
-  }
-
   for (const url of urls) {
     if (!url) continue;
     beppePlayer.src = convertGoogleDriveToDirect(url);
-    beppePlayer.load(); // Critical for iOS
     await new Promise((resolve) => {
-      const clear = () => {
-        beppePlayer.onended = null;
-        beppePlayer.onerror = null;
-        resolve();
-      };
-      beppePlayer.onended = clear;
-      beppePlayer.onerror = clear;
-      beppePlayer.play().catch(clear);
+      beppePlayer.onended = resolve;
+      beppePlayer.onerror = resolve;
+      beppePlayer.play().catch(resolve);
     });
   }
 }
+
+
 
 function preloadAudio(urls) {
   urls.forEach(url => {
     const audio = new Audio();
     audio.src = convertGoogleDriveToDirect(url);
     audio.preload = "auto";
-    audio.load(); // Ensure preloading works on iOS
   });
 }
 
+
 function preloadWorkoutAudios() {
   const audioUrls = [];
+
   Object.values(workouts).forEach(workout => {
     workout.exercises.forEach(ex => {
       if (ex.audio) audioUrls.push(ex.audio);
       if (ex.audioCambio) audioUrls.push(ex.audioCambio);
     });
   });
+
   preloadAudio(audioUrls);
 }
+
+
+// ============================================================
+// 🔊 Audio unlock for iOS from script__5_.js
+// ============================================================
+document.addEventListener("click", () => {
+  if (!window.__audioUnlocked) {
+    beppePlayer.src = "data:audio/mp3;base64,//uQxAAAAAA=="; // 0.1s silenzioso
+    beppePlayer.play().then(() => {
+      window.__audioUnlocked = true;
+      console.log("🔓 Audio sbloccato su iOS");
+    }).catch(() => {
+      console.warn("⚠️ Impossibile sbloccare audio su iOS");
+    });
+  }
+}, { once: true });
