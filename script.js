@@ -8,10 +8,20 @@ let lastSpeakTime = 0;
 let currentSpeakId = 0;
 const ttsAudio = new Audio();
 
+
+ttsAudio.preload = "auto";
+ttsAudio.playsInline = true;
+ttsAudio.setAttribute("playsinline", "");
+ttsAudio.setAttribute("webkit-playsinline", "");
 // NEW: Full workout sequence (warm-up + main workout)
 let fullWorkoutSequence = [];
 
 let beppePlayer = new Audio();
+
+beppePlayer.preload = "auto";
+beppePlayer.playsInline = true;
+beppePlayer.setAttribute("playsinline", "");
+beppePlayer.setAttribute("webkit-playsinline", "");
 beppePlayer.preload = "auto";
 
 // ============================================================
@@ -1569,9 +1579,8 @@ async function webSpeechSpeak(text, lang) {
 }
 
 function playBeep() {
-  const el = document.getElementById("beep-sound");
-  if (!el) return;
-  try { el.currentTime = 0; el.play(); } catch (_) {}
+  const beep = document.getElementById("beep-sound");
+  if (beep) beep.play();
 }
 
 // stub for your pre-recorded audio mode if you use it
