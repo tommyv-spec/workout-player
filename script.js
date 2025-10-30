@@ -14,6 +14,66 @@ let fullWorkoutSequence = [];
 let beppePlayer = new Audio();
 beppePlayer.preload = "auto";
 
+// ============================================================
+// 🔊 SIMPLE iOS AUDIO UNLOCK - ONE UNIFIED FUNCTION
+// ============================================================
+function unlockAllAudio() {
+  if (window.__audioUnlocked) return;
+  console.log("🔊 Unlocking iOS audio...");
+
+  try {
+    // Unlock ttsAudio (voice mode)
+    ttsAudio.src = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
+    ttsAudio.volume = 0.01;
+    ttsAudio.play().then(() => {
+      ttsAudio.volume = 1.0;
+      console.log("  ✅ ttsAudio unlocked");
+    }).catch(() => {});
+
+    // Unlock beppePlayer (beppe mode)
+    beppePlayer.src = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
+    beppePlayer.volume = 0.01;
+    beppePlayer.play().then(() => {
+      beppePlayer.volume = 1.0;
+      console.log("  ✅ beppePlayer unlocked");
+    }).catch(() => {});
+
+    // Unlock beep-sound element (beep mode)
+    const beepEl = document.getElementById("beep-sound");
+    if (beepEl) {
+      beepEl.volume = 0.01;
+      beepEl.play().then(() => {
+        beepEl.pause();
+        beepEl.currentTime = 0;
+        beepEl.volume = 1.0;
+        console.log("  ✅ beep-sound unlocked");
+      }).catch(() => {});
+    }
+
+    // Unlock transition-sound
+    const transitionEl = document.getElementById("transition-sound");
+    if (transitionEl) {
+      transitionEl.volume = 0.01;
+      transitionEl.play().then(() => {
+        transitionEl.pause();
+        transitionEl.currentTime = 0;
+        transitionEl.volume = 1.0;
+        console.log("  ✅ transition-sound unlocked");
+      }).catch(() => {});
+    }
+
+    window.__audioUnlocked = true;
+    console.log("✅ iOS audio unlock complete!");
+  } catch (error) {
+    console.error("❌ Audio unlock error:", error);
+  }
+}
+
+// Attach to first user interaction
+document.addEventListener("touchstart", unlockAllAudio, { once: true, passive: true });
+document.addEventListener("click", unlockAllAudio, { once: true });
+
+
 let beforeUnloadBound = false;
 function bindBeforeUnload() {
   if (beforeUnloadBound) return;
@@ -40,29 +100,7 @@ const beppeSounds = {
 
 
 
-// === iOS audio unlock (run once after first tap) ===
-function __unlockAudioOnce() {
-  if (window.__audioUnlocked) return;
 
-  const AC = window.AudioContext || window.webkitAudioContext;
-  try {
-    if (AC) {
-      const ctx = new AC();
-      if (ctx.state === "suspended") { ctx.resume(); }
-      const src = ctx.createBufferSource();
-      src.buffer = ctx.createBuffer(1, 1, 22050);
-      src.connect(ctx.destination);
-      src.start(0);
-    }
-  } catch (_) { /* ignore */ }
-
-  window.__audioUnlocked = true;
-  window.removeEventListener("touchstart", __unlockAudioOnce, { capture: true });
-  window.removeEventListener("click", __unlockAudioOnce, { capture: true });
-}
-// unlock on the first real user gesture
-window.addEventListener("touchstart", __unlockAudioOnce, { once: true, passive: true, capture: true });
-window.addEventListener("click", __unlockAudioOnce, { once: true, capture: true });
 
 
 
@@ -1564,10 +1602,7 @@ function warmUpServer() {
     .catch(() => console.warn("⚠️ Server TTS non raggiungibile"));
 }
 
-function playBeep() {
-  const beep = document.getElementById("beep-sound");
-  if (beep) beep.play();
-}
+
 
 function playTransition() {
   const transition = document.getElementById("transition-sound");
