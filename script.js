@@ -40,78 +40,116 @@ let fullWorkoutSequence = [];
 // ============================================================
 // 🔊 SIMPLE iOS AUDIO UNLOCK - ONE UNIFIED FUNCTION
 // ============================================================
-function unlockAllAudio() {
-  if (window.__audioUnlocked) return;
+let audioUnlockPromise = null;
+
+async function unlockAllAudio(force = false) {
+  if (window.__audioUnlocked && !force) return true;
+  if (audioUnlockPromise) return audioUnlockPromise;
+
   console.log("🔊 Unlocking iOS audio...");
 
-  try {
-    // Prime shared context
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) {
-      window.__audioCtx = window.__audioCtx || new AC();
-      if (window.__audioCtx.state === "suspended") {
-        window.__audioCtx.resume().catch(() => {});
+  const blip = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
+
+  const primeElement = async (el, useTempSrc = false) => {
+    if (!el) return false;
+
+    const previousSrc = el.src;
+    const previousVolume = typeof el.volume === "number" ? el.volume : 1;
+    const previousMuted = el.muted;
+    let tempApplied = false;
+
+    if (useTempSrc || !el.src) {
+      el.src = blip;
+      tempApplied = true;
+    }
+
+    el.muted = true;
+    if (typeof el.volume === "number") {
+      el.volume = tempApplied ? 0.01 : previousVolume;
+    }
+
+    try {
+      const playPromise = el.play();
+      if (playPromise && typeof playPromise.then === "function") {
+        await playPromise;
       }
-      const tick = window.__audioCtx.createBufferSource();
-      tick.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
-      tick.connect(window.__audioCtx.destination);
-      tick.start(0);
+      el.pause();
+      el.currentTime = 0;
+      return true;
+    } catch (err) {
+      return false;
+    } finally {
+      el.muted = previousMuted;
+      if (typeof el.volume === "number") {
+        el.volume = previousVolume;
+      }
+      if (tempApplied) {
+        if (previousSrc) {
+          el.src = previousSrc;
+        } else {
+          el.removeAttribute("src");
+        }
+        if (typeof el.load === "function") {
+          try { el.load(); } catch {}
+        }
+      }
     }
+  };
 
-    // Prime HTMLAudio elements with a tiny inline MP3
-    const blip = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
+  audioUnlockPromise = (async () => {
+    let unlocked = false;
 
-    // Unlock ttsAudio
     try {
-      ttsAudio.src = blip;
-      ttsAudio.volume = 0.01;
-      ttsAudio.play().then(() => {
-        ttsAudio.pause(); ttsAudio.currentTime = 0; ttsAudio.volume = 1.0;
-        console.log("  ✅ ttsAudio unlocked");
-      }).catch(() => {});
-    } catch {}
+      // Prime shared context
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) {
+        window.__audioCtx = window.__audioCtx || new AC();
+        try {
+          if (window.__audioCtx.state === "suspended") {
+            await window.__audioCtx.resume();
+          }
+          const tick = window.__audioCtx.createBufferSource();
+          tick.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
+          tick.connect(window.__audioCtx.destination);
+          tick.start(0);
+          unlocked = true;
+        } catch (ctxErr) {
+          console.warn("AudioContext unlock failed:", ctxErr);
+        }
+      }
 
-    // Unlock beppePlayer
-    try {
-      beppePlayer.src = blip;
-      beppePlayer.volume = 0.01;
-      beppePlayer.play().then(() => {
-        beppePlayer.pause(); beppePlayer.currentTime = 0; beppePlayer.volume = 1.0;
-        console.log("  ✅ beppePlayer unlocked");
-      }).catch(() => {});
-    } catch {}
+      const elementUnlocks = [
+        await primeElement(ttsAudio, true),
+        await primeElement(beppePlayer, true),
+        await primeElement(document.getElementById("beep-sound"), true),
+        await primeElement(document.getElementById("transition-sound"), true)
+      ];
 
-    // Unlock optional elements if present
-    const beepEl = document.getElementById("beep-sound");
-    if (beepEl) {
-      beepEl.src = beepEl.src || blip;
-      beepEl.volume = 0.01;
-      beepEl.play().then(() => {
-        beepEl.pause(); beepEl.currentTime = 0; beepEl.volume = 1.0;
-        console.log("  ✅ beep-sound unlocked");
-      }).catch(() => {});
+      if (!unlocked && elementUnlocks.some(Boolean)) {
+        unlocked = true;
+      }
+    } catch (error) {
+      console.error("❌ Audio unlock error:", error);
+    } finally {
+      audioUnlockPromise = null;
+      window.__audioUnlocked = unlocked;
+      if (unlocked) {
+        console.log("✅ iOS audio unlock complete!");
+      } else {
+        console.warn("⚠️ Audio still locked, will retry on next interaction.");
+      }
     }
 
-    const transitionEl = document.getElementById("transition-sound");
-    if (transitionEl) {
-      transitionEl.src = transitionEl.src || blip;
-      transitionEl.volume = 0.01;
-      transitionEl.play().then(() => {
-        transitionEl.pause(); transitionEl.currentTime = 0; transitionEl.volume = 1.0;
-        console.log("  ✅ transition-sound unlocked");
-      }).catch(() => {});
-    }
+    return unlocked;
+  })();
 
-    window.__audioUnlocked = true;
-    console.log("✅ iOS audio unlock complete!");
-  } catch (error) {
-    console.error("❌ Audio unlock error:", error);
-  }
+  return audioUnlockPromise;
 }
 
 // Attach to first user interaction (single source of truth)
-document.addEventListener("touchstart", unlockAllAudio, { once: true, passive: true });
-document.addEventListener("click", unlockAllAudio, { once: true });
+document.addEventListener("pointerdown", () => { unlockAllAudio(); }, { once: true, passive: true });
+document.addEventListener("touchstart", () => { unlockAllAudio(); }, { once: true, passive: true });
+document.addEventListener("click", () => { unlockAllAudio(); }, { once: true });
 
 let beforeUnloadBound = false;
 function bindBeforeUnload() {
@@ -1298,37 +1336,9 @@ async function playAudioUrl(url) {
 
 async function ensureAudioUnlocked() {
   if (window.__audioUnlocked) return;
-
-  try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) {
-      window.__audioCtx = window.__audioCtx || new AC();
-      if (window.__audioCtx.state === "suspended") {
-        await window.__audioCtx.resume();
-      }
-      const src = window.__audioCtx.createBufferSource();
-      src.buffer = window.__audioCtx.createBuffer(1, 1, 22050);
-      src.connect(window.__audioCtx.destination);
-      src.start(0);
-    }
-
-    // Primer extra sugli <audio> nel caso il primo click non sia ancora avvenuto
-    const blip = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhACA";
-    try {
-      ttsAudio.src = blip;
-      await ttsAudio.play().catch(()=>{});
-      ttsAudio.pause(); ttsAudio.currentTime = 0;
-    } catch {}
-    try {
-      beppePlayer.src = blip;
-      await beppePlayer.play().catch(()=>{});
-      beppePlayer.pause(); beppePlayer.currentTime = 0;
-    } catch {}
-
-    window.__audioUnlocked = true;
-    console.log("✅ Audio unlocked (context + players)");
-  } catch (e) {
-    console.warn("Unable to fully unlock audio:", e);
+  const unlocked = await unlockAllAudio(true);
+  if (!unlocked) {
+    throw new Error("Audio unlock attempt failed");
   }
 }
 
@@ -1430,12 +1440,20 @@ function playTransition() {
   if (transition) { try { transition.currentTime = 0; transition.play(); } catch {} }
 }
 
-function playBeppeAudio(url) {
+async function playBeppeAudio(url) {
   if (!url) return;
+  try {
+    await ensureAudioUnlocked();
+  } catch (err) {
+    console.warn("Audio unlock skipped for beppePlayer:", err?.message || err);
+  }
+
   beppePlayer.src = convertGoogleDriveToDirect(url);
-  beppePlayer.play().catch((e) => {
+  try {
+    await beppePlayer.play();
+  } catch (e) {
     console.warn("❌ Errore audio:", e);
-  });
+  }
 }
 
 function convertGoogleDriveToDirect(link) {
@@ -1443,13 +1461,26 @@ function convertGoogleDriveToDirect(link) {
 }
 
 async function playBeppeAudioSequence(urls) {
+  if (!Array.isArray(urls) || urls.length === 0) return;
+
+  try {
+    await ensureAudioUnlocked();
+  } catch (err) {
+    console.warn("Audio unlock skipped for sequence:", err?.message || err);
+  }
+
   for (const url of urls) {
     if (!url) continue;
     beppePlayer.src = convertGoogleDriveToDirect(url);
     await new Promise((resolve) => {
-      beppePlayer.onended = resolve;
-      beppePlayer.onerror = resolve;
-      beppePlayer.play().catch(resolve);
+      const clear = () => {
+        beppePlayer.onended = null;
+        beppePlayer.onerror = null;
+        resolve();
+      };
+      beppePlayer.onended = clear;
+      beppePlayer.onerror = clear;
+      beppePlayer.play().catch(clear);
     });
   }
 }
