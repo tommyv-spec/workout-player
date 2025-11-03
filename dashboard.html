@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Dashboard - Fitness App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      font-family: 'Staatliches', sans-serif;
+      background: #000000;
+      color: #FFFFFF;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 80px;
+    }
+
+    header img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    main {
+      min-height: calc(100vh - 80px);
+      padding: 50px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .welcome-section h1 {
+      color: #FFFFFF;
+      font-size: clamp(36px, 6vw, 54px);
+      margin-bottom: 15px;
+      letter-spacing: 2px;
+    }
+
+    .welcome-section .subtitle {
+      color: #B0B0B0;
+      font-size: clamp(18px, 3vw, 24px);
+    }
+
+    .app-sections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .section-card {
+      background: linear-gradient(135deg, rgba(77, 77, 77, 0.8), rgba(77, 77, 77, 0.4));
+      border: 2px solid #7D7D7D;
+      border-radius: 25px;
+      padding: 40px 35px;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      transition: all 0.4s ease;
+      min-height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      transform: scale(0);
+      transition: transform 0.6s ease;
+    }
+
+    .section-card:hover::before {
+      transform: scale(1);
+    }
+
+    .section-card:hover {
+      transform: translateY(-10px);
+      border-color: #FFFFFF;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.4s ease;
+    }
+
+    .section-card:hover .card-icon {
+      background: rgba(255, 255, 255, 0.25);
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    .card-icon svg {
+      width: 42px;
+      height: 42px;
+      color: #FFFFFF;
+    }
+
+    .card-content h2 {
+      color: #FFFFFF;
+      font-size: 32px;
+      margin-bottom: 12px;
+      letter-spacing: 1.5px;
+    }
+
+    .card-content p {
+      color: #B0B0B0;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      letter-spacing: 0.8px;
+    }
+
+    .card-badge.dev {
+      background: rgba(255, 200, 0, 0.35);
+      color: #FFD700;
+      border: 1px solid rgba(255, 200, 0, 0.5);
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 15px 35px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid #7D7D7D;
+      border-radius: 15px;
+      color: #B0B0B0;
+      font-size: 18px;
+      font-family: 'Staatliches', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0 auto;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      border-color: #B0B0B0;
+    }
+
+    .logout-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    @media (max-width: 768px) {
+      .app-sections-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+      
+      .section-card {
+        min-height: 240px;
+        padding: 30px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://drive.google.com/thumbnail?id=1va6OkGp9yAHDJBfeDM3npwqlJJoLUh5C" alt="Logo" />
+  </header>
+
+  <main>
+    <div class="welcome-section">
+      <h1>Benvenuto, <span id="user-name">Utente</span>!</h1>
+      <p class="subtitle">Seleziona la tua area</p>
+    </div>
+
+    <div class="app-sections-grid">
+      <!-- WORKOUT CARD -->
+      <a href="workout.html" class="section-card">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <h2>WORKOUT</h2>
+          <p>Allenamento personalizzato con timer e progressi in tempo reale</p>
+        </div>
+        <div class="card-badge">ATTIVO</div>
+      </a>
+
+      <!-- NUTRITION CARD -->
+      <a href="nutrition.html" class="section-card">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 2v7c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V2l-9 2-9-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <h2>NUTRITION</h2>
+          <p>Traccia i tuoi pasti, monitora calorie e macronutrienti</p>
+        </div>
+        <div class="card-badge dev">IN SVILUPPO</div>
+      </a>
+    </div>
+
+    <button id="logout-button" class="logout-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </button>
+  </main>
+
+  <script>
+    // AUTH CHECK
+    if (sessionStorage.getItem('auth') !== 'true') {
+      window.location.href = 'index.html';
+    }
+
+    // Display username
+    const username = sessionStorage.getItem('user') || localStorage.getItem('loggedUser') || 'Utente';
+    document.getElementById('user-name').textContent = username;
+
+    // Logout
+    document.getElementById('logout-button').addEventListener('click', () => {
+      sessionStorage.clear();
+      localStorage.removeItem('loggedUser');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

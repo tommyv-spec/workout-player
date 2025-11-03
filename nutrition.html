@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Nutrition App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet" />
+  <style>
+    /* RESET */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      font-family: 'Staatliches', sans-serif;
+      background: #000000;
+      color: #FFFFFF;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 80px;
+    }
+
+    header img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #B0B0B0;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .back-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* MAIN CONTAINER */
+    main {
+      min-height: calc(100vh - 80px);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* PAGE TITLE */
+    .page-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .page-header h1 {
+      font-size: clamp(36px, 5vw, 54px);
+      color: #FFFFFF;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .page-header p {
+      color: #B0B0B0;
+      font-size: clamp(16px, 2.5vw, 20px);
+    }
+
+    /* CONTENT SECTIONS */
+    .content-section {
+      background: rgba(77, 77, 77, 0.4);
+      border: 1px solid #7D7D7D;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .content-section h2 {
+      color: #FFFFFF;
+      font-size: 28px;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .content-section p {
+      color: #B0B0B0;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 12px 24px;
+      background: #FFFFFF;
+      color: #000000;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      font-family: 'Staatliches', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: #B0B0B0;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      border: 1px solid #7D7D7D;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .grid-item {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #4D4D4D;
+      border-radius: 15px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+
+    .grid-item:hover {
+      border-color: #7D7D7D;
+      transform: translateY(-3px);
+    }
+
+    .grid-item h3 {
+      color: #FFFFFF;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .grid-item p {
+      color: #B0B0B0;
+      font-size: 14px;
+    }
+
+    /* FORM ELEMENTS */
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #7D7D7D;
+      border-radius: 10px;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-family: 'Staatliches', sans-serif;
+      margin-bottom: 15px;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #B0B0B0;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #FFFFFF;
+    }
+
+    label {
+      display: block;
+      color: #B0B0B0;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    /* STARTER TEMPLATE NOTICE */
+    .starter-notice {
+      background: linear-gradient(135deg, rgba(255, 200, 0, 0.2), rgba(255, 150, 0, 0.1));
+      border: 2px solid rgba(255, 200, 0, 0.5);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .starter-notice h2 {
+      color: #FFD700;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .starter-notice p {
+      color: #FFFFFF;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .starter-notice code {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-family: monospace;
+      color: #FFD700;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Dashboard
+    </a>
+    <img src="https://drive.google.com/thumbnail?id=1va6OkGp9yAHDJBfeDM3npwqlJJoLUh5C" alt="Logo" />
+  </header>
+
+  <main>
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <h1>NUTRITION</h1>
+      <p>Traccia i tuoi pasti e monitora la tua dieta</p>
+    </div>
+
+    <!-- STARTER TEMPLATE NOTICE -->
+    <div class="starter-notice">
+      <h2>🚀 Template Starter</h2>
+      <p>
+        Questo è il tuo template per iniziare a costruire la sezione Nutrition.<br>
+        Modifica questo file (<code>nutrition.html</code>) per aggiungere le tue funzionalità!
+      </p>
+    </div>
+
+    <!-- EXAMPLE SECTION 1: MEAL TRACKER -->
+    <div class="content-section">
+      <h2>📝 Registra Pasto</h2>
+      <p>Esempio di form per tracciare i pasti</p>
+      
+      <label for="meal-name">Nome Pasto</label>
+      <input type="text" id="meal-name" placeholder="es. Colazione, Pranzo, Cena">
+      
+      <label for="meal-calories">Calorie</label>
+      <input type="number" id="meal-calories" placeholder="es. 450">
+      
+      <label for="meal-time">Orario</label>
+      <input type="time" id="meal-time">
+      
+      <label for="meal-notes">Note</label>
+      <textarea id="meal-notes" rows="3" placeholder="Descrivi il pasto..."></textarea>
+      
+      <button class="btn" onclick="addMeal()">Aggiungi Pasto</button>
+    </div>
+
+    <!-- EXAMPLE SECTION 2: TODAY'S MEALS -->
+    <div class="content-section">
+      <h2>🍽️ Pasti di Oggi</h2>
+      <p>I tuoi pasti verranno visualizzati qui</p>
+      <div id="meals-list" style="margin-top: 20px;">
+        <p style="color: #7D7D7D; text-align: center; padding: 30px;">Nessun pasto registrato oggi</p>
+      </div>
+    </div>
+
+    <!-- EXAMPLE SECTION 3: STATS GRID -->
+    <div class="content-section">
+      <h2>📊 Statistiche Giornaliere</h2>
+      <div class="grid">
+        <div class="grid-item">
+          <h3 id="total-calories">0</h3>
+          <p>Calorie Totali</p>
+        </div>
+        <div class="grid-item">
+          <h3 id="meals-count">0</h3>
+          <p>Pasti Registrati</p>
+        </div>
+        <div class="grid-item">
+          <h3 id="calories-goal">2000</h3>
+          <p>Obiettivo Calorie</p>
+        </div>
+        <div class="grid-item">
+          <h3 id="calories-remaining">2000</h3>
+          <p>Calorie Rimaste</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div style="text-align: center; margin-top: 50px;">
+      <button class="btn" onclick="clearMeals()">Cancella Pasti</button>
+      <button class="btn btn-secondary" style="margin-left: 15px;" onclick="exportData()">Esporta Dati</button>
+    </div>
+  </main>
+
+  <script>
+    // AUTH CHECK
+    if (sessionStorage.getItem('auth') !== 'true') {
+      window.location.href = 'index.html';
+    }
+
+    // SAMPLE DATA STRUCTURE
+    let meals = [];
+    let caloriesGoal = 2000;
+
+    // LOAD DATA FROM LOCALSTORAGE
+    function loadData() {
+      const saved = localStorage.getItem('nutrition-meals');
+      if (saved) {
+        meals = JSON.parse(saved);
+        renderMeals();
+        updateStats();
+      }
+    }
+
+    // SAVE DATA TO LOCALSTORAGE
+    function saveData() {
+      localStorage.setItem('nutrition-meals', JSON.stringify(meals));
+    }
+
+    // ADD MEAL
+    function addMeal() {
+      const name = document.getElementById('meal-name').value;
+      const calories = parseInt(document.getElementById('meal-calories').value) || 0;
+      const time = document.getElementById('meal-time').value;
+      const notes = document.getElementById('meal-notes').value;
+
+      if (!name) {
+        alert('Inserisci il nome del pasto');
+        return;
+      }
+
+      const meal = {
+        id: Date.now(),
+        name,
+        calories,
+        time,
+        notes,
+        date: new Date().toISOString()
+      };
+
+      meals.push(meal);
+      saveData();
+      renderMeals();
+      updateStats();
+
+      // Clear form
+      document.getElementById('meal-name').value = '';
+      document.getElementById('meal-calories').value = '';
+      document.getElementById('meal-time').value = '';
+      document.getElementById('meal-notes').value = '';
+    }
+
+    // RENDER MEALS LIST
+    function renderMeals() {
+      const today = new Date().toDateString();
+      const todayMeals = meals.filter(m => new Date(m.date).toDateString() === today);
+
+      const container = document.getElementById('meals-list');
+
+      if (todayMeals.length === 0) {
+        container.innerHTML = '<p style="color: #7D7D7D; text-align: center; padding: 30px;">Nessun pasto registrato oggi</p>';
+        return;
+      }
+
+      container.innerHTML = todayMeals.map(meal => `
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid #4D4D4D; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="color: #FFFFFF; font-size: 20px;">${meal.name}</h3>
+            <span style="color: #FFD700; font-size: 18px; font-weight: bold;">${meal.calories} cal</span>
+          </div>
+          ${meal.time ? `<p style="color: #B0B0B0; font-size: 14px; margin-bottom: 5px;">🕐 ${meal.time}</p>` : ''}
+          ${meal.notes ? `<p style="color: #B0B0B0; font-size: 14px;">${meal.notes}</p>` : ''}
+          <button onclick="deleteMeal(${meal.id})" style="margin-top: 10px; padding: 6px 12px; background: rgba(255,0,0,0.2); border: 1px solid rgba(255,0,0,0.5); color: #ff6b6b; border-radius: 5px; cursor: pointer; font-family: 'Staatliches', sans-serif;">Elimina</button>
+        </div>
+      `).join('');
+    }
+
+    // DELETE MEAL
+    function deleteMeal(id) {
+      if (confirm('Eliminare questo pasto?')) {
+        meals = meals.filter(m => m.id !== id);
+        saveData();
+        renderMeals();
+        updateStats();
+      }
+    }
+
+    // UPDATE STATS
+    function updateStats() {
+      const today = new Date().toDateString();
+      const todayMeals = meals.filter(m => new Date(m.date).toDateString() === today);
+      
+      const totalCals = todayMeals.reduce((sum, m) => sum + m.calories, 0);
+      const remaining = caloriesGoal - totalCals;
+
+      document.getElementById('total-calories').textContent = totalCals;
+      document.getElementById('meals-count').textContent = todayMeals.length;
+      document.getElementById('calories-remaining').textContent = Math.max(0, remaining);
+    }
+
+    // CLEAR ALL MEALS
+    function clearMeals() {
+      if (confirm('Cancellare tutti i pasti? Questa azione non può essere annullata.')) {
+        meals = [];
+        saveData();
+        renderMeals();
+        updateStats();
+      }
+    }
+
+    // EXPORT DATA
+    function exportData() {
+      const data = JSON.stringify(meals, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'nutrition-data.json';
+      a.click();
+    }
+
+    // INIT
+    loadData();
+  </script>
+</body>
+</html>
